@@ -11,7 +11,7 @@ import java.util.List;
 @Service
 public class ReportService {
 
-    SimpleRepository simpleRepository;
+    private final SimpleRepository simpleRepository;
 
 
     public ReportService(SimpleRepository simpleRepository) {
