@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<form th:action="@{/reports/add}" th:object="${newReport}" method="post">
+    <label for="reason">Brottstyp</label>
+    <input id="reason" th:field="*{event}"><br/>
+    <label for="name">Namn</label>
+    <input id="name" th:field="*{name}">
+    <button type="submit">Spara</button>
+    <button type="reset">Avbryt</button>
+</form>
+</body>
+</html>
