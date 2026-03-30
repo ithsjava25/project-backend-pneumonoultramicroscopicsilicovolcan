@@ -23,6 +23,4 @@ public class Advocat {
 
     @Column(nullable = false, name = "Company")
     public String Company;
-
-
 }
