@@ -13,17 +13,19 @@ public class Report {
     private UUID uuid;
     private String name;
     private String event;
-    private String s3Key;
+    private String s3KeyPdf;
+    private String s3KeyFile;
 
 
     public Report() {
     }
 
-    public Report(UUID id, String name, String event, String s3Key) {
+    public Report(UUID id, String name, String event, String s3KeyPdf, String s3KeyFile) {
         this.uuid = id;
         this.name = name;
         this.event = event;
-        this.s3Key = s3Key;
+        this.s3KeyPdf = s3KeyPdf;
+        this.s3KeyFile = s3KeyFile;
     }
 
     public UUID getUuid() {
@@ -50,12 +52,19 @@ public class Report {
         this.event = event;
     }
 
-    public String getS3Key() {
-        return s3Key;
+    public String getS3KeyPdf() {
+        return s3KeyPdf;
     }
 
-    public void setS3Key(String s3Key) {
-        this.s3Key = s3Key;
+    public void setS3KeyPdf(String s3KeyPdf) {
+        this.s3KeyPdf = s3KeyPdf;
+    }
+    public String getS3KeyFile() {
+        return s3KeyFile;
+    }
+
+    public void setS3KeyFile(String s3KeyFile) {
+        this.s3KeyFile = s3KeyFile;
     }
 
     @Override

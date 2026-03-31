@@ -7,12 +7,13 @@ import java.util.UUID;
 
 public class ReportMapper {
 
-    public static Report toEntity(CreateReport report, String s3Key) {
+    public static Report toEntity(CreateReport report, String s3KeyPdf, String s3KeyFile) {
         return new Report(
                 UUID.randomUUID(),
                 report.name(),
                 report.event(),
-                s3Key
+                s3KeyPdf,
+                s3KeyFile
 
         );
     }

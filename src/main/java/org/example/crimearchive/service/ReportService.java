@@ -2,6 +2,9 @@ package org.example.crimearchive.service;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.pdf.PdfWriter;
 import org.example.crimearchive.DTO.CreateReport;
 import org.example.crimearchive.bevis.Report;
 import org.example.crimearchive.mapper.ReportMapper;
@@ -10,7 +13,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -29,20 +35,44 @@ public class ReportService {
     }
 
     public void saveReport(CreateReport report, MultipartFile file) throws IOException {
-        String s3Key = null;
+        
+        String s3KeyPdf = null;
+        try {
+            ByteArrayOutputStream pdfStream = new ByteArrayOutputStream();
+            Document document = new Document();
+            PdfWriter.getInstance(document, pdfStream);
+            document.open();
+            document.add(new Paragraph("Brottsanmälan"));
+            document.add(new Paragraph("Namn: " + report.name()));
+            document.add(new Paragraph("Brottstyp: " + report.event()));
+            document.add(new Paragraph("Datum: " + LocalDateTime.now()));
+            document.close();
 
-        // Ladda upp till MinIO om en fil bifogades
-        if (file != null && !file.isEmpty()) {
-            s3Key = "reports/" + UUID.randomUUID() + "_" + file.getOriginalFilename();
+            byte[] pdfBytes = pdfStream.toByteArray();
+            s3KeyPdf = "reports/pdf/" + UUID.randomUUID() + "_" + report.name() + ".pdf";
 
-            ObjectMetadata metadata = new ObjectMetadata();
-            metadata.setContentType(file.getContentType());
-            metadata.setContentLength(file.getSize());
+            ObjectMetadata pdfMetadata = new ObjectMetadata();
+            pdfMetadata.setContentType("application/pdf");
+            pdfMetadata.setContentLength(pdfBytes.length);
 
-            s3Client.putObject(bucket, s3Key, file.getInputStream(), metadata);
+            s3Client.putObject(bucket, s3KeyPdf, new ByteArrayInputStream(pdfBytes), pdfMetadata);
+
+        } catch (Exception e) {
+            throw new IOException("Kunde inte generera PDF: " + e.getMessage());
         }
 
-        simpleRepository.save(ReportMapper.toEntity(report, s3Key));
+        String s3KeyFile = null;
+        if (file != null && !file.isEmpty()) {
+            s3KeyFile = "reports/files/" + UUID.randomUUID() + "_" + file.getOriginalFilename();
+
+            ObjectMetadata fileMetadata = new ObjectMetadata();
+            fileMetadata.setContentType(file.getContentType());
+            fileMetadata.setContentLength(file.getSize());
+
+            s3Client.putObject(bucket, s3KeyFile, file.getInputStream(), fileMetadata);
+        }
+
+        simpleRepository.save(ReportMapper.toEntity(report, s3KeyPdf, s3KeyFile));
     }
 
     public List<Report> getAllReports() {
