@@ -2,6 +2,7 @@ package org.example.crimearchive.service;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.amazonaws.services.s3.model.S3Object;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.pdf.PdfWriter;
@@ -10,6 +11,8 @@ import org.example.crimearchive.bevis.Report;
 import org.example.crimearchive.mapper.ReportMapper;
 import org.example.crimearchive.repository.SimpleRepository;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -35,7 +38,7 @@ public class ReportService {
     }
 
     public void saveReport(CreateReport report, MultipartFile file) throws IOException {
-        
+
         String s3KeyPdf = null;
         try {
             ByteArrayOutputStream pdfStream = new ByteArrayOutputStream();
@@ -73,6 +76,41 @@ public class ReportService {
         }
 
         simpleRepository.save(ReportMapper.toEntity(report, s3KeyPdf, s3KeyFile));
+    }
+
+    public ResponseEntity<byte[]> downloadPdf(UUID uuid) throws IOException {
+        Report report = simpleRepository.findById(uuid)
+                .orElseThrow(() -> new RuntimeException("Rapporten hittades inte: " + uuid));
+
+        if (report.getS3KeyPdf() == null) {
+            throw new RuntimeException("Ingen PDF finns för denna rapport");
+        }
+
+        S3Object s3Object = s3Client.getObject(bucket, report.getS3KeyPdf());
+        byte[] data = s3Object.getObjectContent().readAllBytes();
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_PDF)
+                .header("Content-Disposition", "attachment; filename=rapport.pdf")
+                .body(data);
+    }
+
+    public ResponseEntity<byte[]> downloadFile(UUID uuid) throws IOException {
+        Report report = simpleRepository.findById(uuid)
+                .orElseThrow(() -> new RuntimeException("Rapporten hittades inte: " + uuid));
+
+        if (report.getS3KeyFile() == null) {
+            throw new RuntimeException("Ingen bifogad fil finns för denna rapport");
+        }
+
+        S3Object s3Object = s3Client.getObject(bucket, report.getS3KeyFile());
+        byte[] data = s3Object.getObjectContent().readAllBytes();
+
+        String filename = report.getS3KeyFile().substring(report.getS3KeyFile().lastIndexOf("/") + 1);
+
+        return ResponseEntity.ok()
+                .header("Content-Disposition", "attachment; filename=" + filename)
+                .body(data);
     }
 
     public List<Report> getAllReports() {
