@@ -1,8 +1,11 @@
 package org.example.crimearchive.service;
 
-import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.amazonaws.services.s3.model.S3Object;
+import software.amazon.awssdk.core.ResponseBytes;
+import software.amazon.awssdk.core.sync.RequestBody;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.GetObjectRequest;
+import software.amazon.awssdk.services.s3.model.GetObjectResponse;
+import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.pdf.PdfWriter;
@@ -16,7 +19,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -27,12 +29,12 @@ import java.util.UUID;
 public class ReportService {
 
     private final SimpleRepository simpleRepository;
-    private final AmazonS3 s3Client;
+    private final S3Client s3Client; // Ändrat från AmazonS3
 
     @Value("${minio.bucket}")
     private String bucket;
 
-    public ReportService(SimpleRepository simpleRepository, AmazonS3 s3Client) {
+    public ReportService(SimpleRepository simpleRepository, S3Client s3Client) {
         this.simpleRepository = simpleRepository;
         this.s3Client = s3Client;
     }
@@ -54,11 +56,14 @@ public class ReportService {
             byte[] pdfBytes = pdfStream.toByteArray();
             s3KeyPdf = "reports/pdf/" + UUID.randomUUID() + "_" + report.name() + ".pdf";
 
-            ObjectMetadata pdfMetadata = new ObjectMetadata();
-            pdfMetadata.setContentType("application/pdf");
-            pdfMetadata.setContentLength(pdfBytes.length);
+            // AWS SDK v2 PutObject
+            PutObjectRequest putPdf = PutObjectRequest.builder()
+                    .bucket(bucket)
+                    .key(s3KeyPdf)
+                    .contentType("application/pdf")
+                    .build();
 
-            s3Client.putObject(bucket, s3KeyPdf, new ByteArrayInputStream(pdfBytes), pdfMetadata);
+            s3Client.putObject(putPdf, RequestBody.fromBytes(pdfBytes));
 
         } catch (Exception e) {
             throw new IOException("Kunde inte generera PDF: " + e.getMessage());
@@ -68,11 +73,14 @@ public class ReportService {
         if (file != null && !file.isEmpty()) {
             s3KeyFile = "reports/files/" + UUID.randomUUID() + "_" + file.getOriginalFilename();
 
-            ObjectMetadata fileMetadata = new ObjectMetadata();
-            fileMetadata.setContentType(file.getContentType());
-            fileMetadata.setContentLength(file.getSize());
+            // AWS SDK v2 PutObject för MultipartFile
+            PutObjectRequest putFile = PutObjectRequest.builder()
+                    .bucket(bucket)
+                    .key(s3KeyFile)
+                    .contentType(file.getContentType())
+                    .build();
 
-            s3Client.putObject(bucket, s3KeyFile, file.getInputStream(), fileMetadata);
+            s3Client.putObject(putFile, RequestBody.fromInputStream(file.getInputStream(), file.getSize()));
         }
 
         simpleRepository.save(ReportMapper.toEntity(report, s3KeyPdf, s3KeyFile));
@@ -86,8 +94,13 @@ public class ReportService {
             throw new RuntimeException("Ingen PDF finns för denna rapport");
         }
 
-        S3Object s3Object = s3Client.getObject(bucket, report.getS3KeyPdf());
-        byte[] data = s3Object.getObjectContent().readAllBytes();
+        GetObjectRequest getObjectRequest = GetObjectRequest.builder()
+                .bucket(bucket)
+                .key(report.getS3KeyPdf())
+                .build();
+
+        ResponseBytes<GetObjectResponse> objectBytes = s3Client.getObjectAsBytes(getObjectRequest);
+        byte[] data = objectBytes.asByteArray();
 
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_PDF)
@@ -103,8 +116,13 @@ public class ReportService {
             throw new RuntimeException("Ingen bifogad fil finns för denna rapport");
         }
 
-        S3Object s3Object = s3Client.getObject(bucket, report.getS3KeyFile());
-        byte[] data = s3Object.getObjectContent().readAllBytes();
+        GetObjectRequest getObjectRequest = GetObjectRequest.builder()
+                .bucket(bucket)
+                .key(report.getS3KeyFile())
+                .build();
+
+        ResponseBytes<GetObjectResponse> objectBytes = s3Client.getObjectAsBytes(getObjectRequest);
+        byte[] data = objectBytes.asByteArray();
 
         String filename = report.getS3KeyFile().substring(report.getS3KeyFile().lastIndexOf("/") + 1);
 

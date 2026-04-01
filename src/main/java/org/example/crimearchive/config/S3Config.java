@@ -1,14 +1,18 @@
 package org.example.crimearchive.config;
 
-import com.amazonaws.auth.AWSStaticCredentialsProvider;
-import com.amazonaws.auth.BasicAWSCredentials;
-import com.amazonaws.client.builder.AwsClientBuilder;
-import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
+import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.CreateBucketRequest;
+import software.amazon.awssdk.services.s3.model.HeadBucketRequest;
+import software.amazon.awssdk.services.s3.model.S3Exception;
+
+import java.net.URI;
 
 @Configuration
 public class S3Config {
@@ -26,26 +30,34 @@ public class S3Config {
     private String bucket;
 
     @Bean
-    public AmazonS3 s3Client() {
-        BasicAWSCredentials credentials = new BasicAWSCredentials(accessKey, secretKey);
-
-        return AmazonS3ClientBuilder.standard()
-                .withEndpointConfiguration(
-                        new AwsClientBuilder.EndpointConfiguration(endpoint, "us-east-1")
-                )
-                .withCredentials(new AWSStaticCredentialsProvider(credentials))
-                .withPathStyleAccessEnabled(true)
+    public S3Client s3Client() {
+        return S3Client.builder()
+                .endpointOverride(URI.create(endpoint))
+                .credentialsProvider(StaticCredentialsProvider.create(
+                        AwsBasicCredentials.create(accessKey, secretKey)
+                ))
+                .region(Region.US_EAST_1)
+                .forcePathStyle(true)
                 .build();
     }
 
     @Bean
-    public ApplicationRunner createBucket(AmazonS3 s3Client) {
+    public ApplicationRunner createBucket(S3Client s3Client) {
         return args -> {
-            if (!s3Client.doesBucketExistV2(bucket)) {
-                s3Client.createBucket(bucket);
-                System.out.println("Bucket skapad: " + bucket);
-            } else {
+            try {
+                s3Client.headBucket(HeadBucketRequest.builder()
+                        .bucket(bucket)
+                        .build());
                 System.out.println("Bucket finns redan: " + bucket);
+            } catch (S3Exception e) {
+                if (e.statusCode() == 404) {
+                    s3Client.createBucket(CreateBucketRequest.builder()
+                            .bucket(bucket)
+                            .build());
+                    System.out.println("Bucket skapad: " + bucket);
+                } else {
+                    System.err.println("Fel vid kontroll av bucket: " + e.getMessage());
+                }
             }
         };
     }
