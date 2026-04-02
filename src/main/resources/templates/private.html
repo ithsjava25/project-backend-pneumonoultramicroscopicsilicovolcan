@@ -5,11 +5,16 @@
     <title>Title</title>
 </head>
 <body>
-<form th:action="@{/reports/add}" th:object="${newReport}" method="post">
+<form th:action="@{/reports/add}" th:object="${newReport}" method="post" enctype="multipart/form-data">
     <label for="reason">Brottstyp</label>
     <input id="reason" th:field="*{event}"><br/>
+
     <label for="name">Namn</label>
-    <input id="name" th:field="*{name}">
+    <input id="name" th:field="*{name}"><br/>
+
+    <label for="file">Bifoga fil</label>
+    <input id="file" type="file" name="file"><br/>
+
     <button type="submit">Spara</button>
     <button type="reset">Avbryt</button>
 </form>

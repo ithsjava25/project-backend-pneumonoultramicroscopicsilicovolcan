@@ -2,17 +2,22 @@ package org.example.crimearchive.controllers;
 
 import jakarta.validation.Valid;
 import org.example.crimearchive.DTO.CreateReport;
+import org.example.crimearchive.DTO.ReportResponse;
 import org.example.crimearchive.service.ReportService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.UUID;
 
 @Controller
 public class HomeController {
 
-    ReportService reportService;
+    private final ReportService reportService;
 
     public HomeController(ReportService reportService) {
         this.reportService = reportService;
@@ -20,7 +25,6 @@ public class HomeController {
 
     @GetMapping("/")
     public String indexPage(Model model) {
-        //model.addAttribute("reports", reportService.getAllReports());
         return "index";
     }
 
@@ -30,9 +34,33 @@ public class HomeController {
         return "private";
     }
 
-    @PostMapping("/reports/add")
-    public String saveReport(@ModelAttribute("newReport") @Valid CreateReport newReport) {
-        reportService.saveReport(newReport);
-        return "redirect:/";
+   @PostMapping("/reports/add")
+    public String saveReport(
+        @ModelAttribute("newReport") @Valid CreateReport newReport,
+        @RequestParam(value = "file", required = false) MultipartFile file,
+    Model model) {
+        try {
+            reportService.saveReport(newReport, file);
+            return "redirect:/";
+        } catch (IOException e) {
+            model.addAttribute("error", "Kunde inte spara rapporten. Försök igen.");
+            model.addAttribute("newReport", newReport);
+            return "private";
+        }
+    }
+
+    @GetMapping("/reports")
+    public ResponseEntity<List<ReportResponse>> getAllReports() {
+        return ResponseEntity.ok(reportService.getAllReportResponses());
+    }
+
+    @GetMapping("/reports/{uuid}/download/pdf")
+    public ResponseEntity<byte[]> downloadPdf(@PathVariable UUID uuid) {
+        return reportService.downloadPdf(uuid);
+    }
+
+    @GetMapping("/reports/{uuid}/download/file")
+    public ResponseEntity<byte[]> downloadFile(@PathVariable UUID uuid) {
+        return reportService.downloadFile(uuid);
     }
 }
