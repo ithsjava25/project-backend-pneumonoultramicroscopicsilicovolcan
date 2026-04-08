@@ -24,7 +24,6 @@ public class ReportService {
     public void saveReport(CreateReport report) {
         if (report.caseNumber() == null || report.caseNumber().isBlank()) {
             String lastCaseNumber = knumberSErvice.getCaseNumber();
-            System.out.println("CaseNumber " + lastCaseNumber);
             simpleRepository.save(ReportMapper.toEntity(new CreateReport(report.event(), report.name(), lastCaseNumber)));
         } else {
             simpleRepository.save(ReportMapper.toEntity(report));

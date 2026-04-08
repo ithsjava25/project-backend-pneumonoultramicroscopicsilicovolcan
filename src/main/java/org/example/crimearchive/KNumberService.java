@@ -29,13 +29,11 @@ public class KNumberService {
     public String getCaseNumber() {
         int year = Year.now().getValue();
         String knumber = repository.findLastKnumber(String.valueOf(year));
-        System.out.println("KNummer frpån db: " + knumber);
         if (knumber == null) {
             int firstNumber = 1;
             return String.format("K-%d-%06d", year, firstNumber);
         } else {
             int intNumber = Integer.parseInt(knumber.substring(7));
-            System.out.println("int nummer: " + intNumber);
             return String.format("K-%d-%06d", year, (intNumber + 1));
         }
     }
