@@ -3,10 +3,7 @@ package org.example.crimearchive.repository;
 import org.example.crimearchive.polis.Account;
 import org.example.crimearchive.polis.UserRepository;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.context.annotation.Bean;
-import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.crypto.password.Pbkdf2PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -25,6 +22,7 @@ public class AccountInitilizer implements CommandLineRunner {
         if(userRepository.count() == 0){
             userRepository.save(createAccount("admin", "password", List.of("user", "admin")));
             userRepository.save(createAccount("demouser", "password", List.of("user")));
+            userRepository.save(createAccount("officer", "password", List.of("user")));
         }
     }
     private Account createAccount(String username, String rawPassword, List<String> roles){

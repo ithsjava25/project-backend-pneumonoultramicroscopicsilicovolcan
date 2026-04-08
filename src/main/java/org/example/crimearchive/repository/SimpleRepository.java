@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.ListCrudRepository;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.UUID;
 
 public interface SimpleRepository extends ListCrudRepository<Report, UUID> {
@@ -14,4 +15,9 @@ public interface SimpleRepository extends ListCrudRepository<Report, UUID> {
     String findLastKnumber(@Param("year") String year);
 
     boolean existsByCaseNumber(String caseNumber);
+
+    long count();
+
+    List<Report> findAllByCaseNumberIn(List<String> permittedCaseNumbers);
+
 }

@@ -18,22 +18,37 @@ public class Account implements UserDetails {
     private Long id;
     private String username;
     private String password;
-    private Collection <? extends GrantedAuthority> authorities;
+    private Collection<? extends GrantedAuthority> authorities;
+//    @ManyToMany()
+//    @JoinTable(
+//            name = "account_cases",
+//            joinColumns = @JoinColumn(name = "account_id"),
+//            inverseJoinColumns = @JoinColumn(name = "case_number")
+//    )
+//    private Set<Investigation> permittedCases;
 
 
     public Long getId() {
         return id;
     }
 
-    public Account(){
+    public Account() {
         this.username = "";
     }
-    public Account(String username, String password, List<String> roles){
+
+    public Account(String username, String password, List<String> roles) {
         this.username = username;
         this.password = password;
         this.authorities = setAuthoritesList(roles);
     }
 
+//    public Set<Report> getDocumentAccess() {
+//        return documentAccess;
+//    }
+//
+//    public void setDocumentAccess(Set<Report> documentAccess) {
+//        this.documentAccess = documentAccess;
+//    }
 
     public void setId(Long id) {
         this.id = id;
@@ -63,7 +78,7 @@ public class Account implements UserDetails {
         this.authorities = setAuthoritesList(roles);
     }
 
-    public List<SimpleGrantedAuthority> setAuthoritesList(List<String> roles){
+    public List<SimpleGrantedAuthority> setAuthoritesList(List<String> roles) {
         return roles.stream().map(
                         r -> r.startsWith("ROLE_") ? new SimpleGrantedAuthority(r.toUpperCase()) : new SimpleGrantedAuthority("ROLE_" + r.toUpperCase()))
                 .toList();

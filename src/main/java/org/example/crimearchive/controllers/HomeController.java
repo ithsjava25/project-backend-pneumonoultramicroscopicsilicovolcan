@@ -2,6 +2,7 @@ package org.example.crimearchive.controllers;
 
 import jakarta.validation.Valid;
 import org.example.crimearchive.DTO.CreateReport;
+import org.example.crimearchive.permissions.PermissionService;
 import org.example.crimearchive.polis.Account;
 import org.example.crimearchive.service.ReportService;
 import org.slf4j.Logger;
@@ -19,9 +20,11 @@ public class HomeController {
 
     Logger log = LoggerFactory.getLogger(HomeController.class);
     ReportService reportService;
+    PermissionService permissionService;
 
-    public HomeController(ReportService reportService) {
+    public HomeController(ReportService reportService, PermissionService permissionService) {
         this.reportService = reportService;
+        this.permissionService = permissionService;
     }
 
     @GetMapping("/")
@@ -37,7 +40,9 @@ public class HomeController {
     }
 
     @GetMapping("/userpage")
-    public String userPage(Model model){
+    public String userPage(@AuthenticationPrincipal Account user, Model model) {
+        //model.addAttribute("reports", permissionService.hasPermission(user.getId()));
+        model.addAttribute("reportAmount", reportService.getAmount());
         return "userpage";
     }
 
@@ -48,6 +53,6 @@ public class HomeController {
             return "private";
         }
         reportService.saveReport(newReport);
-        return "redirect:/";
+        return "redirect:/userpage";
     }
 }

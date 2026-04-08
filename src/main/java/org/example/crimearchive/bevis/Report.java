@@ -26,6 +26,14 @@ public class Report {
         this.caseNumber = caseNumber;
     }
 
+//    public Set<Account> getPermittedViewers() {
+//        return permittedViewers;
+//    }
+//
+//    public void setPermittedViewers(Set<Account> permittedViewers) {
+//        this.permittedViewers = permittedViewers;
+//    }
+
     public String getCaseNumber() {
         return caseNumber;
     }
