@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="sv" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bildbilaga</title>
+    <link rel="stylesheet" th:href="@{/css/report-common.css}">
+    <link rel="stylesheet" th:href="@{/css/report-attachment-prototype.css}">
+</head>
+<body>
+
+<div class="page-wrapper">
+    <div class="page">
+
+        <div class="secret-marker">
+            <img th:src="@{/images/hemlig.png}" alt="Hemlig markering" class="secret-stamp">
+        </div>
+
+        <header class="document-header">
+            <div class="header-left">
+                <img th:src="@{/images/polisemblem.png}" alt="Polisemblem" class="logo">
+                <div class="authority-block">
+                    <div>Polismyndigheten i</div>
+                    <div th:text="${report.policeAuthority}"></div>
+                </div>
+            </div>
+
+            <div class="header-center">
+                <h1>BILDBILAGA</h1>
+            </div>
+
+            <div class="header-right">
+                <div><strong>K-nr:</strong> <span th:text="${report.caseNumber}"></span></div>
+                <div><strong>Sida:</strong> 2</div>
+                <div><strong>Skapad:</strong> <span th:text="${#temporals.format(report.createdAt, 'yyyy-MM-dd HH:mm')}"></span></div>
+            </div>
+        </header>
+
+        <div class="divider"></div>
+
+        <section class="meta-section">
+            <div><strong>Ärende:</strong> <span th:text="${report.event}"></span></div>
+            <div><strong>Plats:</strong> <span th:text="${report.location}"></span></div>
+            <div><strong>Målsägande:</strong> <span th:text="${report.firstName + ' ' + report.lastName}"></span></div>
+        </section>
+
+        <div class="divider"></div>
+
+        <section class="images-section">
+
+            <div class="evidence-block large-block">
+                <div class="image-frame">
+                    <img th:src="@{/images/mock-woman-censored.png}" alt="Bevisbild 1">
+                </div>
+                <div class="caption-row">
+                    <div class="caption">Bild 1. Målsägande, censurerad mustasch.</div>
+                    <button type="button" class="upload-link">Ladda upp bild</button>
+                </div>
+            </div>
+
+            <div class="image-row">
+                <div class="evidence-block small-block">
+                    <div class="image-frame">
+                        <img th:src="@{/images/mock-ica-focus.png}" alt="Bevisbild 2">
+                    </div>
+                    <div class="caption-row">
+                        <div class="caption">Bild 2. Ungefärlig brottsplats.</div>
+                        <button type="button" class="upload-link">Ladda upp bild</button>
+                    </div>
+                </div>
+
+                <div class="evidence-block small-block">
+                    <div class="image-frame">
+                        <img th:src="@{/images/mock-garda-map.png}" alt="Bevisbild 3">
+                    </div>
+                    <div class="caption-row">
+                        <div class="caption">Bild 3. Kartöversikt över Gårda med markerad brottsplats.</div>
+                        <button type="button" class="upload-link">Ladda upp bild</button>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+        <div class="divider"></div>
+
+        <div class="attachment-link-wrapper">
+            <a class="attachment-link" th:href="@{/reports/prototype}">
+                Tillbaka till anmälan
+            </a>
+        </div>
+
+        <footer class="document-footer">
+            <div>
+                <div>Polismyndigheten</div>
+                <div>Box 000</div>
+                <div>411 00 Göteborg</div>
+            </div>
+
+            <div class="footer-right">
+                <div><strong>Handläggande enhet:</strong> Utredningsgrupp 5H</div>
+                <div><strong>Handläggare:</strong> <span th:text="${report.policeName}"></span></div>
+            </div>
+        </footer>
+
+    </div>
+</div>
+
+</body>
+</html>

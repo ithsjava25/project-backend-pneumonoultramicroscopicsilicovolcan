@@ -1,0 +1,78 @@
+.meta-section {
+    font-size: 13px;
+    line-height: 1.7;
+}
+
+.images-section {
+    margin-top: 8px;
+}
+
+.evidence-block {
+    margin-bottom: 18px;
+}
+
+.image-frame {
+    border: 3px solid #111;
+    padding: 18px;
+    background: #fff;
+}
+
+.image-frame img {
+    width: 100%;
+    display: block;
+    object-fit: cover;
+    background: #e9e9e9;
+}
+
+.large-block .image-frame img {
+    height: 330px;
+}
+
+.image-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+}
+
+.small-block .image-frame img {
+    height: 220px;
+}
+
+.caption {
+    margin-top: 8px;
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+.document-footer {
+    margin-top: 18px;
+}
+
+.caption-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 16px;
+    margin-top: 8px;
+}
+
+.caption {
+    font-size: 13px;
+    line-height: 1.4;
+    flex: 1;
+}
+
+.upload-link {
+    background: none;
+    border: none;
+    padding: 0;
+    color: inherit;
+    font: inherit;
+    text-decoration: underline;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.upload-link:hover {
+    opacity: 0.8;
+}
