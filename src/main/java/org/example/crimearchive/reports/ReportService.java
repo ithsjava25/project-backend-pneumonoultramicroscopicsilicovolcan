@@ -31,16 +31,6 @@ public class ReportService {
         Cases cases;
 
         if (report.caseNumber() == null || report.caseNumber().isBlank()) {
-            Cases newCase = new Cases(getNextcaseNumber());
-            casesRepository.save(newCase);
-            reportRepository.save(newCase.addReport(report));
-        } else {
-            if (casesRepository.existsByCaseNumber(report.caseNumber())) {
-                Optional<Cases> oldCase = casesRepository.findFirstByCaseNumber(report.caseNumber());
-                reportRepository.save(oldCase.get().addReport(report));
-            } else {
-                throw new RuntimeException("Wrong case number");
-            }
             String newCaseNumber = knumberService.getKNumber();
             cases = new Cases(newCaseNumber);
 
@@ -55,18 +45,6 @@ public class ReportService {
 
         Report newReport = new Report(UUID.randomUUID(), report.name(), report.event(), cases);
         reportRepository.save(newReport);
-    }
-
-    private String getNextcaseNumber() {
-        // handle years
-        Optional<Cases> lastCase = casesRepository.findTopByOrderByCaseNumberDesc();
-        if (lastCase.isPresent()) {
-            String startingWith = lastCase.get().getCaseNumber().substring(0, 7);
-            String serialNumber = lastCase.get().getCaseNumber().substring(8);
-            int serial = Integer.parseInt(serialNumber) + 1;
-            return String.format("%s%06d", startingWith, serial);
-        }
-        return "K-" + Year.now().getValue() + "-000001";
     }
 
     private String caseNumberSanitation(String caseNumber) {

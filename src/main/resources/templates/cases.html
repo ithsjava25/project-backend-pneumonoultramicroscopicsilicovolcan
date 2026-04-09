@@ -29,5 +29,16 @@
     </table>
     <p th:if="${#lists.isEmpty(cases)}">Inga ärenden hittades.</p>
 </div>
+<br/>
+<div>
+    <h2>Lägg till konto till case</h2>
+    <form method="post" th:action="@{/cases/add}">
+        <label for="add_accountId">Account ID</label>
+        <input id="add_accountId" type="number" name="addAccountId" th:value="${addAccountId}">
+        <label for="case_number">Case number</label>
+        <input id="case_number" type="text" name="case_number" th:value="${case_number}">
+        <button type="submit">Lägg till behörighet</button>
+    </form>
+</div>
 </body>
 </html>

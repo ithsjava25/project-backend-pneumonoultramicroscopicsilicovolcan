@@ -57,6 +57,13 @@ public class HomeController {
         return "cases";
     }
 
+    @PostMapping("/cases/add")
+    public String casesPage(@RequestParam Long addAccountId,
+                            @RequestParam String case_number){
+        caseService.addAccountToCase(addAccountId, case_number);
+        return "cases";
+    }
+
     @PostMapping("/reports/add")
     public String saveReport(
             @ModelAttribute("newReport") @Valid CreateReport newReport,
