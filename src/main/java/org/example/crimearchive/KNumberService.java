@@ -1,6 +1,6 @@
 package org.example.crimearchive;
 
-import org.example.crimearchive.repository.SimpleRepository;
+import org.example.crimearchive.reports.ReportRepository;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
@@ -10,9 +10,9 @@ import java.time.Year;
 public class KNumberService {
 
     private final JdbcTemplate jdbcTemplate;
-    private final SimpleRepository repository;
+    private final ReportRepository repository;
 
-    public KNumberService(JdbcTemplate jdbcTemplate, SimpleRepository repository) {
+    public KNumberService(JdbcTemplate jdbcTemplate, ReportRepository repository) {
         this.jdbcTemplate = jdbcTemplate;
         this.repository = repository;
     }

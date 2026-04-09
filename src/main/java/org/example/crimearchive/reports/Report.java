@@ -1,9 +1,10 @@
-package org.example.crimearchive.bevis;
+package org.example.crimearchive.reports;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import org.example.crimearchive.cases.Cases;
 
 import java.util.Objects;
 import java.util.UUID;
@@ -30,20 +31,17 @@ public class Report {
 
     public Report() {
     }
-
-    public Report(UUID id, String name, String event) {
+    public Report(UUID id, String name, String event, Cases caseEntity) {
         this.uuid = id;
         this.name = name;
         this.event = event;
+        this.caseEntity = caseEntity;
     }
 
-//    public Set<Account> getPermittedViewers() {
-//        return permittedViewers;
-//    }
-//
-//    public void setPermittedViewers(Set<Account> permittedViewers) {
-//        this.permittedViewers = permittedViewers;
-//    }
+    public Report(UUID id, String name, String event) {
+        this(id, name, event, null);
+    }
+
 
 
     public UUID getUuid() {
@@ -75,19 +73,6 @@ public class Report {
         if (o == null || getClass() != o.getClass()) return false;
         Report report = (Report) o;
         return Objects.equals(uuid, report.uuid);
-    }
-    public Report(UUID id, String name, String event, Cases caseEntity) {
-        this.uuid = id;
-        this.name = name;
-        this.event = event;
-        this.caseEntity = caseEntity;
-    }
-    public Cases getCaseEntity() {
-        return caseEntity;
-    }
-
-    public void setCaseEntity(Cases caseEntity) {
-        this.caseEntity = caseEntity;
     }
 
     @Override

@@ -1,12 +1,10 @@
-package org.example.crimearchive.service;
+package org.example.crimearchive.reports;
 
 import org.example.crimearchive.DTO.CreateReport;
 import org.example.crimearchive.KNumberService;
-import org.example.crimearchive.bevis.Cases;
-import org.example.crimearchive.bevis.Report;
-import org.example.crimearchive.permissions.PermissionRepository;
+import org.example.crimearchive.cases.Cases;
+import org.example.crimearchive.cases.CasesRepository;
 import org.example.crimearchive.polis.Account;
-import org.example.crimearchive.repository.SimpleRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,14 +16,14 @@ import java.util.UUID;
 @Service
 public class ReportService {
 
-    private final SimpleRepository simpleRepository;
+    private final ReportRepository reportRepository;
     private final KNumberService knumberService;
-    private final PermissionRepository permissionRepository;
+    private final CasesRepository casesRepository;
 
-    public ReportService(SimpleRepository simpleRepository, KNumberService kservice, PermissionRepository permissionRepository) {
-        this.simpleRepository = simpleRepository;
+    public ReportService(ReportRepository reportRepository, KNumberService kservice, CasesRepository casesRepository) {
+        this.reportRepository = reportRepository;
         this.knumberService = kservice;
-        this.permissionRepository = permissionRepository;
+        this.casesRepository = casesRepository;
     }
 
     @Transactional
@@ -34,12 +32,12 @@ public class ReportService {
 
         if (report.caseNumber() == null || report.caseNumber().isBlank()) {
             Cases newCase = new Cases(getNextcaseNumber());
-            permissionRepository.save(newCase);
-            simpleRepository.save(newCase.addReport(report));
+            casesRepository.save(newCase);
+            reportRepository.save(newCase.addReport(report));
         } else {
-            if (permissionRepository.existsByCaseNumber(report.caseNumber())) {
-                Optional<Cases> oldCase = permissionRepository.findFirstByCaseNumber(report.caseNumber());
-                simpleRepository.save(oldCase.get().addReport(report));
+            if (casesRepository.existsByCaseNumber(report.caseNumber())) {
+                Optional<Cases> oldCase = casesRepository.findFirstByCaseNumber(report.caseNumber());
+                reportRepository.save(oldCase.get().addReport(report));
             } else {
                 throw new RuntimeException("Wrong case number");
             }
@@ -48,20 +46,20 @@ public class ReportService {
 
             cases.getAccounts().add(currentUser);
 
-            permissionRepository.save(cases);
+            casesRepository.save(cases);
         } else {
             String sanitized = caseNumberSanitation(report.caseNumber());
-            cases = permissionRepository.findFirstByCaseNumber(sanitized)
+            cases = casesRepository.findFirstByCaseNumber(sanitized)
                     .orElseThrow(() -> new RuntimeException("Case not found: " + sanitized));
         }
 
         Report newReport = new Report(UUID.randomUUID(), report.name(), report.event(), cases);
-        simpleRepository.save(newReport);
+        reportRepository.save(newReport);
     }
 
     private String getNextcaseNumber() {
         // handle years
-        Optional<Cases> lastCase = permissionRepository.findTopByOrderByCaseNumberDesc();
+        Optional<Cases> lastCase = casesRepository.findTopByOrderByCaseNumberDesc();
         if (lastCase.isPresent()) {
             String startingWith = lastCase.get().getCaseNumber().substring(0, 7);
             String serialNumber = lastCase.get().getCaseNumber().substring(8);
@@ -80,10 +78,10 @@ public class ReportService {
     }
 
     public List<Report> getAllReports() {
-        return simpleRepository.findAll();
+        return reportRepository.findAll();
     }
 
     public long getAmount() {
-        return simpleRepository.count();
+        return reportRepository.count();
     }
 }

@@ -1,6 +1,5 @@
-package org.example.crimearchive.permissions;
+package org.example.crimearchive.cases;
 
-import org.example.crimearchive.bevis.Cases;
 import org.springframework.data.repository.ListCrudRepository;
 import org.springframework.stereotype.Repository;
 
@@ -8,7 +7,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface PermissionRepository extends ListCrudRepository<Cases, Long> {
+public interface CasesRepository extends ListCrudRepository<Cases, Long> {
 
     List<String> findAllBy(Long accountId);
 
@@ -17,6 +16,7 @@ public interface PermissionRepository extends ListCrudRepository<Cases, Long> {
     Optional<Cases> findFirstByCaseNumber(String caseNumber);
 
     boolean existsByCaseNumber(String casenumber);
+
 
 
     List<Cases> findByAccountsId(Long accountId);

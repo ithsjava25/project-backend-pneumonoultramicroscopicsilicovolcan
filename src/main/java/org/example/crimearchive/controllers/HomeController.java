@@ -2,10 +2,10 @@ package org.example.crimearchive.controllers;
 
 import jakarta.validation.Valid;
 import org.example.crimearchive.DTO.CreateReport;
-import org.example.crimearchive.permissions.PermissionRepository;
-import org.example.crimearchive.permissions.PermissionService;
+import org.example.crimearchive.cases.CasesRepository;
+import org.example.crimearchive.cases.CaseService;
 import org.example.crimearchive.polis.Account;
-import org.example.crimearchive.service.ReportService;
+import org.example.crimearchive.reports.ReportService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -22,13 +22,13 @@ public class HomeController {
 
     Logger log = LoggerFactory.getLogger(HomeController.class);
     private final ReportService reportService;
-    private final PermissionService permissionService;
-    private final PermissionRepository permissionRepository;
+    private final CaseService caseService;
+    private final CasesRepository casesRepository;
 
-    public HomeController(ReportService reportService, PermissionService permissionService, PermissionRepository permissionRepository) {
+    public HomeController(ReportService reportService, CaseService caseService, CasesRepository casesRepository) {
         this.reportService = reportService;
-        this.permissionService = permissionService;
-        this.permissionRepository = permissionRepository;
+        this.caseService = caseService;
+        this.casesRepository = casesRepository;
     }
 
     @GetMapping("/")
@@ -51,7 +51,7 @@ public class HomeController {
     @GetMapping("/cases")
     public String casesPage(@RequestParam(required = false) Long accountId, Model model) {
         if (accountId != null) {
-            model.addAttribute("cases", permissionRepository.findByAccountsId(accountId));
+            model.addAttribute("cases", casesRepository.findByAccountsId(accountId));
             model.addAttribute("accountId", accountId);
         }
         return "cases";

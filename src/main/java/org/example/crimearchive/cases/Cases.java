@@ -1,8 +1,9 @@
-package org.example.crimearchive.bevis;
+package org.example.crimearchive.cases;
 
 import jakarta.persistence.*;
 import org.example.crimearchive.DTO.CreateReport;
 import org.example.crimearchive.polis.Account;
+import org.example.crimearchive.reports.Report;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -40,6 +41,13 @@ public class Cases {
         reports.add(newReport);
         newReport.setCaseEntity(this);
         return newReport;
+    }
+
+    public void addAccountToCase(Account account){
+        accounts.add(account);
+    }
+    public void removeAccountFromCase(Account account){
+        accounts.remove(account);
     }
 
     public Cases(String caseNumber) {

@@ -1,7 +1,7 @@
 package org.example.crimearchive.mapper;
 
 import org.example.crimearchive.DTO.CreateReport;
-import org.example.crimearchive.bevis.Report;
+import org.example.crimearchive.reports.Report;
 
 import java.util.UUID;
 

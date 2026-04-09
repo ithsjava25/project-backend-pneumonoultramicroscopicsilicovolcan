@@ -1,7 +1,7 @@
 package org.example.crimearchive.polis;
 
 import jakarta.persistence.*;
-import org.example.crimearchive.bevis.Cases;
+import org.example.crimearchive.cases.Cases;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -36,14 +36,6 @@ public class Account implements UserDetails {
         this.password = password;
         this.authorities = setAuthoritesList(roles);
     }
-
-//    public Set<Report> getDocumentAccess() {
-//        return documentAccess;
-//    }
-//
-//    public void setDocumentAccess(Set<Report> documentAccess) {
-//        this.documentAccess = documentAccess;
-//    }
 
     public void setId(Long id) {
         this.id = id;
