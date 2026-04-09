@@ -4,12 +4,12 @@ import org.example.crimearchive.DTO.CreateReport;
 import org.example.crimearchive.KNumberService;
 import org.example.crimearchive.bevis.Cases;
 import org.example.crimearchive.bevis.Report;
-import org.example.crimearchive.mapper.ReportMapper;
 import org.example.crimearchive.permissions.PermissionRepository;
 import org.example.crimearchive.repository.SimpleRepository;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
+import java.time.Year;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,25 +29,29 @@ public class ReportService {
 
     public void saveReport(CreateReport report) {
         if (report.caseNumber() == null || report.caseNumber().isBlank()) {
-//            String latestCaseNumber = knumberSErvice.getCaseNumber();
-//            permissionRepository.save(new Cases(latestCaseNumber));
-            Optional<Cases> casenumber = permissionRepository.findTopByOrderByCaseNumberDesc();
-            if (casenumber.isEmpty()) {
-                permissionRepository.save(new Cases("K-2026-000001"));
-                simpleRepository.save(ReportMapper.toEntity(report));
-            } else {
-                casenumber.get().getCaseNumber().substring(8);
-            }
-            //simpleRepository.save(ReportMapper.toEntity(new CreateReport(report.event(), report.name(), latestCaseNumber)));
+            Cases newCase = new Cases(getNextcaseNumber());
+            permissionRepository.save(newCase);
+            simpleRepository.save(newCase.addReport(report));
         } else {
-            Optional<Cases> caseNumber = permissionRepository.findFirstByCaseNumber(report.caseNumber());
-            if (caseNumber.isEmpty()) throw new RuntimeException("falty case number");
-            simpleRepository.save(ReportMapper.toEntity(report));
-            String santiziedNumber = caseNumberSanitation(report.caseNumber());
-            //if (caseNumberExists(santiziedNumber))
-            //    simpleRepository.save(ReportMapper.toEntity(report));
-            //simpleRepository.save(ReportMapper.toEntity(new CreateReport(report.event(), report.name(), knumberSErvice.getCaseNumber())));
+            if (permissionRepository.existsByCaseNumber(report.caseNumber())) {
+                Optional<Cases> oldCase = permissionRepository.findFirstByCaseNumber(report.caseNumber());
+                simpleRepository.save(oldCase.get().addReport(report));
+            } else {
+                throw new RuntimeException("Wrong case number");
+            }
         }
+    }
+
+    private String getNextcaseNumber() {
+        // handle years
+        Optional<Cases> lastCase = permissionRepository.findTopByOrderByCaseNumberDesc();
+        if (lastCase.isPresent()) {
+            String startingWith = lastCase.get().getCaseNumber().substring(0, 7);
+            String serialNumber = lastCase.get().getCaseNumber().substring(8);
+            int serial = Integer.parseInt(serialNumber) + 1;
+            return String.format("%s%06d", startingWith, serial);
+        }
+        return "K-" + Year.now().getValue() + "-000001";
     }
 
     private String caseNumberSanitation(String caseNumber) {

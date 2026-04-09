@@ -1,16 +1,18 @@
 package org.example.crimearchive.bevis;
 
 import jakarta.persistence.*;
+import org.example.crimearchive.DTO.CreateReport;
 import org.example.crimearchive.polis.Account;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 @Entity
 public class Cases {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long Id;
+    private Long Id;
     @Column(unique = true, nullable = false)
     private String caseNumber;
 
@@ -27,6 +29,17 @@ public class Cases {
 
 
     public Cases() {
+    }
+
+    public Report addReport(CreateReport report) {
+        Report newReport = new Report(
+                UUID.randomUUID(),
+                report.name(),
+                report.event()
+        );
+        reports.add(newReport);
+        newReport.setCaseEntity(this);
+        return newReport;
     }
 
     public Cases(String caseNumber) {

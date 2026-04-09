@@ -16,4 +16,7 @@ public interface PermissionRepository extends ListCrudRepository<Cases, String> 
 
     Optional<Cases> findFirstByCaseNumber(String caseNumber);
 
+    boolean existsByCaseNumber(String casenumber);
+
+
 }

@@ -20,7 +20,13 @@ public class Report {
     @JoinColumn(name = "reports")
     private Cases caseEntity;
 
+    public Cases getCaseEntity() {
+        return caseEntity;
+    }
 
+    public void setCaseEntity(Cases caseEntity) {
+        this.caseEntity = caseEntity;
+    }
 
     public Report() {
     }
