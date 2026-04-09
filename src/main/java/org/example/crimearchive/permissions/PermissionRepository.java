@@ -8,9 +8,9 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface PermissionRepository extends ListCrudRepository<Cases, String> {
+public interface PermissionRepository extends ListCrudRepository<Cases, Long> {
 
-    List<String> findAllBy(Long accoundId);
+    List<String> findAllBy(Long accountId);
 
     Optional<Cases> findTopByOrderByCaseNumberDesc();
 
@@ -19,4 +19,5 @@ public interface PermissionRepository extends ListCrudRepository<Cases, String> 
     boolean existsByCaseNumber(String casenumber);
 
 
+    List<Cases> findByAccountsId(Long accountId);
 }

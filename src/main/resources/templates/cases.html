@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Cases</title>
+</head>
+<body>
+<h1>Sök ärenden per användare</h1>
+
+<form method="get" action="/cases">
+    <label for="accountId">Account ID</label>
+    <input id="accountId" type="number" name="accountId" th:value="${accountId}">
+    <button type="submit">Sök</button>
+</form>
+
+<div th:if="${cases}">
+    <h2>Ärenden</h2>
+    <table>
+        <thead>
+        <tr>
+            <th>K-nummer</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="c : ${cases}">
+            <td th:text="${c.caseNumber}"></td>
+        </tr>
+        </tbody>
+    </table>
+    <p th:if="${#lists.isEmpty(cases)}">Inga ärenden hittades.</p>
+</div>
+</body>
+</html>

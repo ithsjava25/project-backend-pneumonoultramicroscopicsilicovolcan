@@ -76,6 +76,19 @@ public class Report {
         Report report = (Report) o;
         return Objects.equals(uuid, report.uuid);
     }
+    public Report(UUID id, String name, String event, Cases caseEntity) {
+        this.uuid = id;
+        this.name = name;
+        this.event = event;
+        this.caseEntity = caseEntity;
+    }
+    public Cases getCaseEntity() {
+        return caseEntity;
+    }
+
+    public void setCaseEntity(Cases caseEntity) {
+        this.caseEntity = caseEntity;
+    }
 
     @Override
     public int hashCode() {

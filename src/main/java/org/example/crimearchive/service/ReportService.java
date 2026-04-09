@@ -5,29 +5,33 @@ import org.example.crimearchive.KNumberService;
 import org.example.crimearchive.bevis.Cases;
 import org.example.crimearchive.bevis.Report;
 import org.example.crimearchive.permissions.PermissionRepository;
+import org.example.crimearchive.polis.Account;
 import org.example.crimearchive.repository.SimpleRepository;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Year;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class ReportService {
 
     private final SimpleRepository simpleRepository;
-    private final KNumberService knumberSErvice;
+    private final KNumberService knumberService;
     private final PermissionRepository permissionRepository;
-
 
     public ReportService(SimpleRepository simpleRepository, KNumberService kservice, PermissionRepository permissionRepository) {
         this.simpleRepository = simpleRepository;
-        this.knumberSErvice = kservice;
+        this.knumberService = kservice;
         this.permissionRepository = permissionRepository;
     }
 
-    public void saveReport(CreateReport report) {
+    @Transactional
+    public void saveReport(CreateReport report, Account currentUser) {
+        Cases cases;
+
         if (report.caseNumber() == null || report.caseNumber().isBlank()) {
             Cases newCase = new Cases(getNextcaseNumber());
             permissionRepository.save(newCase);
@@ -39,7 +43,20 @@ public class ReportService {
             } else {
                 throw new RuntimeException("Wrong case number");
             }
+            String newCaseNumber = knumberService.getKNumber();
+            cases = new Cases(newCaseNumber);
+
+            cases.getAccounts().add(currentUser);
+
+            permissionRepository.save(cases);
+        } else {
+            String sanitized = caseNumberSanitation(report.caseNumber());
+            cases = permissionRepository.findFirstByCaseNumber(sanitized)
+                    .orElseThrow(() -> new RuntimeException("Case not found: " + sanitized));
         }
+
+        Report newReport = new Report(UUID.randomUUID(), report.name(), report.event(), cases);
+        simpleRepository.save(newReport);
     }
 
     private String getNextcaseNumber() {
@@ -62,11 +79,6 @@ public class ReportService {
         }
     }
 
-//    public boolean caseNumberExists(String caseNumber) {
-//        return simpleRepository.existsByCaseNumber(caseNumber);
-//    }
-
-    @PreAuthorize("(T(org.example.crimearchive.permissions.DocumentPermissionEvaluator))")
     public List<Report> getAllReports() {
         return simpleRepository.findAll();
     }
