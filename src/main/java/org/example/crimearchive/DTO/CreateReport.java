@@ -14,4 +14,8 @@ public record CreateReport(
     public CreateReport() {
         this("", "","");
     }
+
+    public CreateReport(String event, String name) {
+        this(event, name, "");
+    }
 }

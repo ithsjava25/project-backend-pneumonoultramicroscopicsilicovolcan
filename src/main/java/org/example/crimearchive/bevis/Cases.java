@@ -25,6 +25,14 @@ public class Cases {
     @OneToMany(mappedBy = "caseEntity")
     private Set<Report> reports = new HashSet<>();
 
+
+    public Cases() {
+    }
+
+    public Cases(String caseNumber) {
+        this.caseNumber = caseNumber;
+    }
+
     public long getId() {
         return Id;
     }

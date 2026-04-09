@@ -25,11 +25,10 @@ public class Report {
     public Report() {
     }
 
-    public Report(UUID id, String name, String event, Cases caseEntity) {
+    public Report(UUID id, String name, String event) {
         this.uuid = id;
         this.name = name;
         this.event = event;
-        this.caseEntity = caseEntity;
     }
 
 //    public Set<Account> getPermittedViewers() {
