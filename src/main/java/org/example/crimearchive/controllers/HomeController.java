@@ -77,4 +77,14 @@ public class HomeController {
         reportService.saveReport(newReport, currentUser);
         return "redirect:/userpage";
     }
+
+    @GetMapping("/reports/{uuid}/download/pdf")
+    public ResponseEntity<byte[]> downloadPdf(@PathVariable UUID uuid) {
+        return reportService.downloadPdf(uuid);
+    }
+
+    @GetMapping("/reports/{uuid}/download/file")
+    public ResponseEntity<byte[]> downloadFile(@PathVariable UUID uuid) {
+        return reportService.downloadFile(uuid);
+    }
 }

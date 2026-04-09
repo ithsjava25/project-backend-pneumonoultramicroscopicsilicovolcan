@@ -16,7 +16,8 @@ public class Report {
     private UUID uuid;
     private String name;
     private String event;
-    //private String caseNumber;
+    private String s3KeyPdf;
+    private String s3KeyFile;
     @ManyToOne
     @JoinColumn(name = "reports")
     private Cases caseEntity;
@@ -31,10 +32,14 @@ public class Report {
 
     public Report() {
     }
+
+    public Report(UUID id, String name, String event, String s3KeyPdf, String s3KeyFile) {
     public Report(UUID id, String name, String event, Cases caseEntity) {
         this.uuid = id;
         this.name = name;
         this.event = event;
+        this.s3KeyPdf = s3KeyPdf;
+        this.s3KeyFile = s3KeyFile;
         this.caseEntity = caseEntity;
     }
 
@@ -66,6 +71,21 @@ public class Report {
 
     public void setEvent(String event) {
         this.event = event;
+    }
+
+    public String getS3KeyPdf() {
+        return s3KeyPdf;
+    }
+
+    public void setS3KeyPdf(String s3KeyPdf) {
+        this.s3KeyPdf = s3KeyPdf;
+    }
+    public String getS3KeyFile() {
+        return s3KeyFile;
+    }
+
+    public void setS3KeyFile(String s3KeyFile) {
+        this.s3KeyFile = s3KeyFile;
     }
 
     @Override
