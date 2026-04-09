@@ -3,7 +3,7 @@ package org.example.crimearchive.services;
 import org.example.crimearchive.dto.witness.DTOCreateVittne;
 import org.example.crimearchive.dto.witness.DTOUpdateVittne;
 import org.example.crimearchive.dto.witness.DTOVittne;
-import org.example.crimearchive.entities.witnesses.Vittne;
+import org.example.crimearchive.entities.Vittne.Vittne;
 import org.example.crimearchive.Exceptions.ResourceNotFoundException;
 import org.example.crimearchive.mappers.VittneMapper;
 import org.example.crimearchive.repositories.VittneRepository;

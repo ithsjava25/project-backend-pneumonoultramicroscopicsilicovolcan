@@ -2,11 +2,11 @@ package org.example.crimearchive.entities.cases;
 
 import jakarta.persistence.*;
 import org.example.crimearchive.entities.police.Aina;
-import org.example.crimearchive.entities.evidence.Bevis;
-import org.example.crimearchive.entities.evidence.Brottsplats;
+import org.example.crimearchive.entities.bevis.Bevis;
+import org.example.crimearchive.entities.bevis.Brottsplats;
 import org.example.crimearchive.entities.prosecution.Åklagare;
-import org.example.crimearchive.entities.witnesses.Vittne;
-import org.example.crimearchive.entities.victims.Brottsoffer;
+import org.example.crimearchive.entities.Vittne.Vittne;
+import org.example.crimearchive.entities.BrottsOffer.Brottsoffer;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;

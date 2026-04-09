@@ -3,7 +3,7 @@ package org.example.crimearchive.mappers;
 import org.example.crimearchive.dto.witness.DTOCreateVittne;
 import org.example.crimearchive.dto.witness.DTOUpdateVittne;
 import org.example.crimearchive.dto.witness.DTOVittne;
-import org.example.crimearchive.entities.witnesses.Vittne;
+import org.example.crimearchive.entities.Vittne.Vittne;
 import org.springframework.stereotype.Component;
 
 @Component

@@ -1,4 +1,4 @@
-package org.example.crimearchive.entities.evidence;
+package org.example.crimearchive.entities.bevis;
 import jakarta.persistence.*;
 
 @Entity

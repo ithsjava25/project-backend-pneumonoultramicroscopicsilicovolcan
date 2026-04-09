@@ -1,4 +1,4 @@
-package org.example.crimearchive.entities.witnesses;
+package org.example.crimearchive.entities.Vittne;
 
 
 import jakarta.persistence.*;
