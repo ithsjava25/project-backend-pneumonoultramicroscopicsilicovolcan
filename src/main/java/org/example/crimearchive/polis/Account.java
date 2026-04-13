@@ -70,4 +70,12 @@ public class Account implements UserDetails {
                         r -> r.startsWith("ROLE_") ? new SimpleGrantedAuthority(r.toUpperCase()) : new SimpleGrantedAuthority("ROLE_" + r.toUpperCase()))
                 .toList();
     }
+
+    public Set<Cases> getPermittedCases() {
+        return permittedCases;
+    }
+
+    public void setPermittedCases(Set<Cases> permittedCases) {
+        this.permittedCases = permittedCases;
+    }
 }

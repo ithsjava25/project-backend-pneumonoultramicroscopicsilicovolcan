@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>DurTre Profil</title>
+</head>
+<body>
+<div>
+    <h3>Tilldelade fall</h3>
+    <table>
+        <thead>
+        <th><span>K-Nummber</span></th>
+        <th><span>Händelse</span></th>
+        </thead>
+        <tbody>
+        <tr th:if="${cases.isEmpty()}">
+            <td colspan="2">Inga befogade fall</td>
+        </tr>
+        <tr th:each="entry : ${cases}">
+            <td><span th:text="${entry.key}"></span></td>
+            <td>
+                <ul>
+                    <li th:each="report : ${entry.value}">
+                        <span th:text="${report.getEvent()}"></span>
+                        <button>Gå till rapport</button>
+                    </li>
+                </ul>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+<div>
+    <h2>Profil</h2>
+    <label>Användarnamn: </label>
+    <span th:text="${user.getUsername()}"></span><br/>
+    <label>Roller: </label>
+    <span th:text="${user.getAuthorities()}"></span>
+</div>
+<div>
+    <a th:href="@{/userpage}">Rapportera nytt ärende</a>
+    <a th:href="@{/cases}">Sök tilldelade fall</a>
+</div>
+</body>
+</html>

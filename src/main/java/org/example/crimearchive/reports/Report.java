@@ -19,7 +19,7 @@ public class Report {
     private String s3KeyPdf;
     private String s3KeyFile;
     @ManyToOne
-    @JoinColumn(name = "reports")
+    @JoinColumn(name = "case_id")
     private Cases caseEntity;
 
     public Cases getCaseEntity() {
