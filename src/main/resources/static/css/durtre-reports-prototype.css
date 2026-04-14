@@ -1,462 +1,477 @@
-html {
-    height: 100%;
+/* =========================================================
+   1. Designvärden som definieras här och används längre ner
+
+   Här läggs färger, skuggor, kantlinjer och andra återkommande
+   designvärden in som variabler. De används senare i CSS:en för
+   att styra hur olika delar av sidan ska se ut.
+   ========================================================= */
+
+:root {
+    --bg: #edf2f7;
+    --surface: #ffffff;
+    --surface-soft: #f8fafc;
+    --border: #d7e0ea;
+    --border-strong: #c3cfdb;
+    --text: #122033;
+    --muted: #5e7188;
+    --primary: #173d6b;
+    --primary-strong: #102d4f;
+    --accent: #2580c3;
+    --accent-soft: #edf6fd;
+    --shadow: 0 12px 30px rgba(16, 45, 79, 0.08);
+    --radius-lg: 22px;
+    --radius-md: 14px;
+    --radius-sm: 10px;
 }
 
-body,
-input,
-button,
-textarea,
-select,
-table,
-th,
-td,
-label,
-a,
-span,
-div {
+/* =========================================================
+   2. Grundregler som börjar gälla direkt på sidan
+
+   Här finns de regler som direkt påverkar sidans element från
+   början. De används för att skapa en gemensam startpunkt för
+   hela sidan, så att layout, avstånd och beteenden fungerar på
+   ett mer förutsägbart och enhetligt sätt.
+   ========================================================= */
+
+*,
+*::before,
+*::after {
     box-sizing: border-box;
-    font-family: Tahoma, "MS Sans Serif", "Microsoft Sans Serif", Verdana, sans-serif;
 }
 
+html,
 body {
     min-height: 100%;
     margin: 0;
-    color: #222;
-    background: repeating-linear-gradient(
-            -45deg,
-            #dcdcdc,
-            #dcdcdc 7px,
-            #efefef 7px,
-            #efefef 14px
-    );
+}
+
+body {
+    font-family: "Segoe UI", Inter, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    color: var(--text);
+    background:
+            repeating-linear-gradient(
+                    -45deg,
+                    #e7ebef 0 26px,
+                    #f5f7f9 26px 52px
+            );
 }
 
 a {
-    color: #1f1f1f;
+    color: inherit;
     text-decoration: none;
 }
 
-a:hover {
-    text-decoration: underline;
+button,
+input,
+select,
+textarea {
+    font: inherit;
 }
 
-.app-shell {
-    padding: 8px 14px 12px;
+/* =========================================================
+   3. Sidans övergripande struktur och placering
+
+   Här finns regler för de större delarna av sidan, alltså den
+   yttre layouten som håller ihop innehållet. Den här sektionen
+   styr bland annat hur sidan fyller skärmen, hur innehållet
+   placeras inom sidan och hur mycket utrymme som finns runt
+   de olika huvuddelarna.
+   ========================================================= */
+
+.durtre-shell {
+    min-height: 100vh;
 }
 
-.top-header {
+.page-wrap {
+    max-width: 1360px;
+    margin: 0 auto;
+    padding: 24px 24px 40px;
+}
+
+.report-form {
+    display: block;
+}
+
+/* =========================================================
+   4. Sidhuvudet längst upp på sidan
+
+   Här finns regler för den översta delen av sidan där
+   polisloggan visas tillsammans med texten "DurTre",
+   "Polismyndigheten", etc.
+   ========================================================= */
+
+.topbar {
     display: flex;
     align-items: center;
-    gap: 12px;
-    margin-bottom: 4px;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 20px 32px;
+    background: linear-gradient(135deg, var(--primary-strong), var(--primary));
+    color: #ffffff;
+    box-shadow: 0 6px 20px rgba(16, 45, 79, 0.22);
 }
 
-.police-logo {
-    display: block;
-    width: 56px;
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    min-width: 0;
+}
+
+.brand-logo {
+    width: 58px;
     height: auto;
+    display: block;
     flex: 0 0 auto;
 }
 
-.system-title {
+.brand-text {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+}
+
+.brand-title-row {
     display: flex;
     align-items: baseline;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.brand-title {
+    font-size: 2rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+}
+
+.brand-subtitle {
+    font-size: 1.1rem;
+    font-weight: 500;
+    opacity: 0.92;
+}
+
+.brand-tagline {
+    font-size: 0.95rem;
+    color: rgba(255, 255, 255, 0.76);
+}
+
+.topbar-user {
+    display: flex;
+    align-items: center;
+}
+
+.user-chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 12px 16px;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(8px);
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+/* =========================================================
+   5. Informationsraden under sidhuvudet
+
+   Här finns regler för raden direkt under sidhuvudet där
+   information om den inloggade användaren och den aktiva
+   miljön visas.
+   ========================================================= */
+
+.meta-strip {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 18px;
+    padding: 12px 32px 0;
+    color: var(--muted);
+    font-size: 0.95rem;
+    align-items: center;
+}
+
+.meta-strip-button {
+    margin-left: auto;
+}
+
+.page-heading {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 24px;
+}
+
+.page-heading h1 {
+    margin: 0 0 8px;
+    font-size: 2rem;
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+}
+
+.page-kicker {
+    margin: 0 0 8px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+}
+
+.page-description {
+    margin: 0;
+    max-width: 760px;
+    color: var(--muted);
+    line-height: 1.5;
+}
+
+.page-heading-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+/* =========================================================
+   6. Indelning av sidan i kolumner
+
+   Här finns regler för hur sidans olika rutor och sektioner
+   placeras i förhållande till varandra. Den här delen styr
+   hur exempelvis "K-nummer & Polis", "Vittne & Offer",
+   "Bevis" och "Brottsplats" fördelas över sidan i kolumner,
+   hur mycket plats de får och hur avståndet mellan dem ser ut.
+   ========================================================= */
+
+.report-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+    align-items: start;
+}
+
+.report-column {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* =========================================================
+   7. Rutor för formulärets olika delar
+
+   Här finns regler för de boxar som delar upp formuläret i
+   tydliga sektioner. Den här delen styr hur rutorna ser ut,
+   till exempel deras bakgrund, form, skugga och avstånd
+   inuti varje del.
+   ========================================================= */
+
+.card {
+    background: rgba(255, 255, 255, 0.92);
+    border: 1px solid rgba(255, 255, 255, 0.65);
+    border-radius: var(--radius-lg);
+    padding: 22px;
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(10px);
+}
+
+.card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 14px;
+    margin-bottom: 20px;
+}
+
+.card-header h2 {
+    margin: 4px 0 0;
+    font-size: 1.55rem;
+    line-height: 1.15;
+    letter-spacing: -0.03em;
+}
+
+.card-kicker {
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+}
+
+/* =========================================================
+   8. Hur formulärets fält placeras i varje del
+
+   Här finns regler för hur formulärets fält ordnas inne i
+   sidans olika rutor. Den här sektionen styr bland annat om
+   fält visas under varandra eller bredvid varandra, som i
+   delen med "Vittne & Offer", och hur stort avståndet är
+   mellan fält, etiketter och innehåll i varje formulärdel.
+   ========================================================= */
+
+.field-grid {
+    display: grid;
+    gap: 18px;
+}
+
+.field-grid.two-columns {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.form-field {
+    display: flex;
+    flex-direction: column;
     gap: 8px;
 }
 
-.system-name {
-    font-size: 26px;
+.form-field label {
+    font-size: 0.98rem;
     font-weight: 700;
-    letter-spacing: -0.2px;
+    color: var(--text);
 }
 
-.system-subtitle {
-    font-size: 18px;
-    font-weight: 400;
-}
+/* =========================================================
+   9. Fälten där användaren skriver in uppgifter
 
-.menu-bar {
-    margin-bottom: 10px;
-    padding: 4px 10px 5px;
-    border: 1px solid #bcbcbc;
-    background: repeating-linear-gradient(
-            -45deg,
-            #eeeeee,
-            #eeeeee 7px,
-            #f8f8f8 7px,
-            #f8f8f8 14px
-    );
-    box-shadow:
-            inset 1px 1px 0 #ffffff,
-            inset -1px -1px 0 #d9d9d9,
-            0 1px 0 rgba(0, 0, 0, 0.04);
-}
+   Här finns regler för de rutor i formuläret där användaren
+   fyller i information. Den här delen styr hur fälten ser ut,
+   hur de markeras när man klickar i dem och hur till exempel
+   fältet för "K-nummer" får ett annat utseende än de övriga
+   fälten på sidan.
+   ========================================================= */
 
-.menu-root {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0;
-}
-
-.menu-root a {
-    display: inline-block;
-    padding: 3px 14px 4px;
-    font-size: 13px;
-    line-height: 1;
-    color: #222;
-    border: 1px solid transparent;
-}
-
-.menu-root a:hover {
-    border-top: 1px solid #ffffff;
-    border-left: 1px solid #ffffff;
-    border-right: 1px solid #9d9d9d;
-    border-bottom: 1px solid #9d9d9d;
-    background: linear-gradient(#f8f8f8, #e5e5e5);
-}
-
-.menu-root a:active {
-    border-top: 1px solid #8c8c8c;
-    border-left: 1px solid #8c8c8c;
-    border-right: 1px solid #ffffff;
-    border-bottom: 1px solid #ffffff;
-    background: linear-gradient(#dddddd, #f1f1f1);
-}
-
-.main-layout {
-    display: block;
-}
-
-.panel {
-    margin-bottom: 16px;
-    border: 1px solid #bcbcbc;
-    background: repeating-linear-gradient(
-            -45deg,
-            #efefef,
-            #efefef 7px,
-            #f8f8f8 7px,
-            #f8f8f8 14px
-    );
-    box-shadow:
-            inset 1px 1px 0 #ffffff,
-            inset -1px -1px 0 #d9d9d9,
-            0 1px 0 rgba(0, 0, 0, 0.05);
-}
-
-.panel-header {
-    padding: 5px 8px;
-    border-bottom: 1px solid #c9c9c9;
-    background: linear-gradient(#f5f5f5, #e3e3e3);
-    color: #333;
-    font-size: 12px;
-    font-weight: normal;
-    box-shadow: inset 0 1px 0 #ffffff;
-}
-
-.search-form {
-    padding: 12px 14px;
-}
-
-.panel-results {
-    padding: 12px 14px;
-}
-
-.panel-results > .panel-header {
-    margin: -12px -14px 12px;
-}
-
-.form-grid {
-    display: grid;
-    grid-template-columns: 105px 290px 105px 290px;
-    gap: 8px 12px;
-    align-items: center;
-}
-
-.form-group {
-    display: contents;
-}
-
-.form-group label {
-    font-size: 12px;
-    color: #2a2a2a;
-}
-
-.form-group input,
-.form-group select {
+.form-field input,
+.form-field select,
+.form-field textarea {
     width: 100%;
-    height: 24px;
-    font: inherit;
-    font-size: 12px;
-    color: #222;
-    border-top: 1px solid #7f7f7f;
-    border-left: 1px solid #7f7f7f;
-    border-right: 1px solid #ffffff;
-    border-bottom: 1px solid #ffffff;
+    min-height: 56px;
+    padding: 15px 16px;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-md);
+    color: var(--text);
     outline: none;
+    transition: border-color 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
 }
 
-.form-group input {
-    padding: 2px 6px;
+.form-field input:not(#caseNumber),
+.form-field select,
+.form-field textarea {
     background: #f3efc9;
-    box-shadow: inset 1px 1px 0 #fffbe3;
-}
-
-.form-group select {
-    padding: 1px 2px 1px 4px;
-    background: #f3efc9;
-    box-shadow: inset 1px 1px 0 #fffbe3;
-}
-
-.form-group input:focus,
-.form-group select:focus {
-    box-shadow:
-            inset 1px 1px 0 #fffbe3,
-            0 0 0 1px rgba(70, 110, 180, 0.18);
 }
 
 #caseNumber {
-    background: linear-gradient(#79a6e7, #4f7fc8);
+    background: linear-gradient(135deg, #4b88d1, #2f6fb8);
     color: #ffffff;
-    border-top: 1px solid #3a629d;
-    border-left: 1px solid #3a629d;
-    border-right: 1px solid #d9e6fb;
-    border-bottom: 1px solid #d9e6fb;
-    box-shadow: inset 1px 1px 0 rgba(255, 255, 255, 0.18);
+    border-color: #2d5f99;
+    font-weight: 700;
 }
 
 #caseNumber::placeholder {
-    color: rgba(255, 255, 255, 0.9);
+    color: rgba(255, 255, 255, 0.92);
 }
 
-.summary-block {
-    margin-top: 14px;
+.form-field input:not(#caseNumber):focus,
+.form-field select:focus,
+.form-field textarea:focus {
+    border-color: #d2c35d;
+    box-shadow: 0 0 0 4px rgba(243, 239, 201, 0.45);
+    background: #f6f1cc;
 }
 
-.summary-block label {
-    display: block;
-    margin-bottom: 4px;
-    font-size: 12px;
-    color: #2a2a2a;
+#caseNumber:focus {
+    border-color: #7db3df;
+    box-shadow: 0 0 0 4px rgba(37, 128, 195, 0.18);
+    background: linear-gradient(135deg, #4b88d1, #2f6fb8);
 }
 
-.summary-block textarea {
-    width: 100%;
-    min-height: 110px;
-    padding: 4px 6px;
-    font: inherit;
-    font-size: 12px;
-    color: #222;
-    resize: vertical;
-    border-top: 1px solid #7f7f7f;
-    border-left: 1px solid #7f7f7f;
-    border-right: 1px solid #ffffff;
-    border-bottom: 1px solid #ffffff;
-    outline: none;
-    background: #f3efc9;
-    box-shadow: inset 1px 1px 0 #fffbe3;
-}
+/* =========================================================
+   10. Delen för filer, bilder och bevis
 
-.summary-block textarea:focus {
-    box-shadow:
-            inset 1px 1px 0 #fffbe3,
-            0 0 0 1px rgba(70, 110, 180, 0.18);
-}
+   Här finns regler för området där användaren laddar upp
+   bevismaterial till ärendet. Sektionen styr hur knapparna
+   för att lägga till filer och bilder ser ut, och hur de
+   uppladdade objekten visas i listan under.
+   ========================================================= */
 
-.attachment-panel {
-    margin-top: 16px;
-    margin-bottom: 0;
-}
-
-.attachment-actions,
-.document-actions {
-    margin-top: 0;
-    padding: 12px 14px;
-    text-align: left;
-}
-
-.attachment-actions button,
-.document-actions button {
-    margin-left: 0;
-    margin-right: 6px;
-}
-
-.attachment-panel .result-table td {
-    background: rgba(255, 255, 255, 0.12);
-}
-
-.attachment-panel .result-table tbody tr:hover td {
-    background: rgba(255, 255, 255, 0.24);
-}
-
-.attachment-panel .selected-row td {
-    background: rgba(188, 210, 242, 0.35);
-}
-
-.checkbox-row {
+.upload-toolbar {
     display: flex;
+    gap: 10px;
     flex-wrap: wrap;
-    align-items: center;
-    gap: 10px 18px;
-    margin-top: 10px;
+    margin-bottom: 16px;
 }
 
-.checkbox-row label {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    font-size: 12px;
-    color: #222;
+.evidence-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
 }
 
-.checkbox-row input[type="checkbox"] {
-    margin: 0;
+.evidence-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    padding: 14px 16px;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: #fbfdff;
+}
+
+.file-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+}
+
+.file-name {
+    font-weight: 700;
+    color: var(--text);
+    overflow-wrap: anywhere;
+}
+
+.file-type,
+.file-status {
+    color: var(--muted);
+    font-size: 0.95rem;
+}
+
+/* =========================================================
+   11. Knapparna på sidan
+
+   Här finns regler för sidans knappar. Den här delen bestämmer
+   hur knapparna ser ut, hur mycket plats de tar och hur de
+   ändras när användaren håller musen över dem eller klickar på dem.
+   ========================================================= */
+
+.btn {
+    appearance: none;
+    border: 1px solid transparent;
+    border-radius: 12px;
+    min-height: 48px;
+    padding: 0 18px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.18s ease;
+}
+
+.btn:hover {
     transform: translateY(-1px);
 }
 
-.button-row {
-    margin-top: 10px;
-    text-align: right;
-}
-
-.button-row button {
-    min-width: 74px;
-    height: 25px;
-    padding: 0 10px;
-    font: inherit;
-    font-size: 12px;
-    color: #222;
-    cursor: pointer;
-    background: linear-gradient(#f5f5f5, #dfdfdf);
-    border-top: 1px solid #ffffff;
-    border-left: 1px solid #ffffff;
-    border-right: 1px solid #818181;
-    border-bottom: 1px solid #818181;
-    box-shadow: inset 1px 1px 0 #f8f8f8;
-}
-
-.button-row button + button {
-    margin-left: 6px;
-}
-
-.button-row button:hover {
-    background: linear-gradient(#fafafa, #e7e7e7);
-}
-
-.button-row button:active {
-    border-top: 1px solid #818181;
-    border-left: 1px solid #818181;
-    border-right: 1px solid #ffffff;
-    border-bottom: 1px solid #ffffff;
-    box-shadow: inset 1px 1px 0 #c7c7c7;
-    background: linear-gradient(#dddddd, #f1f1f1);
-}
-
-.button-row button:disabled {
-    color: #777;
-    cursor: default;
-    background: linear-gradient(#f1f1f1, #e3e3e3);
-}
-
-.panel-header-meta {
-    margin-left: 10px;
-    font-size: 11px;
-    font-weight: normal;
-    color: #5a5a5a;
-}
-
-.result-table {
-    width: 100%;
-    table-layout: fixed;
-    border-collapse: collapse;
-    background: transparent;
-}
-
-.result-table th,
-.result-table td {
-    padding: 7px 10px;
-    overflow: hidden;
-    text-align: left;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    font-size: 12px;
-    font-weight: normal;
-}
-
-.result-table th {
-    color: #222;
-    background: linear-gradient(#f4f4f4, #e1e1e1);
-    border-top: 1px solid #ffffff;
-    border-left: 1px solid #ffffff;
-    border-right: 1px solid #9d9d9d;
-    border-bottom: 1px solid #9d9d9d;
-    box-shadow: inset 0 1px 0 #ffffff;
-}
-
-.result-table td {
-    color: #222;
-    border: 1px solid #bcbcbc;
-    background: rgba(255, 255, 255, 0.18);
-}
-
-.result-table tbody tr:hover td {
-    background: rgba(255, 255, 255, 0.30);
-}
-
-.selected-row td {
-    background: rgba(188, 210, 242, 0.42);
-}
-
-.overview-label {
-    width: 220px;
-}
-
-.document-box {
-    margin-top: 16px;
-    border: 1px solid #bcbcbc;
-    background: repeating-linear-gradient(
-            -45deg,
-            #efefef,
-            #efefef 7px,
-            #f8f8f8 7px,
-            #f8f8f8 14px
-    );
-    box-shadow:
-            inset 1px 1px 0 #ffffff,
-            inset -1px -1px 0 #d9d9d9;
-}
-
-.document-box .result-table td {
-    background: rgba(255, 255, 255, 0.16);
-}
-
-.status-bar {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px 18px;
-    margin-top: 10px;
-    padding: 10px 14px;
-    font-size: 14px;
-    font-weight: 700;
+.btn-primary {
     color: #ffffff;
-    background: linear-gradient(#5f8fd4, #3f6fb6);
-    border-top: 1px solid #9fbce9;
-    border-left: 1px solid #9fbce9;
-    border-right: 1px solid #2f548d;
-    border-bottom: 1px solid #2f548d;
-    box-shadow: inset 1px 1px 0 rgba(255, 255, 255, 0.2);
+    background: linear-gradient(135deg, #2e8fcd, #1874b5);
+    box-shadow: 0 10px 20px rgba(24, 116, 181, 0.20);
 }
 
-@media (max-width: 1100px) {
-    .form-grid {
-        grid-template-columns: 105px 1fr;
-    }
+.btn-primary:hover {
+    filter: brightness(1.02);
+}
 
-    .button-row {
-        text-align: left;
-    }
+.btn-secondary {
+    color: var(--text);
+    background: #f8fbfe;
+    border-color: var(--border-strong);
+}
 
-    .menu-root {
-        gap: 14px 18px;
-    }
+.btn-secondary:hover {
+    background: #ffffff;
 }

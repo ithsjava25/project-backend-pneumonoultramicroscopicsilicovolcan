@@ -2,303 +2,182 @@
 <html lang="sv" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DurTre - Skapa nytt ärende</title>
     <link rel="stylesheet" href="/css/durtre-reports-prototype.css">
 </head>
-<body>
+<body class="durtre-body">
 
-<div class="app-shell">
+<div class="durtre-shell">
 
-    <header class="top-header">
-        <img th:src="@{/images/police-logo-color.png}"
-             src="/images/police-logo-color.png"
-             alt="Polislogga"
-             class="police-logo">
+    <header class="topbar">
+        <div class="brand">
+            <img th:src="@{/images/police-logo-color.png}"
+                 src="/images/police-logo-color.png"
+                 alt="Polislogga"
+                 class="brand-logo">
 
-        <div class="system-title">
-            <span class="system-name">DurTre</span>
-            <span class="system-subtitle">Polismyndigheten</span>
+            <div class="brand-text">
+                <div class="brand-title-row">
+                    <span class="brand-title">DurTre</span>
+                    <span class="brand-subtitle">Polismyndigheten</span>
+                </div>
+                <span class="brand-tagline">Skapa och registrera ärenden</span>
+            </div>
+        </div>
+
+        <div class="topbar-user">
+            <span class="user-chip">demouser · Polis</span>
         </div>
     </header>
 
-    <nav class="menu-bar">
-        <div class="menu-root">
-            <a href="#">Arkiv</a>
-            <a href="#">Redigera</a>
-            <a href="#">Funktioner</a>
-            <a href="#">Registrera</a>
-            <a href="#">Sök</a>
-            <a href="#">Verktyg</a>
-            <a href="#">Fönster</a>
-            <a href="#">Hjälp</a>
-        </div>
-    </nav>
+    <div class="meta-strip">
+        <span>Inloggad som: <strong>demouser</strong></span>
+        <span>Roll: <strong>Polis</strong></span>
+        <span>Avdelning: <strong>Centrum</strong></span>
+        <span>Aktiv databas: <strong>TESTMILJÖ</strong></span>
+        <span>Senast uppdaterad: <strong>2026-03-14 10:03</strong></span>
 
-    <main class="main-layout">
+        <button type="submit" form="caseForm" class="btn btn-primary meta-strip-button">
+            Registrera ärende
+        </button>
+    </div>
 
-        <section class="panel panel-search">
-            <div class="panel-header">Skapa nytt ärende</div>
+    <main class="page-wrap">
+        <form id="caseForm" class="report-form" action="#" method="post" enctype="multipart/form-data">
 
-            <form class="search-form" action="#" method="post" enctype="multipart/form-data">
-                <div class="form-grid">
+            <input id="evidenceFiles" name="evidenceFiles" type="file" multiple hidden>
+            <input id="evidenceImages" name="evidenceImages" type="file" accept="image/*" multiple hidden>
 
-                    <div class="form-group">
-                        <label for="caseNumber">K-nummer</label>
-                        <input id="caseNumber"
-                               name="caseNumber"
-                               type="text"
-                               value="Genereras vid registrering"
-                               readonly>
-                    </div>
+            <div class="report-grid">
 
-                    <div class="form-group">
-                        <label for="createdBy">Registreras av</label>
-                        <input id="createdBy"
-                               name="createdBy"
-                               type="text"
-                               value="demouser"
-                               readonly>
-                    </div>
+                <div class="report-column">
+                    <section class="card">
+                        <div class="card-header">
+                            <div>
+                                <span class="card-kicker">Ärende</span>
+                                <h2>K-nummer & Polis</h2>
+                            </div>
+                        </div>
 
-                    <div class="form-group">
-                        <label for="officer">Ansvarig handläggare</label>
-                        <input id="officer" name="officer" type="text" placeholder="Ange handläggare">
-                    </div>
+                        <div class="field-grid">
+                            <div class="form-field">
+                                <label for="caseNumber">K-nummer</label>
+                                <input id="caseNumber"
+                                       name="caseNumber"
+                                       type="text"
+                                       placeholder="Ange K-nummer">
+                            </div>
 
-                    <div class="form-group">
-                        <label for="group">Grupp</label>
-                        <select id="group" name="group">
-                            <option value=""></option>
-                            <option value="city-nord">Göteborg</option>
-                            <option value="regional">Regional utredning</option>
-                        </select>
-                    </div>
+                            <div class="form-field">
+                                <label for="policeOfficer">Polis</label>
+                                <input id="policeOfficer"
+                                       name="policeOfficer"
+                                       type="text"
+                                       placeholder="Ange polis">
+                            </div>
+                        </div>
+                    </section>
 
-                    <div class="form-group">
-                        <label for="department">Avdelning</label>
-                        <select id="department" name="department">
-                            <option value=""></option>
-                            <option value="city-syd">Centrum</option>
-                            <option value="vaster">Väst</option>
-                            <option value="oster">Öst</option>
-                        </select>
-                    </div>
+                    <section class="card">
+                        <div class="card-header">
+                            <div>
+                                <span class="card-kicker">Material</span>
+                                <h2>Bevis</h2>
+                            </div>
+                        </div>
 
-                    <div class="form-group">
-                        <label for="crime">Brottsrubricering</label>
-                        <select id="crime" name="crime">
-                            <option value=""></option>
-                            <option value="ofredande">Ofredande</option>
-                            <option value="bedrageri">Bedrägeri</option>
-                            <option value="misshandel">Misshandel</option>
-                            <option value="stold">Stöld</option>
-                            <option value="skadegorelse">Skadegörelse</option>
-                            <option value="olaga-hot">Olaga hot</option>
-                        </select>
-                    </div>
+                        <div class="upload-toolbar">
+                            <button type="button"
+                                    class="btn btn-secondary"
+                                    onclick="document.getElementById('evidenceFiles').click()">
+                                Lägg till filer
+                            </button>
 
-                    <div class="form-group">
-                        <label for="date">Händelsedatum</label>
-                        <input id="date" name="date" type="text" placeholder="ÅÅÅÅ-MM-DD HH:MM">
-                    </div>
+                            <button type="button"
+                                    class="btn btn-secondary"
+                                    onclick="document.getElementById('evidenceImages').click()">
+                                Lägg till bilder
+                            </button>
+                        </div>
 
-                    <div class="form-group">
-                        <label for="location">Ort / Plats</label>
-                        <select id="location" name="location">
-                            <option value=""></option>
-                            <option value="stockholm">Stockholm</option>
-                            <option value="goteborg">Göteborg</option>
-                            <option value="malmo">Malmö</option>
-                        </select>
-                    </div>
+                        <div class="evidence-list">
+                            <div class="evidence-row">
+                                <div class="file-meta">
+                                    <span class="file-name">brottsplats_1.jpg</span>
+                                    <span class="file-type">Bild</span>
+                                </div>
+                                <div class="file-status">1.8 MB · Klar för uppladdning</div>
+                            </div>
 
-                    <div class="form-group">
-                        <label for="complainant">Målsägande / Anmälare</label>
-                        <input id="complainant" name="complainant" type="text" placeholder="Namn eller identitet">
-                    </div>
+                            <div class="evidence-row">
+                                <div class="file-meta">
+                                    <span class="file-name">vittnesanteckning.pdf</span>
+                                    <span class="file-type">Dokument</span>
+                                </div>
+                                <div class="file-status">420 kB · Klar för uppladdning</div>
+                            </div>
 
-                    <div class="form-group">
-                        <label for="suspect">Misstänkt</label>
-                        <input id="suspect" name="suspect" type="text" placeholder="Namn eller okänd gärningsperson">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="lawyer">Advokat</label>
-                        <input id="lawyer" name="lawyer" type="text" placeholder="Ange advokat">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="prosecutor">Åklagare</label>
-                        <input id="prosecutor" name="prosecutor" type="text" placeholder="Ange åklagare">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="priority">Prioritet</label>
-                        <select id="priority" name="priority">
-                            <option value="normal">Normal</option>
-                            <option value="high">Hög</option>
-                            <option value="urgent">Akut</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="status">Initial status</label>
-                        <select id="status" name="status">
-                            <option value="oppen">Öppen</option>
-                            <option value="pagande">Pågående</option>
-                            <option value="vilande">Vilande</option>
-                        </select>
-                    </div>
+                            <div class="evidence-row">
+                                <div class="file-meta">
+                                    <span class="file-name">kamera_02.png</span>
+                                    <span class="file-type">Bild</span>
+                                </div>
+                                <div class="file-status">2.1 MB · Klar för uppladdning</div>
+                            </div>
+                        </div>
+                    </section>
                 </div>
 
-                <div class="summary-block">
-                    <label for="summary">Kort händelsebeskrivning</label>
-                    <textarea id="summary"
-                              name="summary"
-                              rows="6"
-                              placeholder="Beskriv händelsen kortfattat..."></textarea>
+                <div class="report-column">
+                    <section class="card">
+                        <div class="card-header">
+                            <div>
+                                <span class="card-kicker">Personer</span>
+                                <h2>Vittne & Offer</h2>
+                            </div>
+                        </div>
+
+                        <div class="field-grid two-columns">
+                            <div class="form-field">
+                                <label for="witness">Vittne</label>
+                                <input id="witness"
+                                       name="witness"
+                                       type="text"
+                                       placeholder="Ange namn på vittne">
+                            </div>
+
+                            <div class="form-field">
+                                <label for="victim">Offer</label>
+                                <input id="victim"
+                                       name="victim"
+                                       type="text"
+                                       placeholder="Ange namn på offer">
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="card">
+                        <div class="card-header">
+                            <div>
+                                <span class="card-kicker">Plats</span>
+                                <h2>Brottsplats</h2>
+                            </div>
+                        </div>
+
+                        <div class="form-field">
+                            <label for="crimeScene">Brottsplats</label>
+                            <input id="crimeScene"
+                                   name="crimeScene"
+                                   type="text"
+                                   placeholder="Ange brottsplats">
+                        </div>
+                    </section>
                 </div>
 
-                <input id="evidenceFiles" name="evidenceFiles" type="file" multiple hidden>
-                <input id="evidenceImages" name="evidenceImages" type="file" accept="image/*" multiple hidden>
-
-                <div class="panel attachment-panel">
-                    <div class="panel-header">Bilagor</div>
-
-                    <div class="button-row attachment-actions">
-                        <button type="button" onclick="document.getElementById('evidenceFiles').click()">Lägg till filer</button>
-                        <button type="button" onclick="document.getElementById('evidenceImages').click()">Lägg till bilder</button>
-                        <button type="button">Ta bort vald bilaga</button>
-                    </div>
-
-                    <table class="result-table">
-                        <thead>
-                        <tr>
-                            <th>Filnamn</th>
-                            <th>Typ</th>
-                            <th>Storlek</th>
-                            <th>Status</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr class="selected-row">
-                            <td>brottsplats_1.jpg</td>
-                            <td>Bild</td>
-                            <td>1.8 MB</td>
-                            <td>Klar för uppladdning</td>
-                        </tr>
-                        <tr>
-                            <td>vittnesanteckning.pdf</td>
-                            <td>Dokument</td>
-                            <td>420 kB</td>
-                            <td>Klar för uppladdning</td>
-                        </tr>
-                        <tr>
-                            <td>kamera_02.png</td>
-                            <td>Bild</td>
-                            <td>2.1 MB</td>
-                            <td>Klar för uppladdning</td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <div class="checkbox-row">
-                    <label><input type="checkbox"> sekretessmarkera</label>
-                    <label><input type="checkbox"> brådskande ärende</label>
-                    <label><input type="checkbox"> barn inblandat</label>
-                    <label><input type="checkbox"> relationsärende</label>
-                    <label><input type="checkbox" checked> skapa som utkast först</label>
-                </div>
-
-                <div class="button-row">
-                    <button type="submit">Registrera ärende</button>
-                    <button type="button">Spara utkast</button>
-                    <button type="reset">Rensa</button>
-                </div>
-            </form>
-        </section>
-
-        <section class="panel panel-results">
-            <div class="panel-header">
-                <span>Ärendeöversikt</span>
-                <span class="panel-header-meta">nyregistrering</span>
             </div>
-
-            <table class="result-table">
-                <tbody>
-                <tr>
-                    <th class="overview-label">Status</th>
-                    <td>Ej registrerat</td>
-                </tr>
-                <tr>
-                    <th class="overview-label">K-nummer</th>
-                    <td>Tilldelas automatiskt vid registrering</td>
-                </tr>
-                <tr>
-                    <th class="overview-label">Rapport-UUID</th>
-                    <td>Skapas vid registrering</td>
-                </tr>
-                <tr>
-                    <th class="overview-label">Registreras av</th>
-                    <td>demouser</td>
-                </tr>
-                <tr>
-                    <th class="overview-label">Roll</th>
-                    <td>Utredare</td>
-                </tr>
-                <tr>
-                    <th class="overview-label">PDF-status</th>
-                    <td>Inte skapad ännu</td>
-                </tr>
-                <tr>
-                    <th class="overview-label">Bilagor</th>
-                    <td>3 filer valda</td>
-                </tr>
-                <tr>
-                    <th class="overview-label">Bildsida i PDF</th>
-                    <td>Skapas automatiskt om bilder finns</td>
-                </tr>
-                </tbody>
-            </table>
-
-            <div class="document-box">
-                <table class="result-table">
-                    <thead>
-                    <tr>
-                        <th>Dokument</th>
-                        <th>Status</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr>
-                        <td>Anmälnings-PDF</td>
-                        <td>Skapas vid registrering</td>
-                    </tr>
-                    <tr>
-                        <td>Bilagearkiv</td>
-                        <td>Tillgängligt efter registrering</td>
-                    </tr>
-                    </tbody>
-                </table>
-
-                <div class="button-row document-actions">
-                    <button type="button" disabled>Öppna PDF</button>
-                    <button type="button" disabled>Ladda ner PDF</button>
-                    <button type="button" disabled>Ladda ner bilagor</button>
-                </div>
-            </div>
-        </section>
-
+        </form>
     </main>
-
-    <footer class="status-bar">
-        <span>Inloggad som: demouser</span>
-        <span>Roll: Utredare</span>
-        <span>Avdelning: Centrum</span>
-        <span>Aktiv databas: TESTMILJÖ</span>
-        <span>Senast uppdaterad: 2026-03-14 10:03</span>
-    </footer>
 
 </div>
 
