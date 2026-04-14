@@ -14,7 +14,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.UUID;
 
 @Controller
@@ -68,13 +70,17 @@ public class HomeController {
     public String saveReport(
             @ModelAttribute("newReport") @Valid CreateReport newReport,
             BindingResult bindingResult,
-            @AuthenticationPrincipal Account currentUser) {
+            @RequestParam("file") MultipartFile file, // Viktigt: Ta emot filen här!
+            @AuthenticationPrincipal Account currentUser) throws IOException {
 
         if (bindingResult.hasErrors()) {
-            log.info("Binding Error: {}", bindingResult.getAllErrors().getLast());
+            log.info("Binding Error: {}", bindingResult.getAllErrors());
             return "private";
         }
-        reportService.saveReport(newReport, currentUser);
+
+
+        reportService.saveReportWithFile(newReport, file);
+
         return "redirect:/userpage";
     }
 
