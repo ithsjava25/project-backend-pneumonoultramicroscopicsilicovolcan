@@ -1,4 +1,4 @@
-package org.example.crimearchive.Entity.försvare;
+package org.example.crimearchive.entities.defense;
 
 
 import jakarta.persistence.*;

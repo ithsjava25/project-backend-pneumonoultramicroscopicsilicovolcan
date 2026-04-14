@@ -1,4 +1,9 @@
 package org.example.crimearchive.repositories;
 
-public interface BrottsofferRepository {
+import org.example.crimearchive.entities.BrottsOffer.Brottsoffer;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface BrottsofferRepository extends JpaRepository<Brottsoffer, Long> {
 }
