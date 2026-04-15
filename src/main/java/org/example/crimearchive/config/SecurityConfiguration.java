@@ -21,7 +21,7 @@ public class SecurityConfiguration {
         return http
                 .authorizeHttpRequests(auth -> {
                     auth.requestMatchers("/").permitAll();
-                    auth.requestMatchers("/static/**").permitAll();
+                    auth.requestMatchers("/*.css", "/images/**").permitAll();
                     auth.requestMatchers("/favicon.ico").permitAll();
                     auth.requestMatchers("/index").permitAll();
                     auth.requestMatchers("/error").permitAll();

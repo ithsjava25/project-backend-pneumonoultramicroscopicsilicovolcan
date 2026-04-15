@@ -84,6 +84,7 @@ public class HomeController {
     @GetMapping("/profile")
     public String profilePage(@AuthenticationPrincipal Account user, Model model) {
         List<Cases> caseList = caseService.getAuthzCases(user.getId());
+        model.addAttribute("currentUser", user);
         model.addAttribute("cases", caseService.getReportsWithCaseNumber(caseList));
         model.addAttribute("user", user);
         return "profile";

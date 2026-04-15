@@ -2,10 +2,45 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>DurTre Profil</title>
+    <title>DurTre - Profil</title>
+    <link rel="stylesheet" th:href="@{/style.css}">
 </head>
-<body>
-<div>
+<body class="durtre-body">
+
+<div class="durtre-shell">
+
+    <header class="topbar">
+        <div class="brand">
+            <img th:src="@{/images/police-logo-color.png}"
+                 alt="Polislogga"
+                 class="brand-logo">
+
+            <div class="brand-text">
+                <div class="brand-title-row">
+                    <span class="brand-title">DurTre</span>
+                    <span class="brand-subtitle">Polismyndigheten</span>
+                </div>
+                <span class="brand-tagline">Profilsida</span>
+            </div>
+        </div>
+
+        <div class="topbar-user">
+            <span class="user-chip" th:text="${currentUser.getFullName()}"></span>
+            <button class="user-chip" th:onclick="location.href='/logout'">Logga ut</button>
+        </div>
+    </header>
+    <div class="meta-strip">
+        <span>Inloggad som: <strong th:text="${currentUser.getUsername()}"></strong></span>
+        <span>Roll: <strong th:text="${currentUser.getProfession()}"></strong></span>
+        <span>Avdelning: <strong th:text="${currentUser.getDepartment()}"></strong></span>
+        <span>Aktiv databas: <strong>TESTMILJÖ</strong></span>
+        <span>Senast uppdaterad: <strong>2026-03-14 10:03</strong></span>
+
+        <button th:onclick="location.href='/private'" class="btn btn-primary meta-strip-button">
+            Registrera ärende
+        </button>
+    </div>
+
     <h3>Tilldelade fall</h3>
     <table>
         <thead>
@@ -29,17 +64,10 @@
         </tr>
         </tbody>
     </table>
-</div>
-<div>
-    <h2>Profil</h2>
-    <label>Användarnamn: </label>
-    <span th:text="${user.getUsername()}"></span><br/>
-    <label>Roller: </label>
-    <span th:text="${user.getAuthorities()}"></span>
-</div>
-<div>
-    <a th:href="@{/userpage}">Rapportera nytt ärende</a>
-    <a th:href="@{/cases}">Sök tilldelade fall</a>
+    <div>
+        <button class="btn btn-primary meta-strip-button" th:onclick="location.href='/cases'">Sök tilldelade fall
+        </button>
+    </div>
 </div>
 </body>
 </html>
