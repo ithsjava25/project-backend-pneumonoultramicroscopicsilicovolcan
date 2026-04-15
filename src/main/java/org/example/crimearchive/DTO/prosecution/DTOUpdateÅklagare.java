@@ -1,4 +1,4 @@
-package org.example.crimearchive.DTO.Åklagare;
+package org.example.crimearchive.dto.prosecution;
 
 public record DTOUpdateÅklagare(
     String name,

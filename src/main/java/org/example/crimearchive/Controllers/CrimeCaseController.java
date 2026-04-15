@@ -1,4 +1,4 @@
-package org.example.crimearchive.Controllers;
+package org.example.crimearchive.controllers;
 
 import jakarta.validation.Valid;
 import org.example.crimearchive.dto.knumber.DTOCreateKnumber;

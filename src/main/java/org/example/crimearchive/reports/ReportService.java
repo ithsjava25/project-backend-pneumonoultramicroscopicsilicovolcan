@@ -4,8 +4,8 @@ import com.itextpdf.text.Document;
 import com.itextpdf.text.Image;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.pdf.PdfWriter;
-import org.example.crimearchive.DTO.CreateReport;
-import org.example.crimearchive.DTO.ReportResponse;
+import org.example.crimearchive.dto.CreateReport;
+import org.example.crimearchive.dto.ReportResponse;
 import org.example.crimearchive.KNumberService;
 import org.example.crimearchive.cases.Cases;
 import org.example.crimearchive.cases.CasesRepository;
@@ -141,7 +141,20 @@ public class ReportService {
                 );
             }
 
-            reportRepository.save(ReportMapper.toEntity(report, s3KeyPdf, s3KeyFile));
+            Cases cases;
+            if (report.caseNumber() == null || report.caseNumber().isBlank()) {
+                String newCaseNumber = knumberService.getKNumber();
+                cases = new Cases(newCaseNumber);
+                casesRepository.save(cases);
+            } else {
+                String sanitized = caseNumberSanitation(report.caseNumber());
+                cases = casesRepository.findFirstByCaseNumber(sanitized)
+                        .orElseThrow(() -> new RuntimeException("Case not found: " + sanitized));
+            }
+
+            Report newReport = ReportMapper.toEntity(report, s3KeyPdf, s3KeyFile);
+            newReport.setCaseEntity(cases);
+            reportRepository.save(newReport);
 
         } catch (Exception e) {
             try {
