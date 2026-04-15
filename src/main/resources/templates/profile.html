@@ -45,7 +45,7 @@
     <table>
         <thead>
         <th><span>K-Nummber</span></th>
-        <th><span>Händelse</span></th>
+        <th><span>Antal kopplade rapporter</span></th>
         </thead>
         <tbody>
         <tr th:if="${cases.isEmpty()}">
@@ -54,12 +54,10 @@
         <tr th:each="entry : ${cases}">
             <td><span th:text="${entry.key}"></span></td>
             <td>
-                <ul>
-                    <li th:each="report : ${entry.value}">
-                        <span th:text="${report.getEvent()}"></span>
-                        <button>Gå till rapport</button>
-                    </li>
-                </ul>
+                <span th:text="${entry.value.size()}"></span>
+            </td>
+            <td>
+                <a th:href="@{/caseoverview}">Översikt</a>
             </td>
         </tr>
         </tbody>
