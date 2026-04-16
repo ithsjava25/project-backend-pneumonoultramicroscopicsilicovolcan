@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>DurTre - Profil</title>
+    <link rel="stylesheet" th:href="@{/style.css}">
+</head>
+<body>
+<div class="durtre-shell">
+
+    <header class="topbar">
+        <div class="brand">
+            <img th:src="@{/images/police-logo-color.png}"
+                 alt="Polislogga"
+                 class="brand-logo">
+
+            <div class="brand-text">
+                <div class="brand-title-row">
+                    <span class="brand-title">DurTre</span>
+                    <span class="brand-subtitle">Polismyndigheten</span>
+                </div>
+                <span class="brand-tagline">Utredningsöversikt</span>
+            </div>
+        </div>
+
+        <div class="topbar-user">
+            <span class="user-chip" th:text="${currentUser.getFullName()}"></span>
+            <button class="user-chip" th:onclick="location.href='/logout'">Logga ut</button>
+        </div>
+    </header>
+    <div class="meta-strip">
+        <span>Inloggad som: <strong th:text="${currentUser.getUsername()}"></strong></span>
+        <span>Roll: <strong th:text="${currentUser.getProfession()}"></strong></span>
+        <span>Avdelning: <strong th:text="${currentUser.getDepartment()}"></strong></span>
+        <span>Aktiv databas: <strong>TESTMILJÖ</strong></span>
+        <span>Senast uppdaterad: <strong>2026-03-14 10:03</strong></span>
+
+        <button th:onclick="location.href='/private'" class="btn btn-primary meta-strip-button">
+            Registrera ärende
+        </button>
+    </div>
+
+    <main class="page-wrap">
+        <div class="report-grid">
+
+            <div class="report-column">
+                <section class="card">
+                    <div class="card-header">
+                        <div>
+                            <span class="card-kicker">Ärende</span>
+                            <h2>K-nummer & Polis</h2>
+                        </div>
+                    </div>
+
+                    <div class="field-grid">
+                        <div class="form-field">
+                            <label>K-nummer</label>
+                            <span th:text="${rawcasenumber}">K nummer</span>
+                        </div>
+
+                        <div class="form-field">
+                            <label for="policeOfficer">Polis</label>
+                            <ul>
+                                <li id="policeOfficer">
+                                    Lista av tilldelade poliser till ärendet
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="card">
+                    <div class="card-header">
+                        <div>
+                            <span class="card-kicker">Material</span>
+                            <h2>Bevis</h2>
+                        </div>
+                    </div>
+
+                    <div class="upload-toolbar">
+                        <button type="button"
+                                class="btn btn-secondary"
+                                th:onclick="document.getElementById('evidenceFiles').click()">
+                            Lägg till filer
+                        </button>
+
+                        <button type="button"
+                                class="btn btn-secondary"
+                                onclick="document.getElementById('evidenceImages').click()">
+                            Lägg till bilder
+                        </button>
+                    </div>
+
+                    <div class="evidence-list">
+                        <div class="evidence-row">
+                            <div class="file-meta">
+                                <span class="file-name">brottsplats_1.jpg</span>
+                                <span class="file-type">Bild</span>
+                            </div>
+                            <div class="file-status">1.8 MB · Klar för uppladdning</div>
+                        </div>
+
+                        <div class="evidence-row">
+                            <div class="file-meta">
+                                <span class="file-name">vittnesanteckning.pdf</span>
+                                <span class="file-type">Dokument</span>
+                            </div>
+                            <div class="file-status">420 kB · Klar för uppladdning</div>
+                        </div>
+
+                        <div class="evidence-row">
+                            <div class="file-meta">
+                                <span class="file-name">kamera_02.png</span>
+                                <span class="file-type">Bild</span>
+                            </div>
+                            <div class="file-status">2.1 MB · Klar för uppladdning</div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <div class="report-column">
+                <section class="card">
+                    <div class="card-header">
+                        <div>
+                            <span class="card-kicker">Personer</span>
+                            <h2>Vittne & Offer</h2>
+                        </div>
+                    </div>
+
+                    <div class="field-grid two-columns">
+                        <div class="form-field">
+                            <label for="witness">Vittne</label>
+                            <input id="witness"
+                                   name="witness"
+                                   type="text"
+                                   placeholder="Ange namn på vittne">
+                        </div>
+
+                        <div class="form-field">
+                            <label for="victim">Offer</label>
+                            <input id="victim"
+                                   name="victim"
+                                   type="text"
+                                   placeholder="Ange namn på offer">
+                        </div>
+                    </div>
+                </section>
+
+                <section class="card">
+                    <div class="card-header">
+                        <div>
+                            <span class="card-kicker">Plats</span>
+                            <h2>Brottsplats</h2>
+                        </div>
+                    </div>
+
+                    <div class="form-field">
+                        <label for="crimeScene">Brottsplats</label>
+                        <input id="crimeScene"
+                               name="crimeScene"
+                               type="text"
+                               placeholder="Ange brottsplats">
+                    </div>
+                </section>
+            </div>
+
+        </div>
+    </main>
+    <div>
+        <button class="btn btn-primary meta-strip-button" th:onclick="location.href='/cases'">Sök tilldelade fall
+        </button>
+    </div>
+</div>
+</body>
+</html>

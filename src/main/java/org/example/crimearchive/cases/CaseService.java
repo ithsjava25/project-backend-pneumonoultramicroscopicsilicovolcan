@@ -44,8 +44,20 @@ public class CaseService {
         return casesRepository.findByAccountsId(accountId);
     }
 
-    public Report getReports(Cases caseId) {
+    public Report getReport(Cases caseId) {
         return reportRepository.getReportByCaseEntity(caseId);
+    }
+
+    public Set<Report> getReportSet(Long caseId) {
+        var caseSet = casesRepository.findById(caseId);
+        if (caseSet.isEmpty()) throw new RuntimeException("Resource not found");
+        return caseSet.get().getReports();
+    }
+
+    public Set<Report> getReportSet(String caseNumber) {
+        Long id = caseIdFromCaseNumber(caseNumber);
+        System.out.println("Id found from caseNumber: " + id);
+        return casesRepository.findById(id).orElseThrow().getReports();
     }
 
     public Map<String, Set<Report>> getReportsWithCaseNumber(List<Cases> grantedCases) {
@@ -53,6 +65,11 @@ public class CaseService {
                 cases -> cases.getCaseNumber(), c2 -> c2.getReports()
         ));
         return repos;
+    }
+
+
+    public Long caseIdFromCaseNumber(String casenumber) {
+        return casesRepository.findIdByCaseNumberContaining(casenumber);
     }
 
 //

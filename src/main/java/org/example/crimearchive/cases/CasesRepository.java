@@ -1,5 +1,6 @@
 package org.example.crimearchive.cases;
 
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.ListCrudRepository;
 import org.springframework.stereotype.Repository;
 
@@ -15,6 +16,10 @@ public interface CasesRepository extends ListCrudRepository<Cases, Long> {
 
     boolean existsByCaseNumber(String casenumber);
 
+    @Query(value = "select c.id from cases c where c.case_number like concat('%', :caseNumber)", nativeQuery = true)
+    Long findIdByCaseNumberContaining(String caseNumber);
+
+    String findCaseNumberById(Long id);
 
 
     List<Cases> findByAccountsId(Long accountId);

@@ -90,6 +90,17 @@ public class HomeController {
         return "profile";
     }
 
+    @GetMapping("/caseoverview")
+    public String caseoverview(@AuthenticationPrincipal Account user,
+                               Model model, @RequestParam String casenumber) {
+
+        var overviewList = caseService.getReportSet(casenumber);
+        System.out.println("amount of reports: " + overviewList.size());
+        model.addAttribute("currentUser", user);
+        model.addAttribute("rawcasenumber", casenumber);
+        return "caseoverview";
+    }
+
     @GetMapping("/reports/{uuid}/download/pdf")
     public ResponseEntity<byte[]> downloadPdf(@PathVariable UUID uuid) {
         return reportService.downloadPdf(uuid);
