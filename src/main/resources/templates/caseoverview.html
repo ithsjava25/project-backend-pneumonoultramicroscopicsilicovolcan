@@ -90,40 +90,18 @@
                             Lägg till bilder
                         </button>
                     </div>
-
-                    <div class="evidence-list">
-                        <div class="evidence-row">
-                            <div class="file-meta">
-                                <span class="file-name">brottsplats_1.jpg</span>
-                                <span class="file-type">Bild</span>
-                            </div>
-                            <div class="file-status">1.8 MB · Klar för uppladdning</div>
-                        </div>
-                        <table>
-                            <th:block th:each="report : ${reportList}">
-                                <tr>
-                                    <th class="file-name" th:text="${report.getEvent()}"></th>
-                                    <td class="file-meta">Rapport beskrivning</td>
-                                </tr>
-                            </th:block>
-                        </table>
-
-                        <div class="evidence-row">
-                            <div class="file-meta">
-                                <span class="file-name">vittnesanteckning.pdf</span>
-                                <span class="file-type">Dokument</span>
-                            </div>
-                            <div class="file-status">420 kB · Klar för uppladdning</div>
-                        </div>
-
-                        <div class="evidence-row">
-                            <div class="file-meta">
-                                <span class="file-name">kamera_02.png</span>
-                                <span class="file-type">Bild</span>
-                            </div>
-                            <div class="file-status">2.1 MB · Klar för uppladdning</div>
-                        </div>
-                    </div>
+                    <table>
+                        <th:block th:each="report : ${reportList}">
+                            <tr>
+                                <th class="file-name" th:text="${report.getEvent()}"></th>
+                            </tr>
+                            <tr class="table description">
+                                <td>
+                                    <span class="file-type">Beskrivning</span>
+                                </td>
+                            </tr>
+                        </th:block>
+                    </table>
                 </section>
             </div>
 
@@ -138,19 +116,30 @@
 
                     <div class="field-grid two-columns">
                         <div class="form-field">
-                            <label for="witness">Vittne</label>
-                            <input id="witness"
-                                   name="witness"
-                                   type="text"
-                                   placeholder="Ange namn på vittne">
+                            <label>Vittne</label>
+                            <ul>
+                                <li>
+                                    <span>Ulla-britt</span>
+                                </li>
+                                <li>
+                                    <span>Sven-åke</span>
+                                </li>
+                                <li>
+                                    <span>Nils-erik</span>
+                                </li>
+                                <li>
+                                    <span>Lars-göran</span>
+                                </li>
+                            </ul>
                         </div>
 
                         <div class="form-field">
-                            <label for="victim">Offer</label>
-                            <input id="victim"
-                                   name="victim"
-                                   type="text"
-                                   placeholder="Ange namn på offer">
+                            <label>Offer</label>
+                            <ul>
+                                <li>
+                                    <span>Tre små grisar</span>
+                                </li>
+                            </ul>
                         </div>
                     </div>
                 </section>
@@ -164,11 +153,8 @@
                     </div>
 
                     <div class="form-field">
-                        <label for="crimeScene">Brottsplats</label>
-                        <input id="crimeScene"
-                               name="crimeScene"
-                               type="text"
-                               placeholder="Ange brottsplats">
+                        <label>Område</label>
+                        <span>Majorna</span>
                     </div>
                 </section>
             </div>
