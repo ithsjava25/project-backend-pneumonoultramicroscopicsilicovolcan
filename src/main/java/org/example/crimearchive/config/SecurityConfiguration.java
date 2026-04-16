@@ -21,13 +21,13 @@ public class SecurityConfiguration {
         return http
                 .authorizeHttpRequests(auth -> {
                     auth.requestMatchers("/").permitAll();
-                    auth.requestMatchers("/static/**").permitAll();
+                    auth.requestMatchers("/*.css", "/images/**").permitAll();
                     auth.requestMatchers("/favicon.ico").permitAll();
                     auth.requestMatchers("/index").permitAll();
                     auth.requestMatchers("/error").permitAll();
-                    auth.requestMatchers("/cases/add").hasRole("ADMIN");
 
-                    auth.requestMatchers("/cases").hasRole("ADMIN");
+                    //auth.requestMatchers("/cases/add").hasRole("ADMIN");
+                    //auth.requestMatchers("/cases").hasRole("ADMIN");
 
                     auth.requestMatchers("/private").hasRole("ADMIN");
                     auth.requestMatchers("/userpage").hasRole("USER");
