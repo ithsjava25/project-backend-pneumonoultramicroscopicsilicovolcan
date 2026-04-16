@@ -3,7 +3,6 @@ package org.example.crimearchive.controllers;
 import jakarta.validation.Valid;
 import org.example.crimearchive.DTO.CreateReport;
 import org.example.crimearchive.cases.CaseService;
-import org.example.crimearchive.cases.Cases;
 import org.example.crimearchive.cases.CasesRepository;
 import org.example.crimearchive.polis.Account;
 import org.example.crimearchive.reports.ReportService;
@@ -16,7 +15,6 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.UUID;
 
 @Controller
@@ -81,25 +79,7 @@ public class HomeController {
         return "redirect:/userpage";
     }
 
-    @GetMapping("/profile")
-    public String profilePage(@AuthenticationPrincipal Account user, Model model) {
-        List<Cases> caseList = caseService.getAuthzCases(user.getId());
-        model.addAttribute("currentUser", user);
-        model.addAttribute("cases", caseService.getReportsWithCaseNumber(caseList));
-        model.addAttribute("user", user);
-        return "profile";
-    }
 
-    @GetMapping("/caseoverview")
-    public String caseoverview(@AuthenticationPrincipal Account user,
-                               Model model, @RequestParam String casenumber) {
-
-        var overviewList = caseService.getReportSet(casenumber);
-        System.out.println("amount of reports: " + overviewList.size());
-        model.addAttribute("currentUser", user);
-        model.addAttribute("rawcasenumber", casenumber);
-        return "caseoverview";
-    }
 
     @GetMapping("/reports/{uuid}/download/pdf")
     public ResponseEntity<byte[]> downloadPdf(@PathVariable UUID uuid) {
