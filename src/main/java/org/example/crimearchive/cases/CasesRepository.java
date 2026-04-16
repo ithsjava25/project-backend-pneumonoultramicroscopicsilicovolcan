@@ -21,6 +21,8 @@ public interface CasesRepository extends ListCrudRepository<Cases, Long> {
 
     String findCaseNumberById(Long id);
 
+    boolean existsByCaseNumberAndAccounts_Id(String caseNumber, Long accountId);
+
 
     List<Cases> findByAccountsId(Long accountId);
 }

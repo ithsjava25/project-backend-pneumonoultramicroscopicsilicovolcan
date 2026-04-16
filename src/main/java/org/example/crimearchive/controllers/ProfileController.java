@@ -3,6 +3,7 @@ package org.example.crimearchive.controllers;
 import org.example.crimearchive.cases.CaseService;
 import org.example.crimearchive.cases.Cases;
 import org.example.crimearchive.polis.Account;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -14,7 +15,7 @@ import java.util.List;
 @Controller
 public class ProfileController {
 
-    CaseService caseService;
+    private final CaseService caseService;
 
     public ProfileController(CaseService caseService) {
         this.caseService = caseService;
@@ -31,6 +32,7 @@ public class ProfileController {
     }
 
     @GetMapping("/caseoverview")
+    @PreAuthorize("@caseSecurity.canAccessCase(#casenumber, principal)")
     public String caseoverview(@AuthenticationPrincipal Account user,
                                Model model, @RequestParam String casenumber) {
         

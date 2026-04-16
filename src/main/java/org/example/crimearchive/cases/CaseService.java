@@ -1,12 +1,9 @@
 package org.example.crimearchive.cases;
 
-import org.example.crimearchive.permissions.NullAuthzDeniedHandler;
 import org.example.crimearchive.polis.Account;
 import org.example.crimearchive.polis.UserRepository;
 import org.example.crimearchive.reports.Report;
 import org.example.crimearchive.reports.ReportRepository;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.authorization.method.HandleAuthorizationDenied;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,7 +12,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@Service("permittedFilesChecker")
+@Service
 public class CaseService {
     private final UserRepository userRepository;
     private final ReportRepository reportRepository;
@@ -27,17 +24,13 @@ public class CaseService {
         this.userRepository = userRepository;
     }
 
-    @PreAuthorize("hasRole('admin')")
-    @HandleAuthorizationDenied(handlerClass = NullAuthzDeniedHandler.class)
-    public void addAccountToCase(Long accountId, String caseNumber){
+    public void addAccountToCase(Long accountId, String caseNumber) {
         Optional<Account> account = userRepository.findById(accountId);
         if (account.isEmpty()) throw new RuntimeException("account not found");
-        Account foundAccount = account.get();
         Optional<Cases> cases = casesRepository.findFirstByCaseNumber(caseNumber);
-        if(cases.isPresent()){
-            cases.get().addAccountToCase(foundAccount);
-            casesRepository.save(cases.get());
-        }
+        if (cases.isEmpty()) throw new RuntimeException("Case does not exist");
+        cases.get().addAccountToCase(account.get());
+        casesRepository.save(cases.get());
     }
 
     public List<Cases> getAuthzCases(long accountId) {
@@ -56,7 +49,6 @@ public class CaseService {
 
     public Set<Report> getReportSet(String caseNumber) {
         Long id = caseIdFromCaseNumber(caseNumber);
-        System.out.println("Id found from caseNumber: " + id);
         return casesRepository.findById(id).orElseThrow().getReports();
     }
 
@@ -70,6 +62,10 @@ public class CaseService {
 
     public Long caseIdFromCaseNumber(String casenumber) {
         return casesRepository.findIdByCaseNumberContaining(casenumber);
+    }
+
+    public boolean accountIdConnectedWithCaseId(String caseNumber, Long accountId) {
+        return casesRepository.existsByCaseNumberAndAccounts_Id(caseNumber, accountId);
     }
 
 //
