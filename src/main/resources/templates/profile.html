@@ -26,7 +26,10 @@
 
         <div class="topbar-user">
             <span class="user-chip" th:text="${currentUser.getFullName()}"></span>
-            <button class="user-chip" th:onclick="location.href='/logout'">Logga ut</button>
+            <form th:action="@{/logout}" method="post">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                <button type="submit" style="cursor: pointer;" class="user-chip">Logga ut</button>
+            </form>
         </div>
     </header>
     <div class="meta-strip">
@@ -57,7 +60,7 @@
                 <span th:text="${entry.value.size()}"></span>
             </td>
             <td>
-                <a th:href="@{/caseoverview/${entry.key}">Översikt</a>
+                <a th:href="@{/caseoverview(casenumber=${entry.key})}">Översikt</a>
             </td>
         </tr>
         </tbody>
