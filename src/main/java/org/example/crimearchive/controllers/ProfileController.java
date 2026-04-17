@@ -36,11 +36,9 @@ public class ProfileController {
     public String caseoverview(@AuthenticationPrincipal Account user,
                                Model model, @RequestParam String casenumber) {
         
-        var overviewList = caseService.getReportSet(casenumber);
-        System.out.println("amount of reports: " + overviewList.size());
         model.addAttribute("currentUser", user);
         model.addAttribute("rawcasenumber", casenumber);
-        model.addAttribute("reportList", overviewList);
+        model.addAttribute("reportList", caseService.getReportSet(casenumber));
         return "caseoverview";
     }
 }

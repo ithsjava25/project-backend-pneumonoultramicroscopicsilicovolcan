@@ -15,9 +15,6 @@ public class PermissionService {
 
     public boolean canAccessCase(String caseNumber, Account currentUser) {
         if (caseNumber == null || currentUser == null) return false;
-
-        Long caseId = caseService.caseIdFromCaseNumber(caseNumber);
-        if (caseId == null) return false;
         return caseService.accountIdConnectedWithCaseId(caseNumber, currentUser.getId());
     }
 }

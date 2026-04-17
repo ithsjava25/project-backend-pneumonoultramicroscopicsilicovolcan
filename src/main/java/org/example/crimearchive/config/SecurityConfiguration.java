@@ -34,7 +34,7 @@ public class SecurityConfiguration {
                 })
                 //Bygger inloggingsformuläret automatiskt
                 //.oauth2Login(Customizer.withDefaults()) lägg till tsm med oauth2 application.properties
-                .formLogin(formLogin -> formLogin.defaultSuccessUrl("/userpage"))
+                .formLogin(formLogin -> formLogin.defaultSuccessUrl("/profile"))
         .build();
     }
     @Bean
