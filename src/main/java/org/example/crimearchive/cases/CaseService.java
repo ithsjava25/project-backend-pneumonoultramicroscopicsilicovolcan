@@ -59,6 +59,10 @@ public class CaseService {
         return repos;
     }
 
+    public List<Cases> getAllUnSignedCases() {
+        return casesRepository.findAllByAccountsEmpty();
+    }
+
 
     public Long caseIdFromCaseNumber(String casenumber) {
         return casesRepository.findIdByCaseNumberContaining(casenumber);

@@ -23,6 +23,8 @@ public interface CasesRepository extends ListCrudRepository<Cases, Long> {
 
     boolean existsByCaseNumberAndAccounts_Id(String caseNumber, Long accountId);
 
+    List<Cases> findAllByAccountsEmpty();
+
 
     List<Cases> findByAccountsId(Long accountId);
 }

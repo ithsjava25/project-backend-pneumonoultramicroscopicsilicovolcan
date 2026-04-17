@@ -13,7 +13,10 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 
 import java.util.UUID;
 
@@ -36,10 +39,10 @@ public class HomeController {
         return "index";
     }
 
-    @GetMapping("/private")
+    @GetMapping("/reports")
     public String privatePage(@AuthenticationPrincipal Account user, Model model) {
         model.addAttribute("newReport", new CreateReport());
-        return "private";
+        return "registerreport";
     }
 
     @GetMapping("/userpage")
@@ -48,22 +51,7 @@ public class HomeController {
         return "userpage";
     }
 
-    @GetMapping("/cases")
-    public String casesPage(@RequestParam(required = false) Long accountId, Model model) {
-        if (accountId != null) {
-            model.addAttribute("cases", casesRepository.findByAccountsId(accountId));
-            model.addAttribute("accountId", accountId);
-        }
-        return "cases";
-    }
 
-    @PostMapping("/cases/add")
-    public String casesPage(@RequestParam Long addAccountId,
-                            @RequestParam String case_number,
-                            @AuthenticationPrincipal Account user) {
-        caseService.addAccountToCase(addAccountId, case_number);
-        return "redirect:/cases";
-    }
 
     @PostMapping("/reports/add")
     public String saveReport(
@@ -73,9 +61,9 @@ public class HomeController {
 
         if (bindingResult.hasErrors()) {
             log.info("Binding Error: {}", bindingResult.getAllErrors().getLast());
-            return "private";
+            return "registerreport";
         }
-        reportService.saveReport(newReport, currentUser);
+        reportService.saveReport(newReport, null);
         return "redirect:/userpage";
     }
 

@@ -25,7 +25,8 @@
         </div>
 
         <div class="topbar-user">
-            <span class="user-chip" th:text="${currentUser.getFullName()}"></span>
+            <span class="user-chip" th:text="${currentUser.getFullName()}" th:onclick="location.href='/profile'"
+                  style="cursor: pointer"></span>
             <form th:action="@{/logout}" method="post">
                 <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
                 <button type="submit" style="cursor: pointer;" class="user-chip">Logga ut</button>
@@ -39,7 +40,7 @@
         <span>Aktiv databas: <strong>TESTMILJÖ</strong></span>
         <span>Senast uppdaterad: <strong>2026-03-14 10:03</strong></span>
 
-        <button th:onclick="location.href='/private'" class="btn btn-primary meta-strip-button">
+        <button th:onclick="location.href='/reports'" class="btn btn-primary meta-strip-button">
             Registrera ärende
         </button>
     </div>
