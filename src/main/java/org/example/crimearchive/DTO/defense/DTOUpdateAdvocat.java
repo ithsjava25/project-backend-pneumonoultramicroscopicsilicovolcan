@@ -1,15 +1,13 @@
-package org.example.crimearchive.DTO.Advocat;
-
+package org.example.crimearchive.dto.defense;
 
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 
-public record DTOAdvocat(
-        long id,
+public record DTOUpdateAdvocat(
+        String name,
         String email,
         String company,
-        String telephone,
-        String name,
+        String phone,
         String KNumber,
         LocalDate appointedTime,
         ZonedDateTime crimeTime

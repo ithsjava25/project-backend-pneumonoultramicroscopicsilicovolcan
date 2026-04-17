@@ -1,12 +1,10 @@
-package org.example.crimearchive.dto.police;
+package org.example.crimearchive.dto.informant;
 
 import jakarta.validation.constraints.NotBlank;
 
-public record DTOCreatePolis(
+public record DTOCreateGolare(
         @NotBlank(message = "Name is required")
         String name,
-        @NotBlank(message = "Badge number is required")
-        String badgeNumber,
         @NotBlank(message = "Email is required")
         String email,
         @NotBlank(message = "Phone is required")

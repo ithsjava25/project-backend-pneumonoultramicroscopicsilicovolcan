@@ -10,8 +10,6 @@ public record DTOCreateÅklagare(
     @NotBlank(message = "Phone is required")
     String phone,
     @NotBlank(message = "Company is required")
-    String company,
-    @NotBlank(message = "KNumber is required")
-    String KNumber
+    String company
 ) {
 }

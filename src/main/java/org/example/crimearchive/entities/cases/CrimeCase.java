@@ -20,6 +20,13 @@ public class CrimeCase {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+
+    //Kolla med grabbarna om ska vara knummer eller CaseNumber
+    @Column(unique = true, nullable = false)
+    private String Knumber;
+
+
+
     @Column(nullable = false)
     private String caseNumber;
 
