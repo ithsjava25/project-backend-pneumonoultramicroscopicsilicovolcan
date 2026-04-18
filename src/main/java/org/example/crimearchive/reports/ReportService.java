@@ -58,8 +58,7 @@ public class ReportService {
         if (report.caseNumber() == null || report.caseNumber().isBlank()) {
             String newCaseNumber = knumberService.getKNumber();
             cases = new Cases(newCaseNumber);
-
-            cases.getAccounts().add(currentUser);
+            if (currentUser != null) cases.getAccounts().add(currentUser);
 
             casesRepository.save(cases);
         } else {

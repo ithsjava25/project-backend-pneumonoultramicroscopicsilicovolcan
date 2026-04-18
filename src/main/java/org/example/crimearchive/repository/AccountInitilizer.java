@@ -23,13 +23,14 @@ public class AccountInitilizer implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         if(userRepository.count() == 0){
-            userRepository.save(createAccount("admin", "password", List.of("user", "admin"), "Lars Åkesson", "Polischef", "Västra Götaland"));
+            userRepository.save(createAccount("handler", "password", List.of("user", "handler"), "Lars Åkesson", "Polischef", "Västra Götaland"));
+            userRepository.save(createAccount("sysadmin", "password", List.of("admin"), "Tim Mulle", "IT", "Västra Götaland"));
             userRepository.save(createAccount("demouser", "password", List.of("user"), "Nils Jonsson", "Polis", "Skåne"));
             userRepository.save(createAccount("officer", "password", List.of("user"), "Jimmy Johansson", "Polis", "Lappland"));
 
-            caseService.addAccountToCase(1L, "K-2026-000001");
-            caseService.addAccountToCase(1L, "K-2026-000002");
-            caseService.addAccountToCase(1L, "K-2026-000003");
+            caseService.addAccountToCase(1L, 1L);
+            caseService.addAccountToCase(3L, 2L);
+            caseService.addAccountToCase(4L, 3L);
         }
     }
 

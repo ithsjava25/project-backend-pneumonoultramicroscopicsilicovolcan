@@ -26,18 +26,15 @@ public class SecurityConfiguration {
                     auth.requestMatchers("/index").permitAll();
                     auth.requestMatchers("/error").permitAll();
 
-                    //auth.requestMatchers("/cases/add").hasRole("ADMIN");
-                    //auth.requestMatchers("/cases").hasRole("ADMIN");
-
-                    auth.requestMatchers("/private").hasRole("ADMIN");
                     auth.requestMatchers("/userpage").hasRole("USER");
+                    auth.requestMatchers("/cases/**").hasRole("HANDLER");
 
 
                     auth.anyRequest().authenticated();
                 })
                 //Bygger inloggingsformuläret automatiskt
                 //.oauth2Login(Customizer.withDefaults()) lägg till tsm med oauth2 application.properties
-                .formLogin(formLogin -> formLogin.defaultSuccessUrl("/userpage"))
+                .formLogin(formLogin -> formLogin.defaultSuccessUrl("/profile"))
         .build();
     }
     @Bean
