@@ -31,7 +31,11 @@ public class CaseService {
         if (account.isEmpty()) throw new RuntimeException("account not found");
         Optional<Cases> cases = casesRepository.findFirstByCaseNumber(caseNumber);
         if (cases.isEmpty()) throw new RuntimeException("Case does not exist");
-        cases.get().addAccountToCase(account.get());
+        if (cases.get().getAccounts().stream().anyMatch(acc -> acc.getId().equals(accountId))) {
+            cases.get().removeAccountFromCase(account.get());
+        } else {
+            cases.get().addAccountToCase(account.get());
+        }
         casesRepository.save(cases.get());
     }
 
@@ -43,6 +47,10 @@ public class CaseService {
         if (cases.isEmpty()) throw new RuntimeException("Case not found with id: " + caseId);
         cases.get().addAccountToCase(account.get());
         casesRepository.save(cases.get());
+    }
+
+    public List<Cases> getAllCases() {
+        return casesRepository.findAll();
     }
 
     public List<Cases> getAuthzCases(long accountId) {

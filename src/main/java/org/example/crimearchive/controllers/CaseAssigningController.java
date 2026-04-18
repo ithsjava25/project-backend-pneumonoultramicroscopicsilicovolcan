@@ -27,6 +27,7 @@ public class CaseAssigningController {
         model.addAttribute("currentUser", user);
         model.addAttribute("allAccounts", userService.getAllAccounts());
         model.addAttribute("allUnsignedCases", caseService.getAllUnSignedCases());
+        model.addAttribute("allcases", caseService.getAllCases());
         return "cases";
     }
 

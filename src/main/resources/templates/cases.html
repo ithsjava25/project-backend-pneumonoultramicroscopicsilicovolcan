@@ -49,26 +49,26 @@
         <table>
             <thead>
             <tr>
-                <th>Anställd</th>
-                <th>Antal fall som utreds</th>
+                <th>K-Nummer</th>
+                <th>Antal utredare</th>
             </tr>
             </thead>
             <tbody>
-            <tr th:each="emp : ${allAccounts}">
-                <td th:text="${emp.getFullName()}">Namn på anställd</td>
-                <td th:text="${emp.getPermittedCases().size()}">Antal fall</td>
+            <tr th:each="case : ${allcases}">
+                <td th:text="${case.getCaseNumber()}"></td>
+                <td th:text="${case.getAccounts().size()}"></td>
                 <td>
                     <form method="post" th:action="@{/cases/add}" style="display: flex">
-                        <input type="hidden" name="addAccountId" th:value="${emp.getId()}">
-                        <select name="case_number" required>
-                            <option value="" disabled selected>Välj ärende</option>
-                            <option th:each="c : ${allUnsignedCases}"
-                                    th:value="${c.getCaseNumber()}"
-                                    th:text="${c.getCaseNumber()}">
+                        <input type="hidden" name="case_number" th:value="${case.getCaseNumber()}">
+                        <select name="addAccountId" required>
+                            <option value="" disabled selected hidden>Välj en anställd</option>
+                            <option th:each="accounts : ${allAccounts}"
+                                    th:value="${accounts.getId()}"
+                                    th:text="${accounts.getFullName()}">
 
                             </option>
                         </select>
-                        <button type="submit">Tilldela</button>
+                        <button type="submit">Tilldela/Avlägsna</button>
                     </form>
                 </td>
             </tr>
