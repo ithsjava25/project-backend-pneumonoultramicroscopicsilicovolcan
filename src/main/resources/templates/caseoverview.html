@@ -69,8 +69,8 @@
 
                         <div class="form-field">
                             <label for="policeOfficer">Polis</label>
-                            <ul>
-                                <li id="policeOfficer">
+                            <ul th:each="cop : ${assignedPolice}">
+                                <li id="policeOfficer" th:text="${cop.getFullName()}">
                                     Lista av tilldelade poliser till ärendet
                                 </li>
                             </ul>

@@ -42,6 +42,7 @@ public class ProfileController {
         model.addAttribute("assigncasebutton", user.getAuthorities().stream()
                 .anyMatch(ga -> ga.getAuthority()
                         .equals("ROLE_HANDLER")));
+        model.addAttribute("assignedPolice", caseService.getAllPoliceForCase(casenumber));
         model.addAttribute("currentUser", user);
         model.addAttribute("rawcasenumber", casenumber);
         model.addAttribute("reportList", caseService.getReportSet(casenumber));

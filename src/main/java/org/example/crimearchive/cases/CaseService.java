@@ -53,6 +53,10 @@ public class CaseService {
         return casesRepository.findAll();
     }
 
+    public List<Account> getAllPoliceForCase(String casenumber) {
+        return casesRepository.findFirstByCaseNumber(casenumber).get().getAccounts().stream().toList();
+    }
+
     public List<Cases> getAuthzCases(long accountId) {
         return casesRepository.findByAccountsId(accountId);
     }
