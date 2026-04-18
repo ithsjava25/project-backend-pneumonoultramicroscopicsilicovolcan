@@ -5,6 +5,7 @@ import org.example.crimearchive.polis.UserRepository;
 import org.example.crimearchive.reports.Report;
 import org.example.crimearchive.reports.ReportRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
@@ -24,11 +25,22 @@ public class CaseService {
         this.userRepository = userRepository;
     }
 
+    @Transactional
     public void addAccountToCase(Long accountId, String caseNumber) {
         Optional<Account> account = userRepository.findById(accountId);
         if (account.isEmpty()) throw new RuntimeException("account not found");
         Optional<Cases> cases = casesRepository.findFirstByCaseNumber(caseNumber);
         if (cases.isEmpty()) throw new RuntimeException("Case does not exist");
+        cases.get().addAccountToCase(account.get());
+        casesRepository.save(cases.get());
+    }
+
+    @Transactional
+    public void addAccountToCase(Long accountId, Long caseId) {
+        Optional<Account> account = userRepository.findById(accountId);
+        if (account.isEmpty()) throw new RuntimeException("Account not found with id: " + accountId);
+        Optional<Cases> cases = casesRepository.findById(caseId);
+        if (cases.isEmpty()) throw new RuntimeException("Case not found with id: " + caseId);
         cases.get().addAccountToCase(account.get());
         casesRepository.save(cases.get());
     }

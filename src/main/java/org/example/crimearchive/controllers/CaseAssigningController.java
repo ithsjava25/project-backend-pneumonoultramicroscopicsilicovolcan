@@ -38,5 +38,4 @@ public class CaseAssigningController {
         return "redirect:/cases";
     }
 
-
 }

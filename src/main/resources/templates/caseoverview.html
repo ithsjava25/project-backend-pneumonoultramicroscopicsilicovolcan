@@ -24,6 +24,11 @@
         </div>
 
         <div class="topbar-user">
+            <div th:if="${assigncasebutton}">
+                <form th:action="@{/cases}" method="get">
+                    <button class="user-chip" type="submit" style="cursor: pointer">Tilldelning</button>
+                </form>
+            </div>
             <span class="user-chip" th:text="${currentUser.getFullName()}" th:onclick="location.href='/profile'"
                   style="cursor: pointer"></span>
             <form th:action="@{/logout}" method="post">

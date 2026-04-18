@@ -25,6 +25,9 @@ public class ProfileController {
     @GetMapping("/profile")
     public String profilePage(@AuthenticationPrincipal Account user, Model model) {
         List<Cases> caseList = caseService.getAuthzCases(user.getId());
+        model.addAttribute("assigncasebutton", user.getAuthorities().stream()
+                .anyMatch(ga -> ga.getAuthority()
+                        .equals("ROLE_HANDLER")));
         model.addAttribute("currentUser", user);
         model.addAttribute("cases", caseService.getReportsWithCaseNumber(caseList));
         model.addAttribute("user", user);
@@ -35,7 +38,10 @@ public class ProfileController {
     @PreAuthorize("@caseSecurity.canAccessCase(#casenumber, principal)")
     public String caseoverview(@AuthenticationPrincipal Account user,
                                Model model, @RequestParam String casenumber) {
-        
+
+        model.addAttribute("assigncasebutton", user.getAuthorities().stream()
+                .anyMatch(ga -> ga.getAuthority()
+                        .equals("ROLE_HANDLER")));
         model.addAttribute("currentUser", user);
         model.addAttribute("rawcasenumber", casenumber);
         model.addAttribute("reportList", caseService.getReportSet(casenumber));

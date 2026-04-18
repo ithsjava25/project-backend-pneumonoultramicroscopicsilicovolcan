@@ -26,8 +26,8 @@ public class SecurityConfiguration {
                     auth.requestMatchers("/index").permitAll();
                     auth.requestMatchers("/error").permitAll();
 
-                    auth.requestMatchers("/private").hasRole("ADMIN");
                     auth.requestMatchers("/userpage").hasRole("USER");
+                    auth.requestMatchers("/cases").hasRole("HANDLER");
 
 
                     auth.anyRequest().authenticated();
