@@ -54,7 +54,9 @@ public class CaseService {
     }
 
     public List<Account> getAllPoliceForCase(String casenumber) {
-        return casesRepository.findFirstByCaseNumber(casenumber).get().getAccounts().stream().toList();
+        return casesRepository.findFirstByCaseNumber(casenumber)
+                .orElseThrow(() -> new RuntimeException("Case not found: " + casenumber))
+                .getAccounts().stream().toList();
     }
 
     public List<Cases> getAuthzCases(long accountId) {
@@ -65,15 +67,17 @@ public class CaseService {
         return reportRepository.getReportByCaseEntity(caseId);
     }
 
+    @Transactional(readOnly = true)
     public Set<Report> getReportSet(Long caseId) {
-        var caseSet = casesRepository.findById(caseId);
-        if (caseSet.isEmpty()) throw new RuntimeException("Resource not found");
-        return caseSet.get().getReports();
+        return casesRepository.findById(caseId).orElseThrow(() -> new RuntimeException("Case not found with id: " + caseId))
+                .getReports();
     }
 
+    @Transactional(readOnly = true)
     public Set<Report> getReportSet(String caseNumber) {
         Long id = caseIdFromCaseNumber(caseNumber);
-        return casesRepository.findById(id).orElseThrow().getReports();
+        return casesRepository.findById(id).orElseThrow(() -> new RuntimeException("Case not found with case number: " + caseNumber))
+                .getReports();
     }
 
     public Map<String, Set<Report>> getReportsWithCaseNumber(List<Cases> grantedCases) {
@@ -89,7 +93,9 @@ public class CaseService {
 
 
     public Long caseIdFromCaseNumber(String casenumber) {
-        return casesRepository.findIdByCaseNumberContaining(casenumber);
+        return casesRepository.findFirstByCaseNumber(casenumber)
+                .orElseThrow(() -> new RuntimeException("Case not found: " + casenumber))
+                .getId();
     }
 
     public boolean accountIdConnectedWithCaseId(String caseNumber, Long accountId) {
