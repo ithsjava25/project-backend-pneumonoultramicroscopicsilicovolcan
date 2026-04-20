@@ -20,7 +20,7 @@ public class Cases {
     @ManyToMany
     @JoinTable(
             name = "account_cases",
-            joinColumns = @JoinColumn(name = "report_id"),
+            joinColumns = @JoinColumn(name = "case_id"),
             inverseJoinColumns = @JoinColumn(name = "account_id")
     )
     private Set<Account> accounts = new HashSet<>();
@@ -54,7 +54,7 @@ public class Cases {
         this.caseNumber = caseNumber;
     }
 
-    public long getId() {
+    public Long getId() {
         return Id;
     }
 

@@ -1,53 +1,80 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Cases</title>
+    <link rel="stylesheet" th:href="@{/style.css}">
 </head>
 <body>
-<h1>Sök ärenden per användare</h1>
+<div class="durtre-shell">
 
-<form method="get" action="/cases">
-    <label for="accountId">Account ID</label>
-    <input id="accountId" type="number" name="accountId" th:value="${accountId}">
-    <button type="submit">Sök</button>
-</form>
+    <header class="topbar">
+        <div class="brand">
+            <img th:src="@{/images/police-logo-color.png}"
+                 alt="Polislogga"
+                 class="brand-logo">
 
-<div th:if="${cases}">
-    <h2>Ärenden</h2>
-    <table>
-        <thead>
-        <tr>
-            <th>K-nummer</th>
-            <th>Filer</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="c : ${cases}">
-            <td th:text="${c.caseNumber}"></td>
-            <td>
-                <div th:each="ev : ${evidenceMap[c.caseNumber]}">
-                    <a th:href="@{/evidence/{id}/pdf(id=${ev.id})}">Ladda ner PDF</a>
-                    <a th:if="${ev.s3KeyFile != null}" th:href="@{/evidence/{id}/file(id=${ev.id})}"
-                       th:text="'Ladda ner ' + ${ev.originalFilename}"></a>
+            <div class="brand-text">
+                <div class="brand-title-row">
+                    <span class="brand-title">DurTre</span>
+                    <span class="brand-subtitle">Polismyndigheten</span>
                 </div>
-                <span th:if="${#lists.isEmpty(evidenceMap[c.caseNumber])}">Inga filer uppladdade</span>
-            </td>
-        </tr>
-        </tbody>
-    </table>
-    <p th:if="${#lists.isEmpty(cases)}">Inga ärenden hittades.</p>
-</div>
-<br/>
-<div>
-    <h2>Lägg till konto till case</h2>
-    <form method="post" th:action="@{/cases/add}">
-        <label for="add_accountId">Account ID</label>
-        <input id="add_accountId" type="number" name="addAccountId" th:value="${addAccountId}">
-        <label for="case_number">Case number</label>
-        <input id="case_number" type="text" name="case_number" th:value="${case_number}">
-        <button type="submit">Lägg till behörighet</button>
-    </form>
+                <span class="brand-tagline">Utredningsöversikt</span>
+            </div>
+        </div>
+
+        <div class="topbar-user">
+            <span class="user-chip" th:text="${currentUser.getFullName()}" th:onclick="location.href='/profile'"
+                  style="cursor: pointer"></span>
+            <form th:action="@{/logout}" method="post">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                <button type="submit" style="cursor: pointer;" class="user-chip">Logga ut</button>
+            </form>
+        </div>
+    </header>
+    <div class="meta-strip">
+        <span>Inloggad som: <strong th:text="${currentUser.getUsername()}"></strong></span>
+        <span>Roll: <strong th:text="${currentUser.getProfession()}"></strong></span>
+        <span>Avdelning: <strong th:text="${currentUser.getDepartment()}"></strong></span>
+        <span>Aktiv databas: <strong>TESTMILJÖ</strong></span>
+        <span>Senast uppdaterad: <strong>2026-03-14 10:03</strong></span>
+
+    </div>
+
+    <div>
+        <h2>Tilldela polis till öppna fall</h2>
+        <div th:if="${allUnsignedCases.size() > 0}">
+            <span th:text="|Antal fall utan designerad polis: ${allUnsignedCases.size()}|"></span>
+        </div>
+        <table>
+            <thead>
+            <tr>
+                <th>K-Nummer</th>
+                <th>Antal utredare</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="case : ${allcases}">
+                <td th:text="${case.getCaseNumber()}"></td>
+                <td th:text="${case.getAccounts().size()}"></td>
+                <td>
+                    <form method="post" th:action="@{/cases/add}" style="display: flex">
+                        <input type="hidden" name="case_number" th:value="${case.getCaseNumber()}">
+                        <select name="addAccountId" required>
+                            <option value="" disabled selected hidden>Välj en anställd</option>
+                            <option th:each="accounts : ${allAccounts}"
+                                    th:value="${accounts.getId()}"
+                                    th:text="${accounts.getFullName()}">
+
+                            </option>
+                        </select>
+                        <button type="submit">Tilldela/Avlägsna</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
 </div>
 </body>
 </html>

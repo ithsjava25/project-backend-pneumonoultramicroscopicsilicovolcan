@@ -17,7 +17,7 @@ public class Report {
     private String name;
     private String event;
     @ManyToOne
-    @JoinColumn(name = "reports")
+    @JoinColumn(name = "case_id")
     private Cases caseEntity;
 
     public Cases getCaseEntity() {

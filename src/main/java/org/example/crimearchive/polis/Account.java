@@ -21,6 +21,9 @@ public class Account implements UserDetails {
     private Collection<? extends GrantedAuthority> authorities;
     @ManyToMany(mappedBy = "accounts")
     private Set<Cases> permittedCases = new HashSet<>();
+    private String fullName;
+    private String profession;
+    private String department;
 
 
     public Long getId() {
@@ -31,10 +34,42 @@ public class Account implements UserDetails {
         this.username = "";
     }
 
-    public Account(String username, String password, List<String> roles) {
+    public Account(String username, String password, List<String> roles,
+                   String fullname, String profession, String department) {
         this.username = username;
         this.password = password;
         this.authorities = setAuthoritesList(roles);
+        this.fullName = fullname;
+        this.profession = profession;
+        this.department = department;
+    }
+
+    public Account(String username, String password, List<String> roles) {
+        this(username, password, roles, null, null, null);
+    }
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
+
+    public String getProfession() {
+        return profession;
+    }
+
+    public void setProfession(String profession) {
+        this.profession = profession;
+    }
+
+    public String getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(String department) {
+        this.department = department;
     }
 
     public void setId(Long id) {
@@ -69,5 +104,13 @@ public class Account implements UserDetails {
         return roles.stream().map(
                         r -> r.startsWith("ROLE_") ? new SimpleGrantedAuthority(r.toUpperCase()) : new SimpleGrantedAuthority("ROLE_" + r.toUpperCase()))
                 .toList();
+    }
+
+    public Set<Cases> getPermittedCases() {
+        return permittedCases;
+    }
+
+    public void setPermittedCases(Set<Cases> permittedCases) {
+        this.permittedCases = permittedCases;
     }
 }
