@@ -76,4 +76,9 @@ public class HomeController {
 
         return "redirect:/userpage";
     }
+
+    @GetMapping("/403")
+    public String accessDenied() {
+        return "error/403";
+    }
 }
