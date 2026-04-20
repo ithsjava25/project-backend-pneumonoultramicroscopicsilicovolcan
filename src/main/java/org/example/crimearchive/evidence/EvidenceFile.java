@@ -5,19 +5,37 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-@Entity
+`@Entity`
+`@Table`(
+        uniqueConstraints = `@UniqueConstraint`(
+                name = "uk_evidence_file_group_version",
+                columnNames = {"group_id", "version"}
+        ),
+        indexes = {
+                `@Index`(name = "idx_evidence_file_case_number", columnList = "case_number"),
+                `@Index`(name = "idx_evidence_file_group_id_version", columnList = "group_id, version")
+        }
+)
 public class EvidenceFile {
 
-    @Id
+    `@Id`
+    `@Column`(nullable = false, updatable = false)
     private UUID id;
 
+    `@Column`(name = "group_id", nullable = false)
     private UUID groupId;
+    `@Column`(nullable = false)
     private int version;
+    `@Column`(name = "case_number", nullable = false)
     private String caseNumber;
+    `@Column`(name = "s3_key_pdf", nullable = false)
     private String s3KeyPdf;
+    `@Column`(name = "s3_key_file")
     private String s3KeyFile;
     private String originalFilename;
+    `@Column`(nullable = false)
     private String uploadedBy;
+    `@Column`(nullable = false)
     private LocalDateTime uploadedAt;
 
     public EvidenceFile() {
