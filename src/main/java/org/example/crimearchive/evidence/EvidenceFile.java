@@ -5,37 +5,38 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-`@Entity`
-`@Table`(
-        uniqueConstraints = `@UniqueConstraint`(
+@Entity
+@Table(
+        uniqueConstraints = @UniqueConstraint(
                 name = "uk_evidence_file_group_version",
                 columnNames = {"group_id", "version"}
         ),
         indexes = {
-                `@Index`(name = "idx_evidence_file_case_number", columnList = "case_number"),
-                `@Index`(name = "idx_evidence_file_group_id_version", columnList = "group_id, version")
+                @Index(name = "idx_evidence_file_case_number", columnList = "case_number"),
+                @Index(name = "idx_evidence_file_group_id_version", columnList = "group_id, version")
         }
 )
 public class EvidenceFile {
 
-    `@Id`
-    `@Column`(nullable = false, updatable = false)
+    @Id
+    @Column(nullable = false, updatable = false)
     private UUID id;
 
-    `@Column`(name = "group_id", nullable = false)
+    @Column(name = "group_id", nullable = false)
     private UUID groupId;
-    `@Column`(nullable = false)
+    @Column(nullable = false)
     private int version;
-    `@Column`(name = "case_number", nullable = false)
+    @Column(name = "case_number", nullable = false)
     private String caseNumber;
-    `@Column`(name = "s3_key_pdf", nullable = false)
+    @Column(name = "s3_key_pdf", nullable = false)
     private String s3KeyPdf;
-    `@Column`(name = "s3_key_file")
+    @Column(name = "s3_key_file")
     private String s3KeyFile;
     private String originalFilename;
-    `@Column`(nullable = false)
+    private String contentType;
+    @Column(nullable = false)
     private String uploadedBy;
-    `@Column`(nullable = false)
+    @Column(nullable = false)
     private LocalDateTime uploadedAt;
 
     public EvidenceFile() {
@@ -61,6 +62,8 @@ public class EvidenceFile {
     public String getS3KeyPdf() { return s3KeyPdf; }
     public String getS3KeyFile() { return s3KeyFile; }
     public String getOriginalFilename() { return originalFilename; }
+    public String getContentType() { return contentType; }
+    public void setContentType(String contentType) { this.contentType = contentType; }
     public String getUploadedBy() { return uploadedBy; }
     public LocalDateTime getUploadedAt() { return uploadedAt; }
 }

@@ -1,6 +1,9 @@
 package org.example.crimearchive.evidence;
 
+import org.example.crimearchive.polis.Account;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,27 +20,35 @@ public class EvidenceFileController {
     }
 
     @GetMapping("/case/{caseNumber}")
-    public List<EvidenceFile> getByCaseNumber(@PathVariable String caseNumber) {
-        return evidenceFileService.getByCaseNumber(caseNumber);
+    @PreAuthorize("@caseSecurity.canAccessCase(#caseNumber, principal)")
+    public List<EvidenceFileResponse> getByCaseNumber(@PathVariable String caseNumber) {
+        return evidenceFileService.getByCaseNumber(caseNumber)
+                .stream().map(EvidenceFileResponse::from).toList();
     }
 
     @GetMapping("/case/{caseNumber}/latest")
-    public List<EvidenceFile> getLatestVersions(@PathVariable String caseNumber) {
-        return evidenceFileService.getLatestVersionsByCaseNumber(caseNumber);
+    @PreAuthorize("@caseSecurity.canAccessCase(#caseNumber, principal)")
+    public List<EvidenceFileResponse> getLatestVersions(@PathVariable String caseNumber) {
+        return evidenceFileService.getLatestVersionsByCaseNumber(caseNumber)
+                .stream().map(EvidenceFileResponse::from).toList();
     }
 
     @GetMapping("/group/{groupId}/history")
-    public List<EvidenceFile> getVersionHistory(@PathVariable UUID groupId) {
-        return evidenceFileService.getVersionHistory(groupId);
+    public List<EvidenceFileResponse> getVersionHistory(@PathVariable UUID groupId,
+                                                        @AuthenticationPrincipal Account currentUser) {
+        return evidenceFileService.getVersionHistory(groupId, currentUser)
+                .stream().map(EvidenceFileResponse::from).toList();
     }
 
     @GetMapping("/{id}/pdf")
-    public ResponseEntity<byte[]> downloadPdf(@PathVariable UUID id) {
-        return evidenceFileService.downloadPdf(id);
+    public ResponseEntity<byte[]> downloadPdf(@PathVariable UUID id,
+                                              @AuthenticationPrincipal Account currentUser) {
+        return evidenceFileService.downloadPdf(id, currentUser);
     }
 
     @GetMapping("/{id}/file")
-    public ResponseEntity<byte[]> downloadFile(@PathVariable UUID id) {
-        return evidenceFileService.downloadFile(id);
+    public ResponseEntity<byte[]> downloadFile(@PathVariable UUID id,
+                                               @AuthenticationPrincipal Account currentUser) {
+        return evidenceFileService.downloadFile(id, currentUser);
     }
 }

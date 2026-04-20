@@ -3,6 +3,8 @@ package org.example.crimearchive.service;
 import org.example.crimearchive.evidence.EvidenceFile;
 import org.example.crimearchive.evidence.EvidenceFileRepository;
 import org.example.crimearchive.evidence.EvidenceFileService;
+import org.example.crimearchive.permissions.PermissionService;
+import org.example.crimearchive.polis.Account;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.web.server.ResponseStatusException;
 import software.amazon.awssdk.core.ResponseBytes;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
@@ -27,6 +30,7 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -36,6 +40,10 @@ class EvidenceFileServiceTest {
     private EvidenceFileRepository evidenceFileRepository;
     @Mock
     private S3Client s3Client;
+    @Mock
+    private PermissionService permissionService;
+    @Mock
+    private Account mockUser;
 
     @InjectMocks
     private EvidenceFileService evidenceFileService;
@@ -114,12 +122,13 @@ class EvidenceFileServiceTest {
         UUID id = UUID.randomUUID();
         EvidenceFile ev = new EvidenceFile(id, UUID.randomUUID(), 1, "K-2026-000001", "cases/K-2026-000001/pdf/test.pdf", null, null, "officer1", null);
         when(evidenceFileRepository.findById(id)).thenReturn(Optional.of(ev));
+        when(permissionService.canAccessCase(anyString(), any())).thenReturn(true);
 
         ResponseBytes<GetObjectResponse> mockBytes = mock(ResponseBytes.class);
         when(mockBytes.asByteArray()).thenReturn("pdf-content".getBytes());
         when(s3Client.getObjectAsBytes(any(GetObjectRequest.class))).thenReturn(mockBytes);
 
-        ResponseEntity<byte[]> response = evidenceFileService.downloadPdf(id);
+        ResponseEntity<byte[]> response = evidenceFileService.downloadPdf(id, mockUser);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
@@ -130,7 +139,19 @@ class EvidenceFileServiceTest {
         UUID id = UUID.randomUUID();
         when(evidenceFileRepository.findById(id)).thenReturn(Optional.empty());
 
-        assertThrows(RuntimeException.class, () -> evidenceFileService.downloadPdf(id));
+        assertThrows(ResponseStatusException.class, () -> evidenceFileService.downloadPdf(id, mockUser));
+    }
+
+    @Test
+    void downloadPdf_forbidden_throwsException() {
+        UUID id = UUID.randomUUID();
+        EvidenceFile ev = new EvidenceFile(id, UUID.randomUUID(), 1, "K-2026-000001", "cases/K-2026-000001/pdf/test.pdf", null, null, "officer1", null);
+        when(evidenceFileRepository.findById(id)).thenReturn(Optional.of(ev));
+        when(permissionService.canAccessCase(anyString(), any())).thenReturn(false);
+
+        ResponseStatusException ex = assertThrows(ResponseStatusException.class,
+                () -> evidenceFileService.downloadPdf(id, mockUser));
+        assertEquals(HttpStatus.FORBIDDEN, ex.getStatusCode());
     }
 
     @Test
@@ -140,12 +161,13 @@ class EvidenceFileServiceTest {
                 "cases/K-2026-000001/pdf/test.pdf", "cases/K-2026-000001/files/evidence.jpg",
                 "evidence.jpg", "officer1", null);
         when(evidenceFileRepository.findById(id)).thenReturn(Optional.of(ev));
+        when(permissionService.canAccessCase(anyString(), any())).thenReturn(true);
 
         ResponseBytes<GetObjectResponse> mockBytes = mock(ResponseBytes.class);
         when(mockBytes.asByteArray()).thenReturn("file-content".getBytes());
         when(s3Client.getObjectAsBytes(any(GetObjectRequest.class))).thenReturn(mockBytes);
 
-        ResponseEntity<byte[]> response = evidenceFileService.downloadFile(id);
+        ResponseEntity<byte[]> response = evidenceFileService.downloadFile(id, mockUser);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
@@ -157,7 +179,10 @@ class EvidenceFileServiceTest {
         EvidenceFile ev = new EvidenceFile(id, UUID.randomUUID(), 1, "K-2026-000001",
                 "cases/K-2026-000001/pdf/test.pdf", null, null, "officer1", null);
         when(evidenceFileRepository.findById(id)).thenReturn(Optional.of(ev));
+        when(permissionService.canAccessCase(anyString(), any())).thenReturn(true);
 
-        assertThrows(RuntimeException.class, () -> evidenceFileService.downloadFile(id));
+        ResponseStatusException ex = assertThrows(ResponseStatusException.class,
+                () -> evidenceFileService.downloadFile(id, mockUser));
+        assertEquals(HttpStatus.NOT_FOUND, ex.getStatusCode());
     }
 }

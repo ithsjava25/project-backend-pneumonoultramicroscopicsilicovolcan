@@ -4,11 +4,17 @@ import com.itextpdf.text.Document;
 import com.itextpdf.text.Image;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.pdf.PdfWriter;
+import org.example.crimearchive.permissions.PermissionService;
+import org.example.crimearchive.polis.Account;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ContentDisposition;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 import software.amazon.awssdk.core.ResponseBytes;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
@@ -19,6 +25,7 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -28,13 +35,17 @@ public class EvidenceFileService {
 
     private final EvidenceFileRepository evidenceFileRepository;
     private final S3Client s3Client;
+    private final PermissionService permissionService;
 
     @Value("${minio.bucket}")
     private String bucket;
 
-    public EvidenceFileService(EvidenceFileRepository evidenceFileRepository, S3Client s3Client) {
+    public EvidenceFileService(EvidenceFileRepository evidenceFileRepository,
+                               S3Client s3Client,
+                               PermissionService permissionService) {
         this.evidenceFileRepository = evidenceFileRepository;
         this.s3Client = s3Client;
+        this.permissionService = permissionService;
     }
 
     public void upload(String caseNumber, String reportName, String reportEvent,
@@ -42,6 +53,7 @@ public class EvidenceFileService {
         upload(caseNumber, reportName, reportEvent, file, uploadedBy, null);
     }
 
+    @Transactional
     public void upload(String caseNumber, String reportName, String reportEvent,
                        MultipartFile file, String uploadedBy, UUID groupId) throws IOException {
         String s3KeyPdf = null;
@@ -85,7 +97,7 @@ public class EvidenceFileService {
                 );
             }
 
-            evidenceFileRepository.save(new EvidenceFile(
+            EvidenceFile evidenceFile = new EvidenceFile(
                     UUID.randomUUID(),
                     resolvedGroupId,
                     nextVersion,
@@ -95,7 +107,9 @@ public class EvidenceFileService {
                     file != null ? file.getOriginalFilename() : null,
                     uploadedBy,
                     LocalDateTime.now()
-            ));
+            );
+            evidenceFile.setContentType(file != null ? file.getContentType() : null);
+            evidenceFileRepository.save(evidenceFile);
 
         } catch (Exception e) {
             deleteIfExists(s3KeyPdf);
@@ -104,9 +118,11 @@ public class EvidenceFileService {
         }
     }
 
-    public ResponseEntity<byte[]> downloadPdf(UUID id) {
+    public ResponseEntity<byte[]> downloadPdf(UUID id, Account currentUser) {
         EvidenceFile evidence = evidenceFileRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Bevisfil hittades inte: " + id));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Bevisfil hittades inte: " + id));
+
+        requireCaseAccess(evidence.getCaseNumber(), currentUser);
 
         ResponseBytes<GetObjectResponse> objectBytes = s3Client.getObjectAsBytes(
                 GetObjectRequest.builder()
@@ -121,12 +137,14 @@ public class EvidenceFileService {
                 .body(objectBytes.asByteArray());
     }
 
-    public ResponseEntity<byte[]> downloadFile(UUID id) {
+    public ResponseEntity<byte[]> downloadFile(UUID id, Account currentUser) {
         EvidenceFile evidence = evidenceFileRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Bevisfil hittades inte: " + id));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Bevisfil hittades inte: " + id));
+
+        requireCaseAccess(evidence.getCaseNumber(), currentUser);
 
         if (evidence.getS3KeyFile() == null) {
-            throw new RuntimeException("Ingen bifogad fil finns för denna post");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Ingen bifogad fil finns för denna post");
         }
 
         ResponseBytes<GetObjectResponse> objectBytes = s3Client.getObjectAsBytes(
@@ -136,8 +154,19 @@ public class EvidenceFileService {
                         .build()
         );
 
+        String contentDisposition = ContentDisposition.attachment()
+                .filename(evidence.getOriginalFilename() != null ? evidence.getOriginalFilename() : "fil",
+                        StandardCharsets.UTF_8)
+                .build()
+                .toString();
+
+        MediaType mediaType = evidence.getContentType() != null
+                ? MediaType.parseMediaType(evidence.getContentType())
+                : MediaType.APPLICATION_OCTET_STREAM;
+
         return ResponseEntity.ok()
-                .header("Content-Disposition", "attachment; filename=" + evidence.getOriginalFilename())
+                .contentType(mediaType)
+                .header("Content-Disposition", contentDisposition)
                 .body(objectBytes.asByteArray());
     }
 
@@ -149,8 +178,18 @@ public class EvidenceFileService {
         return evidenceFileRepository.findLatestVersionsByCaseNumber(caseNumber);
     }
 
-    public List<EvidenceFile> getVersionHistory(UUID groupId) {
-        return evidenceFileRepository.findByGroupIdOrderByVersionAsc(groupId);
+    public List<EvidenceFile> getVersionHistory(UUID groupId, Account currentUser) {
+        List<EvidenceFile> history = evidenceFileRepository.findByGroupIdOrderByVersionAsc(groupId);
+        if (!history.isEmpty()) {
+            requireCaseAccess(history.get(0).getCaseNumber(), currentUser);
+        }
+        return history;
+    }
+
+    private void requireCaseAccess(String caseNumber, Account currentUser) {
+        if (!permissionService.canAccessCase(caseNumber, currentUser)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Åtkomst nekad till ärende: " + caseNumber);
+        }
     }
 
     private byte[] generatePdf(String reportName, String reportEvent, MultipartFile file) throws Exception {
