@@ -29,13 +29,18 @@ public class SecurityConfiguration {
                     auth.requestMatchers("/userpage").hasRole("USER");
                     auth.requestMatchers("/cases/**").hasRole("HANDLER");
 
-
                     auth.anyRequest().authenticated();
                 })
                 //Bygger inloggingsformuläret automatiskt
                 //.oauth2Login(Customizer.withDefaults()) lägg till tsm med oauth2 application.properties
                 .formLogin(formLogin -> formLogin.defaultSuccessUrl("/profile"))
-        .build();
+
+                // Visar egen 403-sida när användare saknar behörighet istället för Spring Securities standardfel
+                .exceptionHandling(e -> e
+                        .accessDeniedPage("/403")
+                )
+
+                .build();
     }
     @Bean
     public PasswordEncoder passwordEncoder(){
