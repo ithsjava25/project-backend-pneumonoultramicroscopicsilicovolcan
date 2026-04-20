@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>Cases</title>
@@ -19,11 +19,20 @@
         <thead>
         <tr>
             <th>K-nummer</th>
+            <th>Filer</th>
         </tr>
         </thead>
         <tbody>
         <tr th:each="c : ${cases}">
             <td th:text="${c.caseNumber}"></td>
+            <td>
+                <div th:each="ev : ${evidenceMap[c.caseNumber]}">
+                    <a th:href="@{/evidence/{id}/pdf(id=${ev.id})}">Ladda ner PDF</a>
+                    <a th:if="${ev.s3KeyFile != null}" th:href="@{/evidence/{id}/file(id=${ev.id})}"
+                       th:text="'Ladda ner ' + ${ev.originalFilename}"></a>
+                </div>
+                <span th:if="${#lists.isEmpty(evidenceMap[c.caseNumber])}">Inga filer uppladdade</span>
+            </td>
         </tr>
         </tbody>
     </table>
