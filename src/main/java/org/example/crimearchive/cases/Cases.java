@@ -54,7 +54,7 @@ public class Cases {
         this.caseNumber = caseNumber;
     }
 
-    public long getId() {
+    public Long getId() {
         return Id;
     }
 

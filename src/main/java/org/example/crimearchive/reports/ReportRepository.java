@@ -1,7 +1,9 @@
 package org.example.crimearchive.reports;
 
+import org.example.crimearchive.cases.Cases;
 import org.springframework.data.repository.ListCrudRepository;
 
+import java.util.List;
 import java.util.UUID;
 
 public interface ReportRepository extends ListCrudRepository<Report, UUID> {
@@ -14,6 +16,8 @@ public interface ReportRepository extends ListCrudRepository<Report, UUID> {
 
     long count();
 
-//    List<Report> findAllByCaseNumberIn(List<String> permittedCaseNumbers);
+    List<Report> findAllByCaseEntity(Cases caseEntity);
+
+    Report getReportByCaseEntity(Cases caseEntity);
 
 }

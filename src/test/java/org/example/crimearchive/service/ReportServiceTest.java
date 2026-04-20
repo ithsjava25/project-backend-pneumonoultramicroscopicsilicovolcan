@@ -3,30 +3,19 @@ package org.example.crimearchive.service;
 import org.example.crimearchive.dto.CreateReport;
 import org.example.crimearchive.dto.ReportResponse;
 import org.example.crimearchive.KNumberService;
+import org.example.crimearchive.cases.Cases;
 import org.example.crimearchive.cases.CasesRepository;
 import org.example.crimearchive.reports.Report;
 import org.example.crimearchive.reports.ReportRepository;
 import org.example.crimearchive.reports.ReportService;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.server.ResponseStatusException;
-import software.amazon.awssdk.core.ResponseBytes;
-import software.amazon.awssdk.core.sync.RequestBody;
-import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
-import software.amazon.awssdk.services.s3.model.GetObjectRequest;
-import software.amazon.awssdk.services.s3.model.GetObjectResponse;
-import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -44,172 +33,52 @@ class ReportServiceTest {
     private KNumberService kNumberService;
     @Mock
     private CasesRepository casesRepository;
-    @Mock
-    private S3Client s3Client;
 
     @InjectMocks
     private ReportService reportService;
 
-    @BeforeEach
-    void setUp() {
-        ReflectionTestUtils.setField(reportService, "bucket", "crime-archive");
-    }
-
-
     @Test
-    void saveReport_noFile_uploadsOnlyPdf() throws IOException {
-        CreateReport request = new CreateReport("Johan", "Murder");
+    void saveReport_noCaseNumber_createsNewCaseAndSavesReport() {
+        CreateReport request = new CreateReport("Murder", "Johan");
+        when(kNumberService.getKNumber()).thenReturn("K-2026-000001");
 
-        reportService.saveReport(request, null);
-        // Kommenterade ut för "Wanted but not invoked ... Actually, there were zero interactions with this mock. "
-        //verify(s3Client, times(1)).putObject(any(PutObjectRequest.class), any(RequestBody.class));
+        String caseNumber = reportService.saveReport(request, null);
+
+        assertEquals("K-2026-000001", caseNumber);
+        verify(casesRepository, times(1)).save(any(Cases.class));
         verify(reportRepository, times(1)).save(any(Report.class));
     }
 
     @Test
-    void saveReport_withImage_uploadsTwoFiles() throws IOException {
-        CreateReport request = new CreateReport("Johan", "Murder");
+    void saveReport_existingCaseNumber_usesExistingCase() {
+        Cases existingCase = new Cases("K-2026-000001");
+        CreateReport request = new CreateReport("Murder", "Johan", "K-2026-000001");
+        when(casesRepository.findFirstByCaseNumber("K-2026-000001")).thenReturn(Optional.of(existingCase));
 
-        byte[] minimalPng = new byte[]{
-                (byte)0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A,
-                0x00, 0x00, 0x00, 0x0D, 0x49, 0x48, 0x44, 0x52,
-                0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01,
-                0x08, 0x02, 0x00, 0x00, 0x00, (byte)0x90, 0x77, 0x53,
-                (byte)0xDE, 0x00, 0x00, 0x00, 0x0C, 0x49, 0x44, 0x41,
-                0x54, 0x08, (byte)0xD7, 0x63, (byte)0xF8, (byte)0xCF, (byte)0xC0, 0x00,
-                0x00, 0x00, 0x02, 0x00, 0x01, (byte)0xE2, 0x21, (byte)0xBC,
-                0x33, 0x00, 0x00, 0x00, 0x00, 0x49, 0x45, 0x4E,
-                0x44, (byte)0xAE, 0x42, 0x60, (byte)0x82
-        };
+        String caseNumber = reportService.saveReport(request, null);
 
-        MockMultipartFile image = new MockMultipartFile(
-                "file", "evidence.png", "image/png", minimalPng
-        );
-
-        reportService.saveReportWithFile(request, image);
-
-        verify(s3Client, times(2)).putObject(any(PutObjectRequest.class), any(RequestBody.class));
+        assertEquals("K-2026-000001", caseNumber);
+        verify(casesRepository, never()).save(any());
         verify(reportRepository, times(1)).save(any(Report.class));
     }
 
     @Test
-    void saveReport_withPdf_uploadsTwoFiles() throws IOException {
-        CreateReport request = new CreateReport("Johan", "Murder");
-        MockMultipartFile pdf = new MockMultipartFile(
-                "file", "document.pdf", "application/pdf", "fake-pdf".getBytes()
-        );
-
-        reportService.saveReportWithFile(request, pdf);
-
-        verify(s3Client, times(2)).putObject(any(PutObjectRequest.class), any(RequestBody.class));
-        verify(reportRepository, times(1)).save(any(Report.class));
-    }
-
-    @Test
-    void saveReport_withWordFile_uploadsTwoFiles() throws IOException {
-        CreateReport request = new CreateReport("Johan", "Murder");
-        MockMultipartFile word = new MockMultipartFile(
-                "file", "report.docx",
-                "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                "fake-word".getBytes()
-        );
-
-        reportService.saveReportWithFile(request, word);
-
-        verify(s3Client, times(2)).putObject(any(PutObjectRequest.class), any(RequestBody.class));
-        verify(reportRepository, times(1)).save(any(Report.class));
-    }
-
-    @Test
-    void saveReport_databaseFails_cleansUpS3Files() {
-        CreateReport request = new CreateReport("Johan", "Murder");
-        when(reportRepository.save(any())).thenThrow(new RuntimeException("Database error"));
-
-        assertThrows(IOException.class, () -> reportService.saveReportWithFile(request, null));
-
-        verify(s3Client, atLeastOnce()).deleteObject(any(DeleteObjectRequest.class));
-    }
-
-
-    @Test
-    void downloadPdf_reportExists_returnsPdfWith200() {
-        UUID uuid = UUID.randomUUID();
-        Report report = new Report(uuid, "Johan", "Murder", "reports/pdf/test.pdf", null);
-        when(reportRepository.findById(uuid)).thenReturn(Optional.of(report));
-
-        ResponseBytes<GetObjectResponse> mockBytes = mock(ResponseBytes.class);
-        when(mockBytes.asByteArray()).thenReturn("pdf-content".getBytes());
-        when(s3Client.getObjectAsBytes(any(GetObjectRequest.class))).thenReturn(mockBytes);
-
-        ResponseEntity<byte[]> response = reportService.downloadPdf(uuid);
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertNotNull(response.getBody());
-    }
-
-    @Test
-    void downloadPdf_reportNotFound_throws404() {
-        UUID uuid = UUID.randomUUID();
-        when(reportRepository.findById(uuid)).thenReturn(Optional.empty());
+    void saveReport_caseNotFound_throws404() {
+        CreateReport request = new CreateReport("Murder", "Johan", "K-2026-999999");
+        when(casesRepository.findFirstByCaseNumber("K-2026-999999")).thenReturn(Optional.empty());
 
         ResponseStatusException ex = assertThrows(
                 ResponseStatusException.class,
-                () -> reportService.downloadPdf(uuid)
+                () -> reportService.saveReport(request, null)
         );
 
         assertEquals(HttpStatus.NOT_FOUND, ex.getStatusCode());
     }
 
     @Test
-    void downloadPdf_noPdfKey_throws404() {
+    void getAllReportResponses_returnsCorrectData() {
         UUID uuid = UUID.randomUUID();
-        Report report = new Report(uuid, "Johan", "Murder", null, null);
-        when(reportRepository.findById(uuid)).thenReturn(Optional.of(report));
-
-        ResponseStatusException ex = assertThrows(
-                ResponseStatusException.class,
-                () -> reportService.downloadPdf(uuid)
-        );
-
-        assertEquals(HttpStatus.NOT_FOUND, ex.getStatusCode());
-    }
-
-
-    @Test
-    void downloadFile_fileExists_returnsFileWith200() {
-        UUID uuid = UUID.randomUUID();
-        Report report = new Report(uuid, "Johan", "Murder", "reports/pdf/test.pdf", "reports/files/evidence.jpg");
-        when(reportRepository.findById(uuid)).thenReturn(Optional.of(report));
-
-        ResponseBytes<GetObjectResponse> mockBytes = mock(ResponseBytes.class);
-        when(mockBytes.asByteArray()).thenReturn("file-content".getBytes());
-        when(s3Client.getObjectAsBytes(any(GetObjectRequest.class))).thenReturn(mockBytes);
-
-        ResponseEntity<byte[]> response = reportService.downloadFile(uuid);
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertNotNull(response.getBody());
-    }
-
-    @Test
-    void downloadFile_noFileKey_throws404() {
-        UUID uuid = UUID.randomUUID();
-        Report report = new Report(uuid, "Johan", "Murder", "reports/pdf/test.pdf", null);
-        when(reportRepository.findById(uuid)).thenReturn(Optional.of(report));
-
-        ResponseStatusException ex = assertThrows(
-                ResponseStatusException.class,
-                () -> reportService.downloadFile(uuid)
-        );
-
-        assertEquals(HttpStatus.NOT_FOUND, ex.getStatusCode());
-    }
-
-
-    @Test
-    void getAllReportResponses_returnsListWithoutS3Keys() {
-        UUID uuid = UUID.randomUUID();
-        Report report = new Report(uuid, "Johan", "Murder", "reports/pdf/test.pdf", "reports/files/evidence.jpg");
+        Report report = new Report(uuid, "Johan", "Murder");
         when(reportRepository.findAll()).thenReturn(List.of(report));
 
         List<ReportResponse> responses = reportService.getAllReportResponses();
@@ -227,5 +96,12 @@ class ReportServiceTest {
         List<ReportResponse> responses = reportService.getAllReportResponses();
 
         assertTrue(responses.isEmpty());
+    }
+
+    @Test
+    void getAmount_returnsRepositoryCount() {
+        when(reportRepository.count()).thenReturn(5L);
+
+        assertEquals(5L, reportService.getAmount());
     }
 }

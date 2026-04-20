@@ -9,27 +9,12 @@ import org.example.crimearchive.dto.ReportResponse;
 import org.example.crimearchive.KNumberService;
 import org.example.crimearchive.cases.Cases;
 import org.example.crimearchive.cases.CasesRepository;
-import org.example.crimearchive.mapper.ReportMapper;
 import org.example.crimearchive.polis.Account;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
-import software.amazon.awssdk.core.ResponseBytes;
-import software.amazon.awssdk.core.sync.RequestBody;
-import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
-import software.amazon.awssdk.services.s3.model.GetObjectRequest;
-import software.amazon.awssdk.services.s3.model.GetObjectResponse;
-import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -39,37 +24,31 @@ public class ReportService {
     private final ReportRepository reportRepository;
     private final KNumberService knumberService;
     private final CasesRepository casesRepository;
-    private final S3Client s3Client;
 
-    @Value("${minio.bucket}")
-    private String bucket;
-
-    public ReportService(ReportRepository reportRepository, KNumberService knumberService, CasesRepository casesRepository, S3Client s3Client) {
-        this.reportRepository = reportRepository;
+    public ReportService(ReportRepository reportRepository, KNumberService knumberService, CasesRepository casesRepository) {
+        this.reportRepository = reportReposithttps://github.com/ithsjava25/project-backend-DurTre/pull/13/conflict?name=src%252Fmain%252Fjava%252Forg%252Fexample%252Fcrimearchive%252Freports%252FReportService.java&ancestor_oid=690ead38ec7d8d1cd8a856af36a7112821febcdc&base_oid=6ea31a1a8dd80f1f190c2b39a2733e508f376539&head_oid=704f2c32be2319607cea891783e283c3d3057210ory;
         this.knumberService = knumberService;
         this.casesRepository = casesRepository;
-        this.s3Client = s3Client;
     }
 
     @Transactional
-    public void saveReport(CreateReport report, Account currentUser) {
+    public String saveReport(CreateReport report, Account currentUser) {
         Cases cases;
 
         if (report.caseNumber() == null || report.caseNumber().isBlank()) {
             String newCaseNumber = knumberService.getKNumber();
             cases = new Cases(newCaseNumber);
-
-            cases.getAccounts().add(currentUser);
-
+            if (currentUser != null) cases.getAccounts().add(currentUser);
             casesRepository.save(cases);
         } else {
             String sanitized = caseNumberSanitation(report.caseNumber());
             cases = casesRepository.findFirstByCaseNumber(sanitized)
-                    .orElseThrow(() -> new RuntimeException("Case not found: " + sanitized));
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Case not found: " + sanitized));
         }
 
         Report newReport = new Report(UUID.randomUUID(), report.name(), report.event(), cases);
         reportRepository.save(newReport);
+        return cases.getCaseNumber();
     }
 
     @Transactional
@@ -208,49 +187,6 @@ public class ReportService {
 
     public long getAmount() {
         return reportRepository.count();
-    }
-
-    public ResponseEntity<byte[]> downloadPdf(UUID uuid) {
-        Report report = reportRepository.findById(uuid)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "Rapporten hittades inte: " + uuid));
-
-        if (report.getS3KeyPdf() == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Ingen PDF finns för denna rapport");
-        }
-
-        ResponseBytes<GetObjectResponse> objectBytes = s3Client.getObjectAsBytes(
-                GetObjectRequest.builder()
-                        .bucket(bucket)
-                        .key(report.getS3KeyPdf())
-                        .build()
-        );
-
-        return ResponseEntity.ok()
-                .contentType(MediaType.APPLICATION_PDF)
-                .header("Content-Disposition", "attachment; filename=rapport.pdf")
-                .body(objectBytes.asByteArray());
-    }
-
-    public ResponseEntity<byte[]> downloadFile(UUID uuid) {
-        Report report = reportRepository.findById(uuid)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "Rapporten hittades inte: " + uuid));
-
-        if (report.getS3KeyFile() == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Ingen bifogad fil finns för denna rapport");
-        }
-
-        ResponseBytes<GetObjectResponse> objectBytes = s3Client.getObjectAsBytes(
-                GetObjectRequest.builder()
-                        .bucket(bucket)
-                        .key(report.getS3KeyFile())
-                        .build()
-        );
-
-        return ResponseEntity.ok()
-                .header("Content-Disposition", "attachment; filename=fil")
-                .body(objectBytes.asByteArray());
     }
 
     public List<ReportResponse> getAllReportResponses() {
