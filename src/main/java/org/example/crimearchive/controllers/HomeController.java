@@ -4,32 +4,34 @@ import jakarta.validation.Valid;
 import org.example.crimearchive.DTO.CreateReport;
 import org.example.crimearchive.cases.CaseService;
 import org.example.crimearchive.cases.CasesRepository;
+import org.example.crimearchive.evidence.EvidenceFileService;
 import org.example.crimearchive.polis.Account;
 import org.example.crimearchive.reports.ReportService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-
-import java.util.UUID;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
 @Controller
 public class HomeController {
 
     Logger log = LoggerFactory.getLogger(HomeController.class);
     private final ReportService reportService;
+    private final EvidenceFileService evidenceFileService;
     private final CaseService caseService;
     private final CasesRepository casesRepository;
 
-    public HomeController(ReportService reportService, CaseService caseService, CasesRepository casesRepository) {
+    public HomeController(ReportService reportService, EvidenceFileService evidenceFileService,
+                          CaseService caseService, CasesRepository casesRepository) {
         this.reportService = reportService;
+        this.evidenceFileService = evidenceFileService;
         this.caseService = caseService;
         this.casesRepository = casesRepository;
     }
@@ -51,31 +53,27 @@ public class HomeController {
         return "userpage";
     }
 
-
-
     @PostMapping("/reports/add")
     public String saveReport(
             @ModelAttribute("newReport") @Valid CreateReport newReport,
             BindingResult bindingResult,
+            @RequestParam(required = false) MultipartFile file,
             @AuthenticationPrincipal Account currentUser) {
 
         if (bindingResult.hasErrors()) {
             log.info("Binding Error: {}", bindingResult.getAllErrors().getLast());
             return "registerreport";
         }
-        reportService.saveReport(newReport, null);
+
+        try {
+            String caseNumber = reportService.saveReport(newReport, currentUser);
+            evidenceFileService.upload(caseNumber, newReport.name(), newReport.event(),
+                    file, currentUser.getUsername());
+        } catch (Exception e) {
+            log.error("Fel vid sparande av rapport", e);
+            return "registerreport";
+        }
+
         return "redirect:/userpage";
-    }
-
-
-
-    @GetMapping("/reports/{uuid}/download/pdf")
-    public ResponseEntity<byte[]> downloadPdf(@PathVariable UUID uuid) {
-        return reportService.downloadPdf(uuid);
-    }
-
-    @GetMapping("/reports/{uuid}/download/file")
-    public ResponseEntity<byte[]> downloadFile(@PathVariable UUID uuid) {
-        return reportService.downloadFile(uuid);
     }
 }
