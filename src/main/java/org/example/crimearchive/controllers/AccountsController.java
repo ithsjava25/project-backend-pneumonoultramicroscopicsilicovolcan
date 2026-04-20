@@ -49,15 +49,20 @@ public class AccountsController {
     @PostMapping("/accounts/add")
     public String saveNewAccount(@ModelAttribute("createAccount") @Valid DTOCreatePolis newAccount,
                                  BindingResult bindingResult,
+                                 @AuthenticationPrincipal Account user,
                                  Model model) {
+        model.addAttribute("accountoverview", user.getAuthorities().stream()
+                .anyMatch(ga -> ga.getAuthority().equals("ROLE_ADMIN")));
+        model.addAttribute("currentUser", user);
         if (bindingResult.hasErrors()) {
-            System.out.println("Validation error creating account: " + bindingResult.getErrorCount());
+
             return "newaccountpage";
         }
         try {
             userService.saveNewAccount(newAccount);
         } catch (IllegalArgumentException e) {
-            bindingResult.rejectValue("errorTitle", "error.createAccount", e.getMessage());
+            bindingResult.rejectValue("roles", "error.createAccount", e.getMessage());
+            return "newaccountpage";
         }
         return "redirect:/accounts";
     }

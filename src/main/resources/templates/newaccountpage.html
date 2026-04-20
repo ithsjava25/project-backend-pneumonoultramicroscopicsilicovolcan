@@ -56,11 +56,7 @@
     </div>
 
     <main class="page-wrap">
-        <form id="createAccount" class="report-form" th:action="@{/accounts/add}" method="post"
-              enctype="multipart/form-data">
-
-            <input id="evidenceFiles" name="evidenceFiles" type="file" multiple hidden>
-            <input id="evidenceImages" name="evidenceImages" type="file" accept="image/*" multiple hidden>
+        <form th:object="${createAccount}" class="report-form" th:action="@{/accounts/add}" method="post">
 
             <div class="report-grid">
 
@@ -79,21 +75,30 @@
                                        name="fullName"
                                        type="text"
                                        placeholder="Ange för- och efternamn">
+                                <div>
+                                    <span th:if="${#fields.hasErrors('fullName')}" th:errors="*{fullName}"></span>
+                                </div>
                             </div>
 
                             <div class="form-field">
                                 <label for="userName">Användarnamn</label>
                                 <input id="userName"
-                                       name="username"
                                        type="text"
+                                       th:field="*{username}"
                                        placeholder="Ange användarnamn">
+                                <div>
+                                    <span th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></span>
+                                </div>
                             </div>
                             <div class="form-field">
                                 <label for="passWord">Lösenord</label>
                                 <input id="passWord"
-                                       name="password"
                                        type="text"
+                                       th:field="*{password}"
                                        placeholder="Ange tillfälligt lösenord">
+                                <div>
+                                    <span th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></span>
+                                </div>
                             </div>
                         </div>
                     </section>
@@ -111,17 +116,23 @@
                             <div class="form-field">
                                 <label for="Profession">Roll</label>
                                 <input id="Profession"
-                                       name="profession"
                                        type="text"
+                                       th:field="*{profession}"
                                        placeholder="Ange rollen till kontot (Polis, Chef)">
+                                <div>
+                                    <span th:if="${#fields.hasErrors('profession')}" th:errors="*{profession}"></span>
+                                </div>
                             </div>
 
                             <div class="form-field">
                                 <label for="Department">Avdelning</label>
                                 <input id="Department"
-                                       name="department"
                                        type="text"
+                                       th:field="*{department}"
                                        placeholder="Anställnings område">
+                                <div>
+                                    <span th:if="${#fields.hasErrors('department')}" th:errors="*{department}"></span>
+                                </div>
                             </div>
                         </div>
                     </section>
@@ -136,9 +147,12 @@
                         <div class="form-field">
                             <label for="Roles">Behörigheter</label>
                             <input id="Roles"
-                                   name="roles"
                                    type="text"
-                                   placeholder="Ange dem rollen personen har behörighet till">
+                                   th:field="*{roles}"
+                                   placeholder="Personens roller (user, admin, handler)">
+                            <div>
+                                <span th:if="${#fields.hasErrors('roles')}" th:errors="*{roles}" class="error"></span>
+                            </div>
                             <button type="submit" class="btn btn-primary meta-strip-button">Spara</button>
                         </div>
                     </section>

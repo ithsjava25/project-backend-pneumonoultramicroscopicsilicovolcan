@@ -21,12 +21,11 @@ public class Mapper {
         );
     }
 
-    public static Account newAccountEntity(DTOCreatePolis newUser, String encodedPassword) {
-        List<String> defaultList = List.of("user");
+    public static Account newAccountEntity(DTOCreatePolis newUser, String encodedPassword, List<String> splitRoles) {
         return new Account(
                 newUser.username(),
                 encodedPassword,
-                defaultList,
+                splitRoles,
                 newUser.fullName(),
                 newUser.profession(),
                 newUser.department());
