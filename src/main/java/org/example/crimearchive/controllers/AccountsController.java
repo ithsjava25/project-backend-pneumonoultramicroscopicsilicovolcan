@@ -1,12 +1,15 @@
 package org.example.crimearchive.controllers;
 
+import jakarta.validation.Valid;
+import org.example.crimearchive.DTO.Polis.DTOCreatePolis;
 import org.example.crimearchive.polis.Account;
 import org.example.crimearchive.polis.UserService;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -21,26 +24,34 @@ public class AccountsController {
 
     @GetMapping("/accounts")
     public String adminPage(@AuthenticationPrincipal Account user, Model model) {
+        model.addAttribute("accountoverview", user.getAuthorities().stream()
+                .anyMatch(ga -> ga.getAuthority().equals("ROLE_ADMIN")));
         model.addAttribute("currentUser", user);
         model.addAttribute("allAccounts", userService.getAllAccounts());
-
         return "accountoverview";
     }
 
     @GetMapping("/accounts/detail")
-    public ResponseEntity accountDetails(@RequestParam Long userId) {
+    public String accountDetails(@RequestParam Long userId) {
 
-        return ResponseEntity.ok("user id: " + userId);
+        return userId;
     }
 
-    @GetMapping("/accounts/add")
-    public String createNewAccount() {
+    @GetMapping
+    apping("/accounts/add")
 
-        return "createaccount";
+    public String createNewAccount(@AuthenticationPrincipal Account user, Model model) {
+        model.addAttribute("accountoverview", user.getAuthorities().stream()
+                .anyMatch(ga -> ga.getAuthority().equals("ROLE_ADMIN")));
+        model.addAttribute("currentUser", user);
+        model.addAttribute("createAccount", new DTOCreatePolis());
+        return "newaccountpage";
     }
 
     @PostMapping("/accounts/add")
-    public String saveNewAccount() {
+    public String saveNewAccount(@ModelAttribute("createAccount") @Valid DTOCreatePolis newAccount,
+                                 BindingResult bindingResult,
+                                 Model model) {
 
         return "redirect:/accounts";
     }
