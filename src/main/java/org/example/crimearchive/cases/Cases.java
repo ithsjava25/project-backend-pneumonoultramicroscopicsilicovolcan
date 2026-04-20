@@ -20,7 +20,7 @@ public class Cases {
     @ManyToMany
     @JoinTable(
             name = "account_cases",
-            joinColumns = @JoinColumn(name = "case_id"),
+            joinColumns = @JoinColumn(name = "report_id"),
             inverseJoinColumns = @JoinColumn(name = "account_id")
     )
     private Set<Account> accounts = new HashSet<>();
