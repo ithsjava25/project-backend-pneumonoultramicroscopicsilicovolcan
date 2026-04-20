@@ -25,6 +25,11 @@
         </div>
 
         <div class="topbar-user">
+            <div th:if="${accountoverview}">
+                <form th:action="@{/accounts}" method="get">
+                    <button class="user-chip" type="submit" style="cursor: pointer">Konto översikt</button>
+                </form>
+            </div>
             <div th:if="${assigncasebutton}">
                 <form th:action="@{/cases}" method="get">
                     <button class="user-chip" type="submit" style="cursor: pointer">Tilldelning</button>
