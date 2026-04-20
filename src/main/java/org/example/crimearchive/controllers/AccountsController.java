@@ -7,6 +7,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
@@ -30,5 +31,17 @@ public class AccountsController {
     public ResponseEntity accountDetails(@RequestParam Long userId) {
 
         return ResponseEntity.ok("user id: " + userId);
+    }
+
+    @GetMapping("/accounts/add")
+    public String createNewAccount() {
+
+        return "createaccount";
+    }
+
+    @PostMapping("/accounts/add")
+    public String saveNewAccount() {
+
+        return "redirect:/accounts";
     }
 }

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>DurTre - Admin</title>
+    <title>DurTre - Konton</title>
     <link rel="stylesheet" th:href="@{/style.css}">
 
 </head>
@@ -20,7 +20,7 @@
                     <span class="brand-title">DurTre</span>
                     <span class="brand-subtitle">Polismyndigheten</span>
                 </div>
-                <span class="brand-tagline">Utredningsöversikt</span>
+                <span class="brand-tagline">Administrativ översikt</span>
             </div>
         </div>
 
@@ -54,8 +54,11 @@
         <div class="report-grid">
 
             <div class="report-column">
-                <div>
-                    <h2>Alla konton</h2>
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Alla konton</h2>
+                        <a th:href="@{/accounts/add}">Nytt konto</a>
+                    </div>
                     <table>
                         <thead>
                         <tr>
@@ -80,56 +83,25 @@
                 <section class="card">
                     <div class="card-header">
                         <div>
-                            <span class="card-kicker">Personer</span>
-                            <h2>Vittne & Offer</h2>
+                            <h2>List av nekade förfrågningar från loggern</h2>
                         </div>
                     </div>
 
                     <div class="field-grid two-columns">
                         <div class="form-field">
-                            <label>Vittne</label>
+                            <label>Nekad från k nummer</label>
                             <ul>
                                 <li>
-                                    <span>Ulla-britt</span>
+                                    <span>Tid: 23:00 Konto: Nils Jonsson Knummer / rapport id: </span>
                                 </li>
                                 <li>
-                                    <span>Sven-åke</span>
-                                </li>
-                                <li>
-                                    <span>Nils-erik</span>
-                                </li>
-                                <li>
-                                    <span>Lars-göran</span>
+                                    <span>Tid: 14:23 Konto: Jimmy Johansson Knummer / rapport id: </span>
                                 </li>
                             </ul>
                         </div>
-
-                        <div class="form-field">
-                            <label>Offer</label>
-                            <ul>
-                                <li>
-                                    <span>Tre små grisar</span>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                </section>
-
-                <section class="card">
-                    <div class="card-header">
-                        <div>
-                            <span class="card-kicker">Plats</span>
-                            <h2>Brottsplats</h2>
-                        </div>
-                    </div>
-
-                    <div class="form-field">
-                        <label>Område</label>
-                        <span>Majorna</span>
                     </div>
                 </section>
             </div>
-
         </div>
     </main>
 </div>
