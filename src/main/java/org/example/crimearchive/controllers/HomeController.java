@@ -8,17 +8,13 @@ import org.example.crimearchive.polis.Account;
 import org.example.crimearchive.reports.ReportService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-
-import java.util.UUID;
 
 @Controller
 public class HomeController {
@@ -69,13 +65,4 @@ public class HomeController {
 
 
 
-    @GetMapping("/reports/{uuid}/download/pdf")
-    public ResponseEntity<byte[]> downloadPdf(@PathVariable UUID uuid) {
-        return reportService.downloadPdf(uuid);
-    }
-
-    @GetMapping("/reports/{uuid}/download/file")
-    public ResponseEntity<byte[]> downloadFile(@PathVariable UUID uuid) {
-        return reportService.downloadFile(uuid);
-    }
 }
