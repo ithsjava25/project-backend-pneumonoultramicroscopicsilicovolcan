@@ -9,7 +9,7 @@ import org.example.crimearchive.DTO.ReportResponse;
 import org.example.crimearchive.KNumberService;
 import org.example.crimearchive.cases.Cases;
 import org.example.crimearchive.cases.CasesRepository;
-import org.example.crimearchive.mapper.ReportMapper;
+import org.example.crimearchive.mapper.Mapper;
 import org.example.crimearchive.polis.Account;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -140,7 +140,7 @@ public class ReportService {
                 );
             }
 
-            reportRepository.save(ReportMapper.toEntity(report, s3KeyPdf, s3KeyFile));
+            reportRepository.save(Mapper.toEntity(report, s3KeyPdf, s3KeyFile));
 
         } catch (Exception e) {
             try {

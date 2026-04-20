@@ -34,12 +34,10 @@ public class AccountsController {
     @GetMapping("/accounts/detail")
     public String accountDetails(@RequestParam Long userId) {
 
-        return userId;
+        return "" + userId;
     }
 
-    @GetMapping
-    apping("/accounts/add")
-
+    @GetMapping("/accounts/add")
     public String createNewAccount(@AuthenticationPrincipal Account user, Model model) {
         model.addAttribute("accountoverview", user.getAuthorities().stream()
                 .anyMatch(ga -> ga.getAuthority().equals("ROLE_ADMIN")));
@@ -52,7 +50,15 @@ public class AccountsController {
     public String saveNewAccount(@ModelAttribute("createAccount") @Valid DTOCreatePolis newAccount,
                                  BindingResult bindingResult,
                                  Model model) {
-
+        if (bindingResult.hasErrors()) {
+            System.out.println("Validation error creating account: " + bindingResult.getErrorCount());
+            return "newaccountpage";
+        }
+        try {
+            userService.saveNewAccount(newAccount);
+        } catch (IllegalArgumentException e) {
+            bindingResult.rejectValue("errorTitle", "error.createAccount", e.getMessage());
+        }
         return "redirect:/accounts";
     }
 }

@@ -1,0 +1,35 @@
+package org.example.crimearchive.mapper;
+
+import org.example.crimearchive.DTO.CreateReport;
+import org.example.crimearchive.DTO.Polis.DTOCreatePolis;
+import org.example.crimearchive.polis.Account;
+import org.example.crimearchive.reports.Report;
+
+import java.util.List;
+import java.util.UUID;
+
+public class Mapper {
+
+    public static Report toEntity(CreateReport report, String s3KeyPdf, String s3KeyFile) {
+        return new Report(
+                UUID.randomUUID(),
+                report.name(),
+                report.event(),
+                s3KeyPdf,
+                s3KeyFile
+
+        );
+    }
+
+    public static Account newAccountEntity(DTOCreatePolis newUser, String encodedPassword) {
+        List<String> defaultList = List.of("user");
+        return new Account(
+                newUser.username(),
+                encodedPassword,
+                defaultList,
+                newUser.fullName(),
+                newUser.profession(),
+                newUser.department());
+    }
+
+}
