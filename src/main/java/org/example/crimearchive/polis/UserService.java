@@ -1,7 +1,10 @@
 package org.example.crimearchive.polis;
 
 import org.example.crimearchive.DTO.Polis.DTOCreatePolis;
+import org.example.crimearchive.DTO.Polis.DTOUpdatePolis;
+import org.example.crimearchive.DTO.Polis.UpdatePolice;
 import org.example.crimearchive.mapper.Mapper;
+import org.hibernate.sql.Update;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -29,5 +32,9 @@ public class UserService {
 
         Account newAcc = Mapper.newAccountEntity(newUser, encoder.encode(newUser.password()), assignedRoles);
         userRepository.save(newAcc);
+    }
+
+    public DTOUpdatePolis updateAccountDTOById(Long id){
+        return Mapper.updateAccountDTO(userRepository.findById(id).orElseThrow(()-> new RuntimeException("No user found")));
     }
 }

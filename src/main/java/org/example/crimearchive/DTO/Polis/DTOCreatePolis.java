@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotBlank;
 public record DTOCreatePolis(
         @NotBlank(message = "Namn får inte vara tomt")
         String fullName,
-        @NotBlank(message = "Roll får inte vara tomt")
+        @NotBlank(message = "Yrke får inte vara tomt")
         String profession,
         @NotBlank(message = "Avdelning får inte vara tomt")
         String department,

@@ -32,9 +32,15 @@ public class AccountsController {
     }
 
     @GetMapping("/accounts/detail")
-    public String accountDetails(@RequestParam Long userId) {
+    public String accountDetails(@RequestParam Long userId,
+                                 @AuthenticationPrincipal Account user,
+                                 Model model) {
+        model.addAttribute("accountoverview", user.getAuthorities().stream()
+                .anyMatch(ga -> ga.getAuthority().equals("ROLE_ADMIN")));
+        model.addAttribute("currentUser", user);
+        model.addAttribute("updateAccount", userService.updateAccountDTOById(userId));
 
-        return "" + userId;
+        return "updateaccountpage";
     }
 
     @GetMapping("/accounts/add")
