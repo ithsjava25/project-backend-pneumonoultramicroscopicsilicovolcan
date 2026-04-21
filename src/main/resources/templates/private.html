@@ -12,11 +12,23 @@
     <label for="name">Namn</label>
     <input id="name" th:field="*{name}"> <span th:if="${#fields.hasErrors('name')}" th:error="*{name}"></span><br/>
     <label for="case">K-Nummer</label>
-    <input id="case" th:field="*{caseNumber}"> <span th:if="${#fields.hasErrors('caseNumber')}"
-                                                     th:error="*{caseNumber}"></span><br/>
+    <input id="case" th:field="*{caseNumber}">
+    <button type="button" onclick="generateKNumber()">Generera K-Nummer</button>
+    <span th:if="${#fields.hasErrors('caseNumber')}" th:error="*{caseNumber}"></span><br/>
     <button type="submit">Spara</button>
     <button type="reset">Avbryt</button>
 </form>
+
+<script>
+    function generateKNumber() {
+        fetch('/knumber/generate')
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('case').value = data;
+            })
+            .catch(error => console.error('Error generating K-Number:', error));
+    }
+</script>
 <a href="/userpage">Gå till använar sida</a>
 </body>
 </html>

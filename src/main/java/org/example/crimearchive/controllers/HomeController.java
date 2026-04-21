@@ -24,11 +24,19 @@ public class HomeController {
     private final ReportService reportService;
     private final CaseService caseService;
     private final CasesRepository casesRepository;
+    private final org.example.crimearchive.KNumberService knumberService;
 
-    public HomeController(ReportService reportService, CaseService caseService, CasesRepository casesRepository) {
+    public HomeController(ReportService reportService, CaseService caseService, CasesRepository casesRepository, org.example.crimearchive.KNumberService knumberService) {
         this.reportService = reportService;
         this.caseService = caseService;
         this.casesRepository = casesRepository;
+        this.knumberService = knumberService;
+    }
+
+    @GetMapping("/knumber/generate")
+    @ResponseBody
+    public String generateKNumber() {
+        return knumberService.getKNumber();
     }
 
     @GetMapping("/")
