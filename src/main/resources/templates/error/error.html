@@ -2,7 +2,7 @@
 <html lang="sv">
 <head>
     <meta charset="UTF-8">
-    <title>Internt fel</title>
+    <title>Fel</title>
     <link rel="stylesheet" th:href="@{/style.css}">
 </head>
 
@@ -21,7 +21,10 @@
                     <span class="brand-title">DurTre</span>
                     <span class="brand-subtitle">Polismyndigheten</span>
                 </div>
-                <span class="brand-tagline">Systemfel</span>
+
+                <span class="brand-tagline" th:text="${title}">
+                    Fel
+                </span>
             </div>
         </div>
     </header>
@@ -31,21 +34,20 @@
         <section class="card"
                  style="max-width: 420px; margin: 80px auto; text-align: center; padding: 26px 20px;">
 
-            <span class="card-kicker" style="font-size: 2.2rem;">
+            <span class="card-kicker" style="font-size: 2.2rem;"
+                  th:text="${status}">
                 500
             </span>
 
-            <h2 style="font-size: 1.8rem; margin: 10px 0 12px;">
-                Internt serverfel
+            <h2 style="font-size: 1.8rem; margin: 10px 0 12px;"
+                th:text="${title}">
+                Fel
             </h2>
 
             <p class="page-description"
-               style="font-size: 1rem; margin-bottom: 22px;">
-                Ett oväntat fel inträffade i systemet.
-            </p>
-
-            <p style="color: var(--muted); margin-bottom: 24px; font-size: 0.95rem;">
-                Försök igen senare eller kontakta systemadministratör.
+               style="font-size: 1rem; margin-bottom: 22px;"
+               th:text="${message}">
+                Något gick fel
             </p>
 
             <a href="/" class="btn btn-primary no-hover"
