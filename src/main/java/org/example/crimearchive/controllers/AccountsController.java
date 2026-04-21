@@ -45,7 +45,7 @@ public class AccountsController {
     }
 
     @PostMapping("/accounts/detail")
-    public String updateAccountsDetails(@ModelAttribute DTOUpdatePolis updateAccount,
+    public String updateAccountsDetails(@ModelAttribute("updateAccount") DTOUpdatePolis updateAccount,
                                         @AuthenticationPrincipal Account user,
                                         Model model,
                                         BindingResult bindingResult) {
@@ -55,7 +55,12 @@ public class AccountsController {
         if (bindingResult.hasErrors()) {
             return "updateaccountpage";
         }
-        userService.updateAccount(updateAccount);
+        try {
+            userService.updateAccount(updateAccount);
+        } catch (IllegalArgumentException e) {
+            bindingResult.rejectValue("roles", "error.updateAccount", e.getMessage());
+            return "updateaccountpage";
+        }
         return "redirect:/accounts";
     }
 

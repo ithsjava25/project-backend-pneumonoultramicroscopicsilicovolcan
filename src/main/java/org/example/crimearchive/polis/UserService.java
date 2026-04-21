@@ -9,16 +9,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class UserService {
     private final UserRepository userRepository;
     private PasswordEncoder encoder;
-    private final List<String> VALID_ROLES = List.of("USER", "HANDLER", "ADMIN");
+    private final Set<String> VALID_ROLES = Set.of("USER", "HANDLER", "ADMIN");
 
     public UserService(UserRepository userRepository, PasswordEncoder encoder) {
         this.userRepository = userRepository;
@@ -69,11 +66,11 @@ public class UserService {
     }
 
     private List<String> convertStringToListString(String roles) {
-        if (roles == null || roles.isEmpty()) return List.of();
+        if (roles == null || roles.isBlank()) return List.of();
 
-        List<String> updateList = Arrays.stream(roles.toUpperCase().split(",")).map(String::trim).distinct().toList();
-//        List<String> uptadedList = roles.stream().
-        System.out.println("Updated roles list: " + updateList);
+        List<String> updateList = Arrays.stream(roles.toUpperCase()
+                .split(",")).map(String::trim).distinct().toList();
+        if (!VALID_ROLES.containsAll(updateList)) throw new IllegalArgumentException("Felaktiga roller insatta");
         return updateList;
     }
 }

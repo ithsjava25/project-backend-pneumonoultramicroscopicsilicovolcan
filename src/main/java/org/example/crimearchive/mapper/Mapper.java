@@ -42,21 +42,14 @@ public class Mapper {
                 updateAccount.getProfession(),
                 updateAccount.getDepartment(),
                 updateAccount.getUsername(),
-                //fixa så att man inte måste ändra lösenord
                 "",
-                //mappa om granted auth till string?
                 convertGAtoStringList(updateAccount.getAuthorities())
         );
-    }
-
-    public static Account updateAccountEntity(DTOUpdatePolis updateDTO) {
-        return null;
     }
 
     private static String convertGAtoStringList(Collection<? extends GrantedAuthority> authorities) {
         return authorities.stream().map(
                 r -> r.toString().startsWith("ROLE_") ? r.toString().substring(5) : r.toString()).collect(Collectors.joining(",")).toString();
     }
-
 
 }
