@@ -28,6 +28,7 @@ public class SecurityConfiguration {
 
                     auth.requestMatchers("/userpage").hasRole("USER");
                     auth.requestMatchers("/cases/**").hasRole("HANDLER");
+                    auth.requestMatchers("/accounts/**").hasRole("ADMIN");
 
                     auth.anyRequest().authenticated();
                 })
