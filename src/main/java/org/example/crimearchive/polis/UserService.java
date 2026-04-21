@@ -3,13 +3,13 @@ package org.example.crimearchive.polis;
 import org.example.crimearchive.DTO.Polis.DTOCreatePolis;
 import org.example.crimearchive.DTO.Polis.DTOUpdatePolis;
 import org.example.crimearchive.mapper.Mapper;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
 
 @Service
 public class UserService {
@@ -53,16 +53,6 @@ public class UserService {
         if (updatedAcc.password() != null && !updatedAcc.password().isBlank()) {
             dbAccount.setPassword(encoder.encode(updatedAcc.password()));
         }
-    }
-
-    private Collection<? extends GrantedAuthority> convertRoleStringsToList(String roles) {
-        if (roles == null) return Collections.emptyList();
-
-        List<SimpleGrantedAuthority> updatedList = Arrays.stream(roles.toUpperCase().split(",")).map(
-                r -> r.trim().startsWith("ROLE_") ? new SimpleGrantedAuthority(r) : new SimpleGrantedAuthority("ROLE_" + r)
-        ).toList();
-        if (!VALID_ROLES.containsAll(updatedList)) throw new IllegalArgumentException("Felaktiga roller insatta");
-        return updatedList;
     }
 
     private List<String> convertStringToListString(String roles) {
