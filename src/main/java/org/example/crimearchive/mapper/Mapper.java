@@ -3,7 +3,6 @@ package org.example.crimearchive.mapper;
 import org.example.crimearchive.DTO.CreateReport;
 import org.example.crimearchive.DTO.Polis.DTOCreatePolis;
 import org.example.crimearchive.DTO.Polis.DTOUpdatePolis;
-import org.example.crimearchive.DTO.Polis.UpdatePolice;
 import org.example.crimearchive.polis.Account;
 import org.example.crimearchive.reports.Report;
 import org.springframework.security.core.GrantedAuthority;
@@ -11,6 +10,7 @@ import org.springframework.security.core.GrantedAuthority;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class Mapper {
 
@@ -49,9 +49,14 @@ public class Mapper {
         );
     }
 
-    private static List<String> convertGAtoStringList(Collection<? extends GrantedAuthority> authorities){
-        return authorities.stream().map(
-                ga -> ga.toString()).toList();
+    public static Account updateAccountEntity(DTOUpdatePolis updateDTO) {
+        return null;
     }
+
+    private static String convertGAtoStringList(Collection<? extends GrantedAuthority> authorities) {
+        return authorities.stream().map(
+                r -> r.toString().startsWith("ROLE_") ? r.toString().substring(5) : r.toString()).collect(Collectors.joining(",")).toString();
+    }
+
 
 }

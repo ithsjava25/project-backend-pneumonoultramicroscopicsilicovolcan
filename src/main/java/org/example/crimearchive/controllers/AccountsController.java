@@ -2,6 +2,7 @@ package org.example.crimearchive.controllers;
 
 import jakarta.validation.Valid;
 import org.example.crimearchive.DTO.Polis.DTOCreatePolis;
+import org.example.crimearchive.DTO.Polis.DTOUpdatePolis;
 import org.example.crimearchive.polis.Account;
 import org.example.crimearchive.polis.UserService;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -38,9 +39,24 @@ public class AccountsController {
         model.addAttribute("accountoverview", user.getAuthorities().stream()
                 .anyMatch(ga -> ga.getAuthority().equals("ROLE_ADMIN")));
         model.addAttribute("currentUser", user);
-        model.addAttribute("updateAccount", userService.updateAccountDTOById(userId));
+        model.addAttribute("updateAccount", userService.getDTOUpdateAccountById(userId));
 
         return "updateaccountpage";
+    }
+
+    @PostMapping("/accounts/detail")
+    public String updateAccountsDetails(@ModelAttribute DTOUpdatePolis updateAccount,
+                                        @AuthenticationPrincipal Account user,
+                                        Model model,
+                                        BindingResult bindingResult) {
+        model.addAttribute("accountoverview", user.getAuthorities().stream()
+                .anyMatch(ga -> ga.getAuthority().equals("ROLE_ADMIN")));
+        model.addAttribute("currentUser", user);
+        if (bindingResult.hasErrors()) {
+            return "updateaccountpage";
+        }
+        userService.updateAccount(updateAccount);
+        return "redirect:/accounts";
     }
 
     @GetMapping("/accounts/add")

@@ -56,7 +56,7 @@
     </div>
 
     <main class="page-wrap">
-        <form th:object="${updateAccount}" class="report-form" th:action="@{/accounts/add}" method="post">
+        <form th:object="${updateAccount}" class="report-form" th:action="@{/accounts/detail}" method="post">
             <input type="hidden" name="id" th:value="*{id}">
             <div class="report-grid">
 
@@ -72,7 +72,7 @@
                             <div class="form-field">
                                 <label for="fullname">Namn</label>
                                 <input id="fullname"
-                                       th:field="${updateAccount.fullName}"
+                                       th:field="*{fullName}"
                                        type="text"
                                        placeholder="Ange för- och efternamn">
                                 <div>
@@ -83,7 +83,7 @@
                             <div class="form-field">
                                 <label for="userName">Användarnamn</label>
                                 <input id="userName"
-                                       th:field="${updateAccount.username}"
+                                       th:field="*{username}"
                                        type="text"
                                        placeholder="Ange användarnamn">
                                 <div>
@@ -93,9 +93,9 @@
                             <div class="form-field">
                                 <label for="passWord">Lösenord</label>
                                 <input id="passWord"
-                                       th:field="${updateAccount.password}"
-                                       type="text"
-                                       placeholder="Ange nytt lösenord">
+                                       name="password"
+                                       type="password"
+                                       placeholder="Ange nytt lösenord (Lämna blank för att behålla gamla)">
                                 <div>
                                     <span th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></span>
                                 </div>
@@ -116,7 +116,7 @@
                             <div class="form-field">
                                 <label for="Profession">Roll</label>
                                 <input id="Profession"
-                                       th:field="${updateAccount.profession}"
+                                       th:field="*{profession}"
                                        type="text"
                                        placeholder="Ange rollen till kontot (Polis, Chef)">
                                 <div>
@@ -127,7 +127,7 @@
                             <div class="form-field">
                                 <label for="Department">Avdelning</label>
                                 <input id="Department"
-                                       th:field="${updateAccount.department}"
+                                       th:field="*{department}"
                                        type="text"
                                        placeholder="Anställnings område">
                                 <div>
@@ -148,7 +148,7 @@
                             <label for="Roles">Behörigheter</label>
                             <input id="Roles"
                                    type="text"
-                                   th:field="${updateAccount.roles}"
+                                   th:field="*{roles}"
                                    placeholder="Personens roller (user, admin, handler)">
                             <div>
                                 <span th:if="${#fields.hasErrors('roles')}" th:errors="*{roles}" class="error"></span>
