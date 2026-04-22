@@ -5,7 +5,7 @@ import org.example.crimearchive.dto.police.DTOPolis;
 import org.example.crimearchive.dto.police.DTOUpdatePolis;
 import org.example.crimearchive.entities.police.Aina;
 import org.example.crimearchive.repositories.PolisRepository;
-import org.example.crimearchive.Exceptions.ResourceNotFoundException;
+import org.example.crimearchive.exceptions.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

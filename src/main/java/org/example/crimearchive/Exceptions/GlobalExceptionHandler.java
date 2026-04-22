@@ -1,4 +1,4 @@
-package org.example.crimearchive.Exceptions;
+package org.example.crimearchive.exceptions;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

@@ -1,4 +1,4 @@
-package org.example.crimearchive.entities.Vittne;
+package org.example.crimearchive.entities.vittne;
 
 
 import jakarta.persistence.*;

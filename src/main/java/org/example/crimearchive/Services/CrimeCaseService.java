@@ -5,9 +5,8 @@ import org.example.crimearchive.dto.knumber.DTOKnumber;
 import org.example.crimearchive.dto.knumber.DTOUpdateKnumber;
 import org.example.crimearchive.entities.cases.CrimeCase;
 import org.example.crimearchive.repositories.CrimeCaseRepository;
-import org.example.crimearchive.KNumberService;
 import org.example.crimearchive.mappers.CrimeCaseMapper;
-import org.example.crimearchive.Exceptions.ResourceNotFoundException;
+import org.example.crimearchive.exceptions.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,12 +16,10 @@ import java.util.stream.Collectors;
 public class CrimeCaseService {
 
     private final CrimeCaseRepository crimeCaseRepository;
-    private final KNumberService kNumberService;
     private final CrimeCaseMapper crimeCaseMapper;
 
-    public CrimeCaseService(CrimeCaseRepository crimeCaseRepository, KNumberService kNumberService, CrimeCaseMapper crimeCaseMapper) {
+    public CrimeCaseService(CrimeCaseRepository crimeCaseRepository, CrimeCaseMapper crimeCaseMapper) {
         this.crimeCaseRepository = crimeCaseRepository;
-        this.kNumberService = kNumberService;
         this.crimeCaseMapper = crimeCaseMapper;
     }
 
@@ -46,7 +43,6 @@ public class CrimeCaseService {
 
     public DTOKnumber save(DTOCreateKnumber dto) {
         CrimeCase crimeCase = new CrimeCase();
-        crimeCase.setCaseNumber(kNumberService.getKNumber());
         crimeCase.setDescription(dto.description());
         CrimeCase saved = crimeCaseRepository.save(crimeCase);
         return crimeCaseMapper.toDTO(saved);

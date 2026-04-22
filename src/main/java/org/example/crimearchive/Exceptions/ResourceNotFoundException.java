@@ -1,4 +1,4 @@
-package org.example.crimearchive.Exceptions;
+package org.example.crimearchive.exceptions;
 
 public class ResourceNotFoundException extends RuntimeException {
     private final String resourceName;

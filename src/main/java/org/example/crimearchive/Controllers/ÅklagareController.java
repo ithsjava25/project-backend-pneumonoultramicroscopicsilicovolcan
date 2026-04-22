@@ -1,4 +1,4 @@
-package org.example.crimearchive.Controllers;
+package org.example.crimearchive.controllers;
 
 public class ÅklagareController {
 }

@@ -1,30 +1,26 @@
 package org.example.crimearchive.entities.cases;
 
 import jakarta.persistence.*;
+import org.example.crimearchive.listeners.CaseListener;
 import org.example.crimearchive.entities.police.Aina;
 import org.example.crimearchive.entities.bevis.Bevis;
 import org.example.crimearchive.entities.bevis.Brottsplats;
 import org.example.crimearchive.entities.prosecution.Åklagare;
-import org.example.crimearchive.entities.Vittne.Vittne;
-import org.example.crimearchive.entities.BrottsOffer.Brottsoffer;
+import org.example.crimearchive.entities.vittne.Vittne;
+import org.example.crimearchive.entities.brottsoffer.Brottsoffer;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
 @Entity
+@EntityListeners(CaseListener.class)
 @Table(name = "crime_case")
 public class CrimeCase {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-
-    //Kolla med grabbarna om ska vara knummer eller CaseNumber
-    @Column(unique = true, nullable = false)
-    private String Knumber;
-
 
 
     @Column(nullable = false)
