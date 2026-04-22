@@ -4,6 +4,8 @@ import com.itextpdf.text.Document;
 import com.itextpdf.text.Image;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.pdf.PdfWriter;
+import org.example.crimearchive.cases.CaseLifecycleService;
+import org.example.crimearchive.cases.CasesRepository;
 import org.example.crimearchive.permissions.PermissionService;
 import org.example.crimearchive.polis.Account;
 import org.springframework.beans.factory.annotation.Value;
@@ -36,16 +38,22 @@ public class EvidenceFileService {
     private final EvidenceFileRepository evidenceFileRepository;
     private final S3Client s3Client;
     private final PermissionService permissionService;
+    private final CaseLifecycleService lifecycleService;
+    private final CasesRepository casesRepository;
 
     @Value("${minio.bucket}")
     private String bucket;
 
     public EvidenceFileService(EvidenceFileRepository evidenceFileRepository,
                                S3Client s3Client,
-                               PermissionService permissionService) {
+                               PermissionService permissionService,
+                               CaseLifecycleService lifecycleService,
+                               CasesRepository casesRepository) {
         this.evidenceFileRepository = evidenceFileRepository;
         this.s3Client = s3Client;
         this.permissionService = permissionService;
+        this.lifecycleService = lifecycleService;
+        this.casesRepository = casesRepository;
     }
 
     public void upload(String caseNumber, String reportName, String reportEvent,
@@ -110,6 +118,11 @@ public class EvidenceFileService {
             );
             evidenceFile.setContentType(file != null ? file.getContentType() : null);
             evidenceFileRepository.save(evidenceFile);
+
+            casesRepository.findFirstByCaseNumber(caseNumber).ifPresent(cases ->
+                    lifecycleService.onDocumentUploaded(cases,
+                            file != null ? file.getOriginalFilename() : "okänd fil",
+                            uploadedBy));
 
         } catch (Exception e) {
             deleteIfExists(s3KeyPdf);

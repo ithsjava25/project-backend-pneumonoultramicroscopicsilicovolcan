@@ -18,11 +18,14 @@ public class CaseService {
     private final UserRepository userRepository;
     private final ReportRepository reportRepository;
     private final CasesRepository casesRepository;
+    private final CaseLifecycleService lifecycleService;
 
-    public CaseService(ReportRepository reportRepository, CasesRepository casesRepository, UserRepository userRepository) {
+    public CaseService(ReportRepository reportRepository, CasesRepository casesRepository,
+                       UserRepository userRepository, CaseLifecycleService lifecycleService) {
         this.reportRepository = reportRepository;
         this.casesRepository = casesRepository;
         this.userRepository = userRepository;
+        this.lifecycleService = lifecycleService;
     }
 
     @Transactional
@@ -31,12 +34,16 @@ public class CaseService {
         if (account.isEmpty()) throw new RuntimeException("account not found");
         Optional<Cases> cases = casesRepository.findFirstByCaseNumber(caseNumber);
         if (cases.isEmpty()) throw new RuntimeException("Case does not exist");
-        if (cases.get().getAccounts().stream().anyMatch(acc -> acc.getId().equals(accountId))) {
+        boolean alreadyAssigned = cases.get().getAccounts().stream().anyMatch(acc -> acc.getId().equals(accountId));
+        if (alreadyAssigned) {
             cases.get().removeAccountFromCase(account.get());
+            casesRepository.save(cases.get());
+            lifecycleService.onHandlerRemoved(cases.get(), account.get().getUsername(), account.get().getUsername());
         } else {
             cases.get().addAccountToCase(account.get());
+            casesRepository.save(cases.get());
+            lifecycleService.onHandlerAssigned(cases.get(), account.get().getUsername(), account.get().getUsername());
         }
-        casesRepository.save(cases.get());
     }
 
     @Transactional
@@ -47,6 +54,7 @@ public class CaseService {
         if (cases.isEmpty()) throw new RuntimeException("Case not found with id: " + caseId);
         cases.get().addAccountToCase(account.get());
         casesRepository.save(cases.get());
+        lifecycleService.onHandlerAssigned(cases.get(), account.get().getUsername(), account.get().getUsername());
     }
 
     public List<Cases> getAllCases() {
