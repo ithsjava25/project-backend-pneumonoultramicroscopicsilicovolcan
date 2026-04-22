@@ -1,5 +1,6 @@
 package org.example.crimearchive;
 
+import jakarta.annotation.PostConstruct;
 import org.example.crimearchive.reports.ReportRepository;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
@@ -13,6 +14,12 @@ public class KNumberService {
 
     public KNumberService(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
+    }
+
+
+    @PostConstruct
+    public void init() {
+        jdbcTemplate.execute("CREATE SEQUENCE IF NOT EXISTS knummer_seq START 1 INCREMENT 1");
     }
 
     public String getKNumber() {

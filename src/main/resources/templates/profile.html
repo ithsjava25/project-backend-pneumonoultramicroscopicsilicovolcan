@@ -25,6 +25,11 @@
         </div>
 
         <div class="topbar-user">
+            <div th:if="${accountoverview}">
+                <form th:action="@{/accounts}" method="get">
+                    <button class="user-chip" type="submit" style="cursor: pointer">Konto översikt</button>
+                </form>
+            </div>
             <div th:if="${assigncasebutton}">
                 <form th:action="@{/cases}" method="get">
                     <button class="user-chip" type="submit" style="cursor: pointer">Tilldelning</button>
@@ -50,28 +55,70 @@
             Registrera ärende
         </button>
     </div>
-
-    <h3>Tilldelade fall</h3>
-    <table>
-        <thead>
-        <th><span>K-Nummber</span></th>
-        <th><span>Antal kopplade rapporter</span></th>
-        </thead>
-        <tbody>
-        <tr th:if="${cases.isEmpty()}">
-            <td colspan="2">Inga befogade fall</td>
-        </tr>
-        <tr th:each="entry : ${cases}">
-            <td><span th:text="${entry.key}"></span></td>
-            <td>
-                <span th:text="${entry.value.size()}"></span>
-            </td>
-            <td>
-                <a th:href="@{/caseoverview(casenumber=${entry.key})}">Översikt</a>
-            </td>
-        </tr>
-        </tbody>
-    </table>
+    <div class="report-grid">
+    <div class="report-column">
+        <div class="card">
+            <h3>Tilldelade fall</h3>
+            <table>
+                <thead>
+                <th><span>K-Nummber</span></th>
+                <th><span>Antal kopplade rapporter</span></th>
+                </thead>
+                <tbody>
+                <tr th:if="${cases.isEmpty()}">
+                    <td colspan="2">Inga befogade fall</td>
+                </tr>
+                <tr th:each="entry : ${cases}">
+                    <td><span th:text="${entry.key}"></span></td>
+                    <td>
+                        <span th:text="${entry.value.size()}"></span>
+                    </td>
+                    <td>
+                        <a th:href="@{/caseoverview(casenumber=${entry.key})}">Översikt</a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="report-column">
+        <div class="card">
+            <div class="card-header">
+                <span class="card-kicker">Konto uppgifter</span>
+                <label for="enableEdit" class="card-kicker">
+                    <input type="checkbox" id="enableEdit" autocomplete="off"> Redigera profil
+                </label>
+            </div>
+            <div class="field-grid">
+                <form id="profileForm" th:object="${updateProfile}" th:action="@{/profile/update}" method="post">
+                    <input th:field="*{fullname}" type="text" disabled>
+                    <input th:field="*{password}" type="password" placeholder="Ange nytt lösenord" disabled>
+                    <button class="btn-primary" type="submit" id="submitBtn" disabled>Spara uppdatering</button>
+                    <div>
+                        <span th:if="${#fields.hasErrors('fullname')}" th:errors="*{fullname}"></span>
+                        <span th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></span>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    </div>
 </div>
 </body>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const checkbox = document.getElementById('enableEdit');
+        const form = document.getElementById('profileForm');
+        // Hämta alla inputs och knappar inuti formuläret
+        const formElements = form.querySelectorAll('input, button');
+
+        checkbox.addEventListener('change', function () {
+            formElements.forEach(element => {
+                // Om checkboxen är ikryssad, ta bort disabled (false)
+                // Om den inte är ikryssad, lägg till disabled (true)
+                element.disabled = !this.checked;
+            });
+        });
+    });
+</script>
 </html>

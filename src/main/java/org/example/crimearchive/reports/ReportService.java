@@ -5,6 +5,7 @@ import org.example.crimearchive.DTO.ReportResponse;
 import org.example.crimearchive.KNumberService;
 import org.example.crimearchive.cases.Cases;
 import org.example.crimearchive.cases.CasesRepository;
+import org.example.crimearchive.mapper.Mapper;
 import org.example.crimearchive.polis.Account;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
