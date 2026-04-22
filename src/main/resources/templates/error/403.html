@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <title>Åtkomst nekad</title>
+    <link rel="stylesheet" th:href="@{/style.css}">
+</head>
+
+<body class="durtre-body">
+
+<div class="durtre-shell">
+
+    <header class="topbar">
+        <div class="brand">
+            <img th:src="@{/images/police-logo-color.png}"
+                 alt="Polislogga"
+                 class="brand-logo">
+
+            <div class="brand-text">
+                <div class="brand-title-row">
+                    <span class="brand-title">DurTre</span>
+                    <span class="brand-subtitle">Polismyndigheten</span>
+                </div>
+                <span class="brand-tagline">Åtkomst nekad</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="page-wrap">
+
+        <section class="card"
+                 style="max-width: 420px; margin: 80px auto; text-align: center; padding: 26px 20px;">
+
+            <span class="card-kicker" style="font-size: 2.2rem;">
+                403
+            </span>
+
+            <h2 style="font-size: 1.8rem; margin: 10px 0 12px;">
+                Du har inte behörighet
+            </h2>
+
+            <p class="page-description"
+               style="font-size: 1rem; margin-bottom: 22px;">
+                Du saknar rättigheter för att visa denna sida.
+            </p>
+
+            <p style="color: var(--muted); margin-bottom: 24px; font-size: 0.95rem;">
+                Kontakta administratör om du anser att detta är fel.
+            </p>
+
+            <a href="/" class="btn btn-primary no-hover"
+               style="display: inline-flex; align-items: center; justify-content: center;">
+                Startsida
+            </a>
+
+        </section>
+
+    </main>
+
+</div>
+
+</body>
+</html>
