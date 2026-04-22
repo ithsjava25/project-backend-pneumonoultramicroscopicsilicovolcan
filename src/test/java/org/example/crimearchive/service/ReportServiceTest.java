@@ -3,6 +3,7 @@ package org.example.crimearchive.service;
 import org.example.crimearchive.DTO.CreateReport;
 import org.example.crimearchive.DTO.ReportResponse;
 import org.example.crimearchive.KNumberService;
+import org.example.crimearchive.cases.CaseLifecycleService;
 import org.example.crimearchive.cases.CaseService;
 import org.example.crimearchive.cases.Cases;
 import org.example.crimearchive.cases.CasesRepository;
@@ -34,6 +35,8 @@ class ReportServiceTest {
     private KNumberService kNumberService;
     @Mock
     private CasesRepository casesRepository;
+    @Mock
+    private CaseLifecycleService lifecycleService;
 
     @InjectMocks
     private CaseService caseService;

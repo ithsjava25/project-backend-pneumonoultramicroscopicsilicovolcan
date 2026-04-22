@@ -1,5 +1,7 @@
 package org.example.crimearchive.service;
 
+import org.example.crimearchive.cases.CaseLifecycleService;
+import org.example.crimearchive.cases.CasesRepository;
 import org.example.crimearchive.evidence.EvidenceFile;
 import org.example.crimearchive.evidence.EvidenceFileRepository;
 import org.example.crimearchive.evidence.EvidenceFileService;
@@ -42,6 +44,10 @@ class EvidenceFileServiceTest {
     private S3Client s3Client;
     @Mock
     private PermissionService permissionService;
+    @Mock
+    private CaseLifecycleService lifecycleService;
+    @Mock
+    private CasesRepository casesRepository;
     @Mock
     private Account mockUser;
 
