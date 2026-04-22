@@ -6,6 +6,7 @@ import org.example.crimearchive.DTO.Polis.DTOUpdatePolis;
 import org.example.crimearchive.exceptions.PasswordValidationException;
 import org.example.crimearchive.polis.Account;
 import org.example.crimearchive.polis.UserService;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -34,6 +35,7 @@ public class AccountsController {
     }
 
     @GetMapping("/accounts/detail")
+    @PreAuthorize("#user.id != authentication.principal.id")
     public String accountDetails(@RequestParam Long userId,
                                  @AuthenticationPrincipal Account user,
                                  Model model) {
