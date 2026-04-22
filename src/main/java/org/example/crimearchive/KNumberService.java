@@ -19,8 +19,7 @@ public class KNumberService {
 
     @PostConstruct
     public void init() {
-        // Här anger du schemat explicit
-        jdbcTemplate.execute("CREATE SEQUENCE IF NOT EXISTS public.knummer_seq START 1 INCREMENT 1");
+        jdbcTemplate.execute("CREATE SEQUENCE IF NOT EXISTS knummer_seq START 1 INCREMENT 1");
     }
 
     public String getKNumber() {

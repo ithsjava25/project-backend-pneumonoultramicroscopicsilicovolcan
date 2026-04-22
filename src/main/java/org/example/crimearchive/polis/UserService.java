@@ -36,7 +36,7 @@ public class UserService {
     public void saveNewAccount(DTOCreatePolis newUser) {
         List<String> assignedRoles = Arrays.stream(newUser.roles().toUpperCase().split(",")).map(String::trim).toList();
         if (!VALID_ROLES.containsAll(assignedRoles)) throw new IllegalArgumentException("Felaktiga roller");
-
+        if(newUser.password().length() <= MINIMUM_PASSWORD_LENGTH) throw new PasswordValidationException("Lösenordet måste vara längre än 5");
         Account newAcc = Mapper.newAccountEntity(newUser, encoder.encode(newUser.password()), assignedRoles);
         userRepository.save(newAcc);
     }
