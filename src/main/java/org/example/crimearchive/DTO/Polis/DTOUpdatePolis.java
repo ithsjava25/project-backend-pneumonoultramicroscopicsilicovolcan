@@ -1,9 +1,19 @@
 package org.example.crimearchive.DTO.Polis;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+
 public record DTOUpdatePolis(
-        String name,
-        String badgeNumber,
-        String email,
-        String phone
+        Long id,
+        @NotBlank(message = "Namn får inte vara tomt")
+        String fullName,
+        @NotBlank(message = "Yrke får inte vara tomt")
+        String profession,
+        @NotBlank(message = "Avdelning får inte vara tomt")
+        String department,
+        @NotBlank(message = "Användarnamn får inte vara tomt")
+        String username,
+        String password,
+        String roles
 ) {
 }
