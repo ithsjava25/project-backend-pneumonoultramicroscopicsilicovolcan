@@ -92,6 +92,11 @@ public class Account implements UserDetails {
         this.password = password;
     }
 
+    public List<String> getAuthoritesAsStringList(){
+        return authorities.stream().map(ga ->
+                ga.toString().substring(5)).toList();
+    }
+
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return authorities;
     }

@@ -64,12 +64,14 @@
                         <tr>
                             <th>Namn</th>
                             <th>Avdelning</th>
+                            <th>Behörigheter</th>
                         </tr>
                         </thead>
                         <tbody>
                         <tr th:each="user : ${allAccounts}">
                             <td th:text="${user.getFullName()}"></td>
                             <td th:text="${user.getDepartment()}"></td>
+                            <td th:text="${user.getAuthoritesAsStringList()}"></td>
                             <td>
                                 <a th:href="@{/accounts/detail(userId=${user.getId()})}">Inställningar</a>
                             </td>
