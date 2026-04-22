@@ -47,7 +47,6 @@ public class UserService {
     @Transactional
     public void updateAccount(DTOUpdatePolis updatedAcc) {
         Long accId = updatedAcc.id();
-        System.out.println("ACC ID: " + accId);
         Account dbAccount = userRepository.findById(accId).orElseThrow(() -> new RuntimeException("Inget konto funnet"));
 
         dbAccount.setFullName(updatedAcc.fullName());

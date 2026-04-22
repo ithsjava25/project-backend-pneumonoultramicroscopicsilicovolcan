@@ -46,8 +46,6 @@ public class ProfileController {
 
     @PostMapping("/profile/update")
     public String updateProfile(@ModelAttribute("updateProfile") DTOUpdateProfile profileUpdate){
-        System.out.println("alla fält: " + profileUpdate.id()
-        + " namn: " + profileUpdate.fullname() + " pass:" + profileUpdate.password());
         userService.updateProfile(profileUpdate);
         return "redirect:/profile";
     }
