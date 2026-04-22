@@ -68,6 +68,11 @@
                         </div>
 
                         <div class="form-field">
+                            <label>Status</label>
+                            <span th:text="${caseStatus}">Status</span>
+                        </div>
+
+                        <div class="form-field">
                             <label for="policeOfficer">Polis</label>
                             <ul id="policeOfficer">
                                 <li th:each="cop : ${assignedPolice}" th:text="${cop.getFullName()}">
@@ -75,6 +80,21 @@
                                 </li>
                             </ul>
                         </div>
+                    </div>
+
+                    <div th:if="${isHandler}" style="margin-top: 12px;">
+                        <form method="post" th:action="@{/caseoverview/status}" style="display: flex; gap: 8px; align-items: center;">
+                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                            <input type="hidden" name="casenumber" th:value="${rawcasenumber}">
+                            <select name="status" required>
+                                <option th:each="s : ${allStatuses}"
+                                        th:value="${s}"
+                                        th:text="${s}"
+                                        th:selected="${s == caseStatus}">
+                                </option>
+                            </select>
+                            <button type="submit" class="btn btn-secondary">Ändra status</button>
+                        </form>
                     </div>
                 </section>
 
@@ -165,6 +185,67 @@
                         <label>Område</label>
                         <span>Majorna</span>
                     </div>
+                </section>
+            </div>
+
+        </div>
+
+        <div class="report-grid" style="margin-top: 24px;">
+
+            <div class="report-column">
+                <section class="card">
+                    <div class="card-header">
+                        <div>
+                            <span class="card-kicker">Historik</span>
+                            <h2>Händelselogg</h2>
+                        </div>
+                    </div>
+                    <table th:if="${!#lists.isEmpty(events)}">
+                        <thead>
+                            <tr>
+                                <th>Tid</th>
+                                <th>Händelse</th>
+                                <th>Utförd av</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="event : ${events}">
+                                <td th:text="${#temporals.format(event.createdAt, 'yyyy-MM-dd HH:mm')}"></td>
+                                <td th:text="${event.description}"></td>
+                                <td th:text="${event.performedBy}"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <p th:if="${#lists.isEmpty(events)}">Inga händelser registrerade.</p>
+                </section>
+            </div>
+
+            <div class="report-column">
+                <section class="card">
+                    <div class="card-header">
+                        <div>
+                            <span class="card-kicker">Anteckningar</span>
+                            <h2>Kommentarer</h2>
+                        </div>
+                    </div>
+                    <div th:if="${!#lists.isEmpty(comments)}">
+                        <div th:each="comment : ${comments}" style="padding: 8px 0; border-bottom: 1px solid #eee;">
+                            <div>
+                                <strong th:text="${comment.author}"></strong>
+                                &mdash;
+                                <span th:text="${#temporals.format(comment.createdAt, 'yyyy-MM-dd HH:mm')}"></span>
+                            </div>
+                            <div th:text="${comment.content}" style="margin-top: 4px;"></div>
+                        </div>
+                    </div>
+                    <form method="post" th:action="@{/caseoverview/comment}" style="margin-top: 12px;">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                        <input type="hidden" name="casenumber" th:value="${rawcasenumber}">
+                        <textarea name="content" rows="3"
+                                  placeholder="Skriv en kommentar..."
+                                  style="width: 100%; box-sizing: border-box;"></textarea>
+                        <button type="submit" class="btn btn-secondary" style="margin-top: 6px;">Lägg till kommentar</button>
+                    </form>
                 </section>
             </div>
 
