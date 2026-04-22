@@ -2,6 +2,7 @@ package org.example.crimearchive.controllers;
 
 import jakarta.validation.Valid;
 import org.example.crimearchive.DTO.CreateReport;
+import org.example.crimearchive.KNumberService;
 import org.example.crimearchive.cases.CaseService;
 import org.example.crimearchive.cases.CasesRepository;
 import org.example.crimearchive.evidence.EvidenceFileService;
@@ -27,13 +28,16 @@ public class HomeController {
     private final EvidenceFileService evidenceFileService;
     private final CaseService caseService;
     private final CasesRepository casesRepository;
+    private final KNumberService kNumberService;
 
     public HomeController(ReportService reportService, EvidenceFileService evidenceFileService,
-                          CaseService caseService, CasesRepository casesRepository) {
+                          CaseService caseService, CasesRepository casesRepository,
+                          KNumberService kNumberService) {
         this.reportService = reportService;
         this.evidenceFileService = evidenceFileService;
         this.caseService = caseService;
         this.casesRepository = casesRepository;
+        this.kNumberService = kNumberService;
     }
 
     @GetMapping("/")
@@ -43,8 +47,16 @@ public class HomeController {
 
     @GetMapping("/reports")
     public String privatePage(@AuthenticationPrincipal Account user, Model model) {
-        model.addAttribute("newReport", new CreateReport());
-        return "registerreport";
+
+        CreateReport report = new CreateReport(
+                "",
+                "",
+                kNumberService.getKNumber()
+        );
+
+        model.addAttribute("newReport", report);
+
+        return "reports";
     }
 
     @GetMapping("/userpage")
@@ -53,25 +65,53 @@ public class HomeController {
         return "userpage";
     }
 
-    @PostMapping("/reports/add")
+    @PostMapping("/reports")
     public String saveReport(
             @ModelAttribute("newReport") @Valid CreateReport newReport,
             BindingResult bindingResult,
-            @RequestParam(required = false) MultipartFile file,
+            @RequestParam(required = false) java.util.List<MultipartFile> files,
+            @RequestParam(required = false) java.util.List<MultipartFile> images,
             @AuthenticationPrincipal Account currentUser) {
 
         if (bindingResult.hasErrors()) {
             log.info("Binding Error: {}", bindingResult.getAllErrors().getLast());
-            return "registerreport";
+            return "reports";
         }
 
         try {
             String caseNumber = reportService.saveReport(newReport, currentUser);
-            evidenceFileService.upload(caseNumber, newReport.name(), newReport.event(),
-                    file, currentUser.getUsername());
+
+            if (files != null) {
+                for (MultipartFile f : files) {
+                    if (!f.isEmpty()) {
+                        evidenceFileService.upload(
+                                caseNumber,
+                                newReport.name(),
+                                newReport.event(),
+                                f,
+                                currentUser.getUsername()
+                        );
+                    }
+                }
+            }
+
+            if (images != null) {
+                for (MultipartFile img : images) {
+                    if (!img.isEmpty()) {
+                        evidenceFileService.upload(
+                                caseNumber,
+                                newReport.name(),
+                                newReport.event(),
+                                img,
+                                currentUser.getUsername()
+                        );
+                    }
+                }
+            }
+
         } catch (Exception e) {
             log.error("Fel vid sparande av rapport", e);
-            return "registerreport";
+            return "reports";
         }
 
         return "redirect:/userpage";

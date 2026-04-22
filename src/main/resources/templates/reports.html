@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="sv" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DurTre - Skapa nytt ärende</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body class="durtre-body">
+
+<div class="durtre-shell">
+
+    <header class="topbar">
+        <div class="brand">
+            <img th:src="@{/images/police-logo-color.png}"
+                 src="/images/police-logo-color.png"
+                 alt="Polislogga"
+                 class="brand-logo">
+
+            <div class="brand-text">
+                <div class="brand-title-row">
+                    <span class="brand-title">DurTre</span>
+                    <span class="brand-subtitle">Polismyndigheten</span>
+                </div>
+                <span class="brand-tagline">Skapa och registrera ärenden</span>
+            </div>
+        </div>
+
+        <div class="topbar-user">
+            <span class="user-chip">demouser · Polis</span>
+        </div>
+    </header>
+
+    <div class="meta-strip">
+        <span>Inloggad som: <strong>demouser</strong></span>
+        <span>Roll: <strong>Polis</strong></span>
+        <span>Avdelning: <strong>Centrum</strong></span>
+        <span>Aktiv databas: <strong>TESTMILJÖ</strong></span>
+        <span>Senast uppdaterad: <strong>2026-03-14 10:03</strong></span>
+
+        <button type="submit" form="caseForm" class="btn btn-primary meta-strip-button">
+            Registrera ärende
+        </button>
+    </div>
+
+    <main class="page-wrap">
+        <form id="caseForm"
+              class="report-form"
+              th:action="@{/reports}"
+              th:object="${newReport}"
+              method="post"
+              enctype="multipart/form-data">
+
+            <input id="files" name="files" type="file" multiple hidden>
+            <input id="images" name="images" type="file" accept="image/*" multiple hidden>
+
+            <div class="report-grid">
+
+                <div class="report-column">
+                    <section class="card">
+                        <div class="card-header">
+                            <div>
+                                <span class="card-kicker">Ärende</span>
+                                <h2>K-nummer & Polis</h2>
+                            </div>
+                        </div>
+
+                        <div class="field-grid">
+                            <div class="form-field">
+                                <label for="caseNumber">K-nummer</label>
+                                <input id="caseNumber"
+                                       th:field="*{caseNumber}"
+                                       type="text"
+                                       readonly>
+                            </div>
+
+                            <div class="form-field">
+                                <label for="policeOfficer">Polis</label>
+                                <input id="policeOfficer"
+                                       th:field="*{name}"
+                                       type="text"
+                                       placeholder="Ange polis">
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="card">
+                        <div class="card-header">
+                            <div>
+                                <span class="card-kicker">Material</span>
+                                <h2>Bevis</h2>
+                            </div>
+                        </div>
+
+                        <div class="upload-toolbar">
+                            <button type="button"
+                                    class="btn btn-secondary"
+                                    onclick="document.getElementById('files').click()">
+                                Lägg till filer
+                            </button>
+
+                            <button type="button"
+                                    class="btn btn-secondary"
+                                    onclick="document.getElementById('images').click()">
+                                Lägg till bilder
+                            </button>
+                        </div>
+
+                        <div class="evidence-list" id="evidenceList"></div>
+
+                    </section>
+                </div>
+
+                <div class="report-column">
+                    <section class="card">
+                        <div class="card-header">
+                            <div>
+                                <span class="card-kicker">Personer</span>
+                                <h2>Vittne & Offer</h2>
+                            </div>
+                        </div>
+
+                        <div class="field-grid two-columns">
+                            <div class="form-field">
+                                <label for="witness">Vittne</label>
+                                <input id="witness"
+                                       name="witness"
+                                       type="text"
+                                       placeholder="Ange namn på vittne">
+                            </div>
+
+                            <div class="form-field">
+                                <label for="victim">Offer</label>
+                                <input id="victim"
+                                       name="victim"
+                                       type="text"
+                                       placeholder="Ange namn på offer">
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="card">
+                        <div class="card-header">
+                            <div>
+                                <span class="card-kicker">Plats</span>
+                                <h2>Brottsplats</h2>
+                            </div>
+                        </div>
+
+                        <div class="form-field">
+                            <label for="crimeScene">Brottsplats</label>
+                            <input id="crimeScene"
+                                   th:field="*{event}"
+                                   type="text"
+                                   placeholder="Ange brottsplats">
+                        </div>
+                    </section>
+                </div>
+
+            </div>
+        </form>
+    </main>
+
+</div>
+
+</body>
+</html>
