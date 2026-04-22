@@ -3,6 +3,7 @@ package org.example.crimearchive.service;
 import org.example.crimearchive.DTO.CreateReport;
 import org.example.crimearchive.DTO.ReportResponse;
 import org.example.crimearchive.KNumberService;
+import org.example.crimearchive.cases.CaseService;
 import org.example.crimearchive.cases.Cases;
 import org.example.crimearchive.cases.CasesRepository;
 import org.example.crimearchive.reports.Report;
@@ -35,6 +36,8 @@ class ReportServiceTest {
     private CasesRepository casesRepository;
 
     @InjectMocks
+    private CaseService caseService;
+    @InjectMocks
     private ReportService reportService;
 
     @Test
@@ -53,7 +56,7 @@ class ReportServiceTest {
     void saveReport_existingCaseNumber_usesExistingCase() {
         Cases existingCase = new Cases("K-2026-000001");
         CreateReport request = new CreateReport("Murder", "Johan", "K-2026-000001");
-        when(casesRepository.findFirstByCaseNumber("K-2026-000001")).thenReturn(Optional.of(existingCase));
+        when(caseService.getCaseFromCaseNumber("K-2026-000001")).thenReturn(Optional.of(existingCase));
 
         String caseNumber = reportService.saveReport(request, null);
 
@@ -65,13 +68,12 @@ class ReportServiceTest {
     @Test
     void saveReport_caseNotFound_throws404() {
         CreateReport request = new CreateReport("Murder", "Johan", "K-2026-999999");
-        when(casesRepository.findFirstByCaseNumber("K-2026-999999")).thenReturn(Optional.empty());
+        when(caseService.getCaseFromCaseNumber("K-2026-999999")).thenReturn(Optional.empty());
 
         ResponseStatusException ex = assertThrows(
                 ResponseStatusException.class,
                 () -> reportService.saveReport(request, null)
         );
-
         assertEquals(HttpStatus.NOT_FOUND, ex.getStatusCode());
     }
 
