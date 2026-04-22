@@ -1,5 +1,6 @@
 package org.example.crimearchive.controllers;
 
+import org.example.crimearchive.DTO.Polis.DTOUpdatePolis;
 import org.example.crimearchive.polis.Account;
 import org.example.crimearchive.polis.UserRepository;
 import org.junit.jupiter.api.Test;
@@ -10,6 +11,7 @@ import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.postgresql.PostgreSQLContainer;
@@ -18,8 +20,11 @@ import java.util.List;
 
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
@@ -93,7 +98,38 @@ public class AccountControllerTests {
                 .andExpect(status().isForbidden());
     }
 
+    @Test
+    void adminCanAccessAccountDetailsOnOthers() throws Exception {
+        Account myAdmin = createAndSaveTestUser("admin", "admin");
+        Account myUser = createAndSaveTestUser("user", "user");
 
+        mockMvc.perform(get("/accounts/detail")
+                        .with(user(myAdmin))
+                        .with(csrf())
+                        .param("userId", myUser.getId().toString()))
+                .andExpect(status().isOk())
+
+                .andExpect(view().name("updateaccoutpage"))
+
+                .andExpect(model().attribute("updateAccount", isA(DTOUpdatePolis.class)));
+    }
+
+    @Test
+    @Transactional
+    void adminCanChangePrivlagesOnOthers() throws Exception {
+        Account myAdmin = createAndSaveTestUser("admin", "admin");
+        Account myUser = createAndSaveTestUser("user", "user");
+
+        mockMvc.perform(post("/accounts/detail")
+                        .with(user(myAdmin))
+                        .with(csrf())
+                        .param("roles", "handler"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/accounts"));
+
+        Account updatedUser = userRepository.findById(myUser.getId()).get();
+        assertEquals("ROLE_USER,ROLE_HANDLER", updatedUser.getAuthoritesAsStringList());
+    }
 
 
 }
