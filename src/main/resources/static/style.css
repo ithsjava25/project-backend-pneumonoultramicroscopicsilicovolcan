@@ -465,11 +465,15 @@ textarea {
     filter: brightness(1.02);
 }
 
-.btn-primary:disabled {
+.btn-primary:disabled, .btn-primary:disabled:hover {
     color: #d7e0ea;
-    background: linear-gradient(135deg, #d7e0ea, #5e7188);
-    box-shadow: 0 10px 20px rgba(24, 116, 181, 0.20);
+    background: linear-gradient(135deg, #d7e0ea, #c3cfdb);
+    box-shadow: none;
+    cursor: not-allowed;
+    filter: none;
+    transform: none;
 }
+
 
 .btn-secondary {
     color: var(--text);

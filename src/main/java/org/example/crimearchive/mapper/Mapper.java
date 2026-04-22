@@ -18,9 +18,7 @@ public class Mapper {
         return new Report(
                 UUID.randomUUID(),
                 report.name(),
-                report.event(),
-                s3KeyPdf,
-                s3KeyFile
+                report.event()
 
         );
     }
