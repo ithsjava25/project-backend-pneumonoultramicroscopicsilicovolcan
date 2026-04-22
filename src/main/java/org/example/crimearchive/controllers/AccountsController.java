@@ -3,6 +3,7 @@ package org.example.crimearchive.controllers;
 import jakarta.validation.Valid;
 import org.example.crimearchive.DTO.Polis.DTOCreatePolis;
 import org.example.crimearchive.DTO.Polis.DTOUpdatePolis;
+import org.example.crimearchive.exceptions.PasswordValidationException;
 import org.example.crimearchive.polis.Account;
 import org.example.crimearchive.polis.UserService;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -46,9 +47,9 @@ public class AccountsController {
 
     @PostMapping("/accounts/detail")
     public String updateAccountsDetails(@ModelAttribute("updateAccount") DTOUpdatePolis updateAccount,
+                                        BindingResult bindingResult,
                                         @AuthenticationPrincipal Account user,
-                                        Model model,
-                                        BindingResult bindingResult) {
+                                        Model model) {
         model.addAttribute("accountoverview", user.getAuthorities().stream()
                 .anyMatch(ga -> ga.getAuthority().equals("ROLE_ADMIN")));
         model.addAttribute("currentUser", user);
@@ -82,13 +83,15 @@ public class AccountsController {
                 .anyMatch(ga -> ga.getAuthority().equals("ROLE_ADMIN")));
         model.addAttribute("currentUser", user);
         if (bindingResult.hasErrors()) {
-
             return "newaccountpage";
         }
         try {
             userService.saveNewAccount(newAccount);
         } catch (IllegalArgumentException e) {
             bindingResult.rejectValue("roles", "error.createAccount", e.getMessage());
+            return "newaccountpage";
+        }catch (PasswordValidationException e){
+            bindingResult.rejectValue("password", "error.createAccount", e.getMessage());
             return "newaccountpage";
         }
         return "redirect:/accounts";

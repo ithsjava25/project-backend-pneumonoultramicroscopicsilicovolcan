@@ -86,15 +86,18 @@
             <div class="card-header">
                 <span class="card-kicker">Konto uppgifter</span>
                 <label for="enableEdit" class="card-kicker">
-                    <input type="checkbox" id="enableEdit"> Redigera profil
+                    <input type="checkbox" id="enableEdit" autocomplete="off"> Redigera profil
                 </label>
             </div>
             <div class="field-grid">
                 <form id="profileForm" th:object="${updateProfile}" th:action="@{/profile/update}" method="post">
-                    <input type="hidden" name="id" th:value="*{id}">
-                    <input th:field="*{fullname}" type="text" disabled></input>
-                    <input name="password" type="password" placeholder="Ange nytt lösenord" disabled>
+                    <input th:field="*{fullname}" type="text" disabled>
+                    <input th:field="*{password}" type="password" placeholder="Ange nytt lösenord" disabled>
                     <button class="btn-primary" type="submit" id="submitBtn" disabled>Spara uppdatering</button>
+                    <div>
+                        <span th:if="${#fields.hasErrors('fullname')}" th:errors="*{fullname}"></span>
+                        <span th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></span>
+                    </div>
                 </form>
             </div>
         </div>

@@ -3,6 +3,7 @@ package org.example.crimearchive.polis;
 import org.example.crimearchive.DTO.Polis.DTOCreatePolis;
 import org.example.crimearchive.DTO.Polis.DTOUpdatePolis;
 import org.example.crimearchive.DTO.Polis.DTOUpdateProfile;
+import org.example.crimearchive.exceptions.PasswordValidationException;
 import org.example.crimearchive.mapper.Mapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -17,6 +18,7 @@ public class UserService {
     private final UserRepository userRepository;
     private PasswordEncoder encoder;
     private final Set<String> VALID_ROLES = Set.of("USER", "HANDLER", "ADMIN");
+    private final int MINIMUM_PASSWORD_LENGTH = 5;
 
     public UserService(UserRepository userRepository, PasswordEncoder encoder) {
         this.userRepository = userRepository;
@@ -56,6 +58,7 @@ public class UserService {
         dbAccount.setAuthorities(convertStringToListString(updatedAcc.roles()));
 
         if (updatedAcc.password() != null && !updatedAcc.password().isBlank()) {
+            if(updatedAcc.password().length() <= MINIMUM_PASSWORD_LENGTH) throw new PasswordValidationException("Lösenordet måste vara längre än 5");
             dbAccount.setPassword(encoder.encode(updatedAcc.password()));
         }
     }
@@ -70,6 +73,7 @@ public class UserService {
                 .orElseThrow(() -> new RuntimeException("Kontot hittades inte"));
         updateProfile.setFullName(profileUpdate.fullname());
         if(profileUpdate.password() != null && !profileUpdate.password().isBlank()){
+            if(profileUpdate.password().length() <= MINIMUM_PASSWORD_LENGTH) throw new PasswordValidationException("Lösenordet måste vara längre än 5");
             updateProfile.setPassword(encoder.encode(profileUpdate.password().trim()));
         }
     }

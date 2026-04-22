@@ -1,6 +1,7 @@
 package org.example.crimearchive.DTO.Polis;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 public record DTOUpdatePolis(
         Long id,
