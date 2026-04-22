@@ -465,6 +465,12 @@ textarea {
     filter: brightness(1.02);
 }
 
+.btn-primary:disabled {
+    color: #d7e0ea;
+    background: linear-gradient(135deg, #d7e0ea, #5e7188);
+    box-shadow: 0 10px 20px rgba(24, 116, 181, 0.20);
+}
+
 .btn-secondary {
     color: var(--text);
     background: #f8fbfe;

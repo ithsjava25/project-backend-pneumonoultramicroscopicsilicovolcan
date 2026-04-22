@@ -85,7 +85,7 @@
         <div class="card">
             <div class="card-header">
                 <span class="card-kicker">Konto uppgifter</span>
-                <label style="font-size: 0.8rem; margin-left: 10px;">
+                <label for="enableEdit" class="card-kicker">
                     <input type="checkbox" id="enableEdit"> Redigera profil
                 </label>
             </div>
@@ -94,7 +94,7 @@
                     <input type="hidden" name="id" th:value="*{id}">
                     <input th:field="*{fullname}" type="text" disabled></input>
                     <input name="password" type="password" placeholder="Ange nytt lösenord" disabled>
-                    <button type="submit" id="submitBtn" disabled>Spara uppdatering</button>
+                    <button class="btn-primary" type="submit" id="submitBtn" disabled>Spara uppdatering</button>
                 </form>
             </div>
         </div>
