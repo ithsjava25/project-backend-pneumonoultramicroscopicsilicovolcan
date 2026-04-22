@@ -51,7 +51,7 @@ public class HomeController {
         CreateReport report = new CreateReport(
                 "",
                 "",
-                kNumberService.getKNumber()
+                ""
         );
 
         model.addAttribute("newReport", report);

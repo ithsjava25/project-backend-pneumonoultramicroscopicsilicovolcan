@@ -38,8 +38,10 @@
         <span>Aktiv databas: <strong>TESTMILJÖ</strong></span>
         <span>Senast uppdaterad: <strong>2026-03-14 10:03</strong></span>
 
-        <button type="submit" form="caseForm" class="btn btn-primary meta-strip-button">
-            Registrera ärende
+        <button type="button"
+                class="btn btn-secondary meta-strip-button"
+                onclick="location.href='/'">
+            Tillbaka till startsidan
         </button>
     </div>
 
@@ -69,7 +71,7 @@
                             <div class="form-field">
                                 <label for="caseNumber">K-nummer</label>
                                 <input id="caseNumber"
-                                       th:field="*{caseNumber}"
+                                       value="Genereras automatiskt"
                                        type="text"
                                        readonly>
                             </div>
@@ -155,6 +157,11 @@
                                    placeholder="Ange brottsplats">
                         </div>
                     </section>
+                    <div class="form-actions">
+                        <button type="submit" form="caseForm" class="btn btn-primary">
+                            Registrera ärende
+                        </button>
+                    </div>
                 </div>
 
             </div>
