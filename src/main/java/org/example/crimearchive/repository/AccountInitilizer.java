@@ -4,12 +4,14 @@ import org.example.crimearchive.cases.CaseService;
 import org.example.crimearchive.polis.Account;
 import org.example.crimearchive.polis.UserRepository;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 @Component
+@Order(2)
 public class AccountInitilizer implements CommandLineRunner {
     private final UserRepository userRepository;
     private final CaseService caseService;

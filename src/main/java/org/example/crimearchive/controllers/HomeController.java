@@ -116,4 +116,12 @@ public class HomeController {
 
         return "redirect:/userpage";
     }
+
+    @GetMapping("/403")
+    public String accessDenied(Model model) {
+        model.addAttribute("status", 403);
+        model.addAttribute("title", "Åtkomst nekad");
+        model.addAttribute("message", "Du saknar rättigheter för att visa denna sida.");
+        return "error/error";
+    }
 }
