@@ -2,6 +2,7 @@ package org.example.crimearchive.polis;
 
 import org.example.crimearchive.DTO.Polis.DTOCreatePolis;
 import org.example.crimearchive.DTO.Polis.DTOUpdatePolis;
+import org.example.crimearchive.DTO.Polis.DTOUpdateProfile;
 import org.example.crimearchive.mapper.Mapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -57,6 +58,20 @@ public class UserService {
 
         if (updatedAcc.password() != null && !updatedAcc.password().isBlank()) {
             dbAccount.setPassword(encoder.encode(updatedAcc.password()));
+        }
+    }
+
+    public DTOUpdateProfile prefillProfileFields(Account user){
+        return new DTOUpdateProfile(user.getFullName(), "", user.getId());
+    }
+
+    @Transactional
+    public void updateProfile(DTOUpdateProfile profileUpdate){
+        Account updateProfile = userRepository.findById(profileUpdate.id())
+                .orElseThrow(() -> new RuntimeException("Kontot hittades inte"));
+        updateProfile.setFullName(profileUpdate.fullname());
+        if(profileUpdate.password() != null && !profileUpdate.password().isBlank()){
+            updateProfile.setPassword(encoder.encode(profileUpdate.password().trim()));
         }
     }
 
