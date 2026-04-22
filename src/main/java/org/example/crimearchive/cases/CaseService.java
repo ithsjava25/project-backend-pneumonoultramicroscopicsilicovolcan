@@ -59,6 +59,10 @@ public class CaseService {
                 .getAccounts().stream().toList();
     }
 
+    public void saveCase(Cases newCase){
+        casesRepository.save(newCase);
+    }
+
     public List<Cases> getAuthzCases(long accountId) {
         return casesRepository.findByAccountsId(accountId);
     }
@@ -96,6 +100,10 @@ public class CaseService {
         return casesRepository.findFirstByCaseNumber(casenumber)
                 .orElseThrow(() -> new RuntimeException("Case not found: " + casenumber))
                 .getId();
+    }
+
+    public Optional<Cases> getCaseFromCaseNumber(String casenumber){
+        return casesRepository.findFirstByCaseNumber(casenumber);
     }
 
     public boolean accountIdConnectedWithCaseId(String caseNumber, Long accountId) {

@@ -5,9 +5,11 @@ import org.example.crimearchive.polis.Account;
 import org.example.crimearchive.polis.UserRepository;
 import org.example.crimearchive.reports.ReportService;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 @Component
+@Order(1)
 public class ReportInitilizer implements CommandLineRunner {
 
     private final ReportService reportService;
