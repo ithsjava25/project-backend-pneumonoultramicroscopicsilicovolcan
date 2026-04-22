@@ -28,7 +28,7 @@ public class AccountsController {
         model.addAttribute("accountoverview", user.getAuthorities().stream()
                 .anyMatch(ga -> ga.getAuthority().equals("ROLE_ADMIN")));
         model.addAttribute("currentUser", user);
-        model.addAttribute("allAccounts", userService.getAllAccounts());
+        model.addAttribute("allAccounts", userService.getAllAccountsButloggedin(user));
         return "accountoverview";
     }
 

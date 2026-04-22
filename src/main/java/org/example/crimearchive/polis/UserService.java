@@ -26,6 +26,10 @@ public class UserService {
         return userRepository.findAll();
     }
 
+    public List<Account> getAllAccountsButloggedin(Account loggedIn){
+        return userRepository.findAllByIdNot(loggedIn.getId());
+    }
+
     public void saveNewAccount(DTOCreatePolis newUser) {
         List<String> assignedRoles = Arrays.stream(newUser.roles().toUpperCase().split(",")).map(String::trim).toList();
         if (!VALID_ROLES.containsAll(assignedRoles)) throw new IllegalArgumentException("Felaktiga roller");
@@ -37,6 +41,7 @@ public class UserService {
     public DTOUpdatePolis getDTOUpdateAccountById(Long id) {
         return Mapper.updateAccountDTO(userRepository.findById(id).orElseThrow(()-> new RuntimeException("No user found")));
     }
+
 
     @Transactional
     public void updateAccount(DTOUpdatePolis updatedAcc) {
