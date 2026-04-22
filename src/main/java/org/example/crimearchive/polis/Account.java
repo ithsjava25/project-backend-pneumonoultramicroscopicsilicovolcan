@@ -2,6 +2,7 @@ package org.example.crimearchive.polis;
 
 import jakarta.persistence.*;
 import org.example.crimearchive.cases.Cases;
+import org.example.crimearchive.cases.CaseService;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;

@@ -1,8 +1,7 @@
 package org.example.crimearchive.reports;
 
-import org.example.crimearchive.DTO.CreateReport;
-import org.example.crimearchive.DTO.ReportResponse;
-import org.example.crimearchive.KNumberService;
+import org.example.crimearchive.dto.CreateReport;
+import org.example.crimearchive.dto.ReportResponse;
 import org.example.crimearchive.cases.Cases;
 import org.example.crimearchive.cases.CasesRepository;
 import org.example.crimearchive.polis.Account;
@@ -18,12 +17,10 @@ import java.util.UUID;
 public class ReportService {
 
     private final ReportRepository reportRepository;
-    private final KNumberService knumberService;
     private final CasesRepository casesRepository;
 
-    public ReportService(ReportRepository reportRepository, KNumberService knumberService, CasesRepository casesRepository) {
+    public ReportService(ReportRepository reportRepository, CasesRepository casesRepository) {
         this.reportRepository = reportRepository;
-        this.knumberService = knumberService;
         this.casesRepository = casesRepository;
     }
 
@@ -32,8 +29,7 @@ public class ReportService {
         Cases cases;
 
         if (report.caseNumber() == null || report.caseNumber().isBlank()) {
-            String newCaseNumber = knumberService.getKNumber();
-            cases = new Cases(newCaseNumber);
+            cases = new Cases();
             if (currentUser != null) cases.getAccounts().add(currentUser);
             casesRepository.save(cases);
         } else {

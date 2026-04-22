@@ -1,7 +1,7 @@
 package org.example.crimearchive.service;
 
-import org.example.crimearchive.DTO.CreateReport;
-import org.example.crimearchive.DTO.ReportResponse;
+import org.example.crimearchive.dto.CreateReport;
+import org.example.crimearchive.dto.ReportResponse;
 import org.example.crimearchive.KNumberService;
 import org.example.crimearchive.cases.Cases;
 import org.example.crimearchive.cases.CasesRepository;

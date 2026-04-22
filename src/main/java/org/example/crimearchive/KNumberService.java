@@ -1,6 +1,5 @@
 package org.example.crimearchive;
 
-import org.example.crimearchive.reports.ReportRepository;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
