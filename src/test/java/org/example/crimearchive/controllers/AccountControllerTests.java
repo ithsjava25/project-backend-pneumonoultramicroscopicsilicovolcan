@@ -174,5 +174,43 @@ public class AccountControllerTests {
                 .andExpect(status().isForbidden());
     }
 
+    @Test
+    @Transactional
+    void adminCanSaveNewAccounts() throws Exception {
+        Account myAdmin = createAndSaveTestUser("admin", "admin");
+
+        mockMvc.perform(post("/accounts/add")
+                        .with(user(myAdmin))
+                        .with(csrf())
+                        .param("fullName", "name")
+                        .param("profession", "pro")
+                        .param("department", "dep")
+                        .param("username", "username")
+                        .param("password", "password")
+                        .param("roles", "user"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(view().name("accountoverview"));
+
+        Account savedAcc = userRepository.findUserByUsername("username");
+        assertEquals("name", savedAcc.getFullName());
+    }
+
+    @Test
+    void nonAdminCannotPostNewAccount() throws Exception {
+        Account myUser = createAndSaveTestUser("user", "user");
+
+        mockMvc.perform(post("/accounts/add")
+                        .with(user(myUser))
+                        .with(csrf())
+                        .param("fullName", "name")
+                        .param("profession", "pro")
+                        .param("department", "dep")
+                        .param("username", "username")
+                        .param("password", "password")
+                        .param("roles", "user"))
+                .andExpect(status().isForbidden());
+
+    }
+
 
 }
