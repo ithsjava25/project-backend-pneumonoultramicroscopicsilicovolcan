@@ -1,5 +1,8 @@
 package org.example.crimearchive.controllers;
 
+import org.example.crimearchive.KNumberService;
+import org.example.crimearchive.cases.Cases;
+import org.example.crimearchive.cases.CasesRepository;
 import org.example.crimearchive.polis.Account;
 import org.example.crimearchive.polis.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +34,10 @@ public abstract class IntegrationBaseTest {
     @Autowired
     protected UserRepository userRepository;
     @Autowired
+    protected CasesRepository casesRepository;
+    @Autowired
+    protected KNumberService Kservice;
+    @Autowired
     protected PasswordEncoder encoder;
     @MockitoBean
     protected S3Client minio;
@@ -45,5 +52,11 @@ public abstract class IntegrationBaseTest {
         user.setProfession("PJ");
         user.setDepartment("Home");
         return userRepository.save(user);
+    }
+
+    protected Cases createCaseAndSave(){
+        Cases newCase = new Cases();
+        newCase.setCaseNumber(Kservice.getKNumber());
+        return casesRepository.save(newCase);
     }
 }
