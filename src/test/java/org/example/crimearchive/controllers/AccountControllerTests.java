@@ -1,5 +1,6 @@
 package org.example.crimearchive.controllers;
 
+import org.example.crimearchive.DTO.Polis.DTOCreatePolis;
 import org.example.crimearchive.DTO.Polis.DTOUpdatePolis;
 import org.example.crimearchive.polis.Account;
 import org.example.crimearchive.polis.UserRepository;
@@ -139,6 +140,38 @@ public class AccountControllerTests {
 
         Account updatedUser = userRepository.findById(myUser.getId()).get();
         assertEquals(List.of("USER", "HANDLER"), updatedUser.getAuthoritesAsStringList());
+    }
+
+    @Test
+    void adminCanGoToNewAccountPage() throws Exception {
+        Account myAdmin = createAndSaveTestUser("admin", "admin");
+
+        mockMvc.perform(get("/accounts/add")
+                        .with(user(myAdmin)))
+                .andExpect(status().isOk())
+
+                .andExpect(view().name("newaccountpage"))
+
+                .andExpect(model().attribute("createAccount", isA(DTOCreatePolis.class)));
+    }
+
+    @Test
+    void nonOtherThanAdminCanAccessCreateAccoutPage() throws Exception {
+        Account myUser = createAndSaveTestUser("user", "user");
+        Account myHandler = createAndSaveTestUser("handler", "handler");
+        Account accNoRoles = createAndSaveTestUser("noroles", "");
+
+        mockMvc.perform(get("/accounts/add")
+                        .with(user(myUser)))
+                .andExpect(status().isForbidden());
+
+        mockMvc.perform(get("/accounts/add")
+                        .with(user(myHandler)))
+                .andExpect(status().isForbidden());
+
+        mockMvc.perform(get("/accounts/add")
+                        .with(user(accNoRoles)))
+                .andExpect(status().isForbidden());
     }
 
 
