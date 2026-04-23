@@ -5,13 +5,13 @@ import org.example.crimearchive.cases.Cases;
 import org.example.crimearchive.polis.Account;
 import org.junit.jupiter.api.Test;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.isA;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 public class ProfileControllerTests extends IntegrationBaseTest{
@@ -94,6 +94,7 @@ public class ProfileControllerTests extends IntegrationBaseTest{
         mockMvc.perform(get("/caseoverview")
                 .with(user(caseAccess))
                 .param("casenumber", testCase.getCaseNumber()))
+                .andDo(print())
                 .andExpect(status().isForbidden());
     }
 }

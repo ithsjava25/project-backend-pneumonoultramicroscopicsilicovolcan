@@ -55,12 +55,13 @@ public class AccountControllerTests extends IntegrationBaseTest {
     }
 
     @Test
-    void adminCannotElevatePrivligesOnSelf() throws Exception {
+    void adminCannotElevatePrivilegesOnSelf() throws Exception {
         Account myAdmin = createAndSaveTestUser("admin", "admin");
 
         mockMvc.perform(get("/accounts/detail")
                         .with(user(myAdmin))
                         .param("userId", myAdmin.getId().toString()))
+                .andDo(print())
                 .andExpect(status().isForbidden());
     }
 
