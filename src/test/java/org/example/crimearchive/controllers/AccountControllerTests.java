@@ -16,6 +16,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 public class AccountControllerTests extends IntegrationBaseTest {
@@ -148,7 +149,6 @@ public class AccountControllerTests extends IntegrationBaseTest {
                         .param("password", "password")
                         .param("roles", "user"))
                 .andExpect(status().is3xxRedirection());
-        //.andExpect(view().name("accountoverview"));
 
         Account savedAcc = userRepository.findUserByUsername("username");
         assertEquals("name", savedAcc.getFullName());
@@ -171,5 +171,114 @@ public class AccountControllerTests extends IntegrationBaseTest {
 
     }
 
+    @Test
+    void updateAccountWithInvalidInputdontRedirect() throws Exception {
+        Account myAdmin = createAndSaveTestUser("admin", "admin");
+        Account updateAcc = createAndSaveTestUser("user", "user");
 
+        mockMvc.perform(post("/accounts/detail")
+                        .with(user(myAdmin))
+                        .with(csrf())
+                        .param("id", updateAcc.getId().toString())
+                        .param("fullName", "")
+                        .param("profession", updateAcc.getProfession())
+                        .param("department", updateAcc.getDepartment())
+                        .param("username", updateAcc.getUsername())
+                        .param("roles", "user"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("updateaccountpage"));
+    }
+
+
+    @Test
+    void updateAccountWithNonExistantRolesDontRedirect() throws Exception {
+        Account myAdmin = createAndSaveTestUser("admin", "admin");
+        Account updateAcc = createAndSaveTestUser("user", "user");
+
+        mockMvc.perform(post("/accounts/detail")
+                        .with(user(myAdmin))
+                        .with(csrf())
+                        .param("id", updateAcc.getId().toString())
+                        .param("fullName", "newname")
+                        .param("profession", updateAcc.getProfession())
+                        .param("department", updateAcc.getDepartment())
+                        .param("username", updateAcc.getUsername())
+                        .param("roles", "noSuchRole"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("updateaccountpage"));
+    }
+
+    @Test
+    void updateAccountWithInvalidPasswordDontRedirect() throws Exception {
+        Account myAdmin = createAndSaveTestUser("admin", "admin");
+        Account updateAcc = createAndSaveTestUser("user", "user");
+
+        mockMvc.perform(post("/accounts/detail")
+                        .with(user(myAdmin))
+                        .with(csrf())
+                        .param("id", updateAcc.getId().toString())
+                        .param("fullName", "newname")
+                        .param("profession", updateAcc.getProfession())
+                        .param("department", updateAcc.getDepartment())
+                        .param("username", updateAcc.getUsername())
+                        .param("password", "eror")
+                        .param("roles", "user"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("updateaccountpage"));
+    }
+    @Test
+    void newAccountWithInvalidInputdontRedirect() throws Exception {
+        Account myAdmin = createAndSaveTestUser("admin", "admin");
+        Account updateAcc = createAndSaveTestUser("user", "user");
+
+        mockMvc.perform(post("/accounts/add")
+                        .with(user(myAdmin))
+                        .with(csrf())
+                        .param("id", updateAcc.getId().toString())
+                        .param("fullName", "")
+                        .param("profession", updateAcc.getProfession())
+                        .param("department", updateAcc.getDepartment())
+                        .param("username", updateAcc.getUsername())
+                        .param("roles", "user"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("newaccountpage"));
+    }
+
+
+    @Test
+    void newAccountWithNonExistantRolesDontRedirect() throws Exception {
+        Account myAdmin = createAndSaveTestUser("admin", "admin");
+        Account updateAcc = createAndSaveTestUser("user", "user");
+
+        mockMvc.perform(post("/accounts/add")
+                        .with(user(myAdmin))
+                        .with(csrf())
+                        .param("id", updateAcc.getId().toString())
+                        .param("fullName", "newname")
+                        .param("profession", updateAcc.getProfession())
+                        .param("department", updateAcc.getDepartment())
+                        .param("username", updateAcc.getUsername())
+                        .param("roles", "noSuchRole"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("newaccountpage"));
+    }
+
+    @Test
+    void newAccountWithInvalidPasswordDontRedirect() throws Exception {
+        Account myAdmin = createAndSaveTestUser("admin", "admin");
+        Account updateAcc = createAndSaveTestUser("user", "user");
+
+        mockMvc.perform(post("/accounts/add")
+                        .with(user(myAdmin))
+                        .with(csrf())
+                        .param("id", updateAcc.getId().toString())
+                        .param("fullName", "newname")
+                        .param("profession", updateAcc.getProfession())
+                        .param("department", updateAcc.getDepartment())
+                        .param("username", updateAcc.getUsername())
+                        .param("password", "eror")
+                        .param("roles", "user"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("newaccountpage"));
+    }
 }

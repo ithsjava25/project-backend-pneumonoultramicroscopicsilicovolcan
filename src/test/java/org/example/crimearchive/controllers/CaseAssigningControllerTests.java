@@ -16,7 +16,7 @@ public class CaseAssigningControllerTests extends IntegrationBaseTest {
     @Test
     void handlerCanAccessCases() throws Exception {
         Account myHandler = createAndSaveTestUser("handler", "handler");
-        Cases newCase = createCaseAndSave();
+        createCaseAndSave();
         mockMvc.perform(get("/cases")
                         .with(user(myHandler)))
                 .andExpect(status().isOk())
