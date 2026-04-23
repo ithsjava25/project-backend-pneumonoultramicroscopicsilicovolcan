@@ -19,6 +19,8 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @Controller
@@ -67,7 +69,7 @@ public class ProfileController {
                                Model model, @RequestParam String casenumber) {
         prepareModel(model, user);
         boolean isHandler = user.getAuthorities().stream()
-                .anyMatch(ga -> ga.getAuthority().equals("ROLE_HANDLER"));
+                .anyMatch(ga -> ga.getAuthority().equals("ROLE_HANDLER") || ga.getAuthority().equals("ROLE_ADMIN"));
         model.addAttribute("isHandler", isHandler);
         model.addAttribute("assignedPolice", caseService.getAllPoliceForCase(casenumber));
         model.addAttribute("rawcasenumber", casenumber);
@@ -85,7 +87,7 @@ public class ProfileController {
                                @RequestParam CaseStatus status,
                                @AuthenticationPrincipal Account user) {
         lifecycleService.changeStatus(casenumber, status, user.getUsername());
-        return "redirect:/caseoverview?casenumber=" + casenumber;
+        return "redirect:/caseoverview?casenumber=" + URLEncoder.encode(casenumber, StandardCharsets.UTF_8);
     }
 
     @PostMapping("/caseoverview/comment")
@@ -96,7 +98,7 @@ public class ProfileController {
         if (content != null && !content.isBlank()) {
             lifecycleService.addComment(casenumber, content, user.getUsername());
         }
-        return "redirect:/caseoverview?casenumber=" + casenumber;
+        return "redirect:/caseoverview?casenumber=" + URLEncoder.encode(casenumber, StandardCharsets.UTF_8);
     }
 
     private void prepareModel(Model model, Account user) {

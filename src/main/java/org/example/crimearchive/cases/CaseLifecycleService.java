@@ -42,6 +42,7 @@ public class CaseLifecycleService {
     public void onHandlerRemoved(Cases cases, String handlerName, String performedBy) {
         eventRepository.save(new CaseEvent(cases, CaseEventType.HANDLER_REMOVED,
                 "Handläggare " + handlerName + " togs bort från ärendet", performedBy));
+        // Only revert to OPEN from ASSIGNED — later states (IN_PROGRESS, CLOSED) are not disturbed by handler removal.
         if (cases.getAccounts().isEmpty() && cases.getStatus() == CaseStatus.ASSIGNED) {
             updateStatus(cases, CaseStatus.OPEN, performedBy);
         }
@@ -55,6 +56,9 @@ public class CaseLifecycleService {
 
     @Transactional
     public CaseComment addComment(String caseNumber, String content, String author) {
+        if (content != null && content.length() > 2000) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Kommentar får inte överstiga 2000 tecken");
+        }
         Cases cases = findCase(caseNumber);
         CaseComment comment = commentRepository.save(new CaseComment(cases, content, author));
         eventRepository.save(new CaseEvent(cases, CaseEventType.COMMENT_ADDED,
@@ -65,8 +69,8 @@ public class CaseLifecycleService {
     @Transactional
     public void changeStatus(String caseNumber, CaseStatus newStatus, String performedBy) {
         Cases cases = findCase(caseNumber);
+        if (cases.getStatus() == newStatus) return;
         updateStatus(cases, newStatus, performedBy);
-        casesRepository.save(cases);
     }
 
     public List<CaseEvent> getEvents(String caseNumber) {

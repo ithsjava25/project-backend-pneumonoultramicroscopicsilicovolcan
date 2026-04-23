@@ -86,7 +86,8 @@
                         <form method="post" th:action="@{/caseoverview/status}" style="display: flex; gap: 8px; align-items: center;">
                             <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
                             <input type="hidden" name="casenumber" th:value="${rawcasenumber}">
-                            <select name="status" required>
+                            <label for="statusSelect">Välj status</label>
+                            <select id="statusSelect" name="status" required>
                                 <option th:each="s : ${allStatuses}"
                                         th:value="${s}"
                                         th:text="${s}"
@@ -241,7 +242,8 @@
                     <form method="post" th:action="@{/caseoverview/comment}" style="margin-top: 12px;">
                         <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
                         <input type="hidden" name="casenumber" th:value="${rawcasenumber}">
-                        <textarea name="content" rows="3"
+                        <label for="commentContent">Ny kommentar</label>
+                        <textarea id="commentContent" name="content" rows="3"
                                   placeholder="Skriv en kommentar..."
                                   style="width: 100%; box-sizing: border-box;"></textarea>
                         <button type="submit" class="btn btn-secondary" style="margin-top: 6px;">Lägg till kommentar</button>
