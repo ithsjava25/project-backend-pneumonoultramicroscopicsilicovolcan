@@ -1,6 +1,6 @@
 package org.example.crimearchive.repository;
 
-import org.example.crimearchive.DTO.CreateReport;
+import org.example.crimearchive.dto.CreateReport;
 import org.example.crimearchive.polis.Account;
 import org.example.crimearchive.polis.UserRepository;
 import org.example.crimearchive.reports.ReportService;

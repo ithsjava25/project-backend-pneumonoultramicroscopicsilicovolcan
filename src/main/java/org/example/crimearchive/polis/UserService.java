@@ -1,8 +1,8 @@
 package org.example.crimearchive.polis;
 
-import org.example.crimearchive.DTO.Polis.DTOCreatePolis;
-import org.example.crimearchive.DTO.Polis.DTOUpdatePolis;
-import org.example.crimearchive.DTO.Polis.DTOUpdateProfile;
+import org.example.crimearchive.dto.Polis.DTOCreatePolis;
+import org.example.crimearchive.dto.Polis.DTOUpdatePolis;
+import org.example.crimearchive.dto.Polis.DTOUpdateProfile;
 import org.example.crimearchive.exceptions.PasswordValidationException;
 import org.example.crimearchive.mapper.Mapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
