@@ -23,9 +23,8 @@ import java.util.List;
 @Transactional
 public abstract class IntegrationBaseTest {
 
-    @Container
     @ServiceConnection
-    static PostgreSQLContainer postgres = new PostgreSQLContainer("postgres:18-alpine");
+    protected static final PostgreSQLContainer postgres = new PostgreSQLContainer("postgres:18-alpine");
 
     @Autowired
     protected MockMvc mockMvc;

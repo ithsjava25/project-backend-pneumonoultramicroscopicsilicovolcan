@@ -18,38 +18,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-//@SpringBootTest
-//@AutoConfigureMockMvc
-//@Testcontainers
-
 public class AccountControllerTests extends IntegrationBaseTest {
 
-//    @Autowired
-//    private MockMvc mockMvc;
-//
-//    @MockitoBean
-//    private S3Client minio;
-//
-//    @Container
-//    @ServiceConnection
-//    static PostgreSQLContainer postgres = new PostgreSQLContainer("postgres:18-alpine");
-//
-//    @Autowired
-//    UserRepository userRepository;
-//
-//    @Autowired
-//    PasswordEncoder passwordEncoder;
-//
-//    private Account createAndSaveTestUser(String username, String role) {
-//        Account user = new Account();
-//        user.setUsername(username);
-//        user.setPassword(passwordEncoder.encode("password"));
-//        user.setAuthorities(List.of(role));
-//        user.setFullName("Test gubbe");
-//        user.setProfession("PJ");
-//        user.setDepartment("Home");
-//        return userRepository.save(user);
-//    }
 
     /**
      * Test uses Test container with report and account initializer
