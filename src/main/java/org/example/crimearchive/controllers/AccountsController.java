@@ -35,7 +35,7 @@ public class AccountsController {
     }
 
     @GetMapping("/accounts/detail")
-    @PreAuthorize("#user.id != authentication.principal.id")
+    @PreAuthorize("#userId != authentication.principal.id")
     public String accountDetails(@RequestParam Long userId,
                                  @AuthenticationPrincipal Account user,
                                  Model model) {

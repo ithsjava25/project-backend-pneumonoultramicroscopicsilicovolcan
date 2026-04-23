@@ -10,11 +10,13 @@ import org.springframework.boot.testcontainers.service.connection.ServiceConnect
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithUserDetails;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.postgresql.PostgreSQLContainer;
+import software.amazon.awssdk.services.s3.S3Client;
 
 import java.util.List;
 
@@ -34,6 +36,9 @@ public class AccountControllerTests {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @MockitoBean
+    S3Client minio;
 
     @Container
     @ServiceConnection
@@ -94,7 +99,7 @@ public class AccountControllerTests {
 
         mockMvc.perform(get("/accounts/detail")
                         .with(user(myAdmin))
-                        .param("userId", "1"))
+                        .param("userId", myAdmin.getId().toString()))
                 .andExpect(status().isForbidden());
     }
 
@@ -109,7 +114,7 @@ public class AccountControllerTests {
                         .param("userId", myUser.getId().toString()))
                 .andExpect(status().isOk())
 
-                .andExpect(view().name("updateaccoutpage"))
+                .andExpect(view().name("updateaccountpage"))
 
                 .andExpect(model().attribute("updateAccount", isA(DTOUpdatePolis.class)));
     }
@@ -123,12 +128,17 @@ public class AccountControllerTests {
         mockMvc.perform(post("/accounts/detail")
                         .with(user(myAdmin))
                         .with(csrf())
-                        .param("roles", "handler"))
+                        .param("id", myUser.getId().toString())
+                        .param("fullName", myUser.getFullName())
+                        .param("profession", myUser.getProfession())
+                        .param("department", myUser.getDepartment())
+                        .param("username", myUser.getUsername())
+                        .param("roles", "user,handler"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/accounts"));
 
         Account updatedUser = userRepository.findById(myUser.getId()).get();
-        assertEquals("ROLE_USER,ROLE_HANDLER", updatedUser.getAuthoritesAsStringList());
+        assertEquals(List.of("USER", "HANDLER"), updatedUser.getAuthoritesAsStringList());
     }
 
 
