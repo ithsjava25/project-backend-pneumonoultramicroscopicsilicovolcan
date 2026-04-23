@@ -39,7 +39,7 @@ public class AccountControllerTests {
     private MockMvc mockMvc;
 
     @MockitoBean
-    S3Client minio;
+    private S3Client minio;
 
     @Container
     @ServiceConnection
