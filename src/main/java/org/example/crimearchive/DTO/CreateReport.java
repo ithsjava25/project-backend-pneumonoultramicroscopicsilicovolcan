@@ -9,13 +9,16 @@ public record CreateReport(
         @NotBlank(message = "Måste ha ett namn på anmälaren")
         String name,
         @ValidCasenumber
-        String caseNumber){
+        String caseNumber,
+        String witness,
+        String victim
+) {
 
     public CreateReport() {
-        this("", "","");
+        this("", "", "", "", "");
     }
 
     public CreateReport(String event, String name) {
-        this(event, name, "");
+        this(event, name, "", "", "");
     }
 }
