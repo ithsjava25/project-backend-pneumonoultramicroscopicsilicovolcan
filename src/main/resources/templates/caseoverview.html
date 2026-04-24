@@ -74,11 +74,14 @@
 
                         <div class="form-field">
                             <label for="policeOfficer">Polis</label>
+                            <div th:if="${canAdd}">
                             <ul id="policeOfficer">
                                 <li th:each="cop : ${assignedPolice}" th:text="${cop.getFullName()}">
                                     Lista av tilldelade poliser till ärendet
                                 </li>
                             </ul>
+                            </div>
+                            <span th:if="${!canAdd}">***********</span>
                         </div>
                     </div>
 
@@ -99,8 +102,8 @@
                     </div>
                 </section>
 
-                <section class="card">
-                    <div class="card-header">
+                <section class="card" th:with="hasAccess=${canAdd}">
+                    <div class="card-header" th:classappend="${!hasAccess} ? 'locked' : ''">
                         <div>
                             <span class="card-kicker">Material</span>
                             <h2>Bevis</h2>
@@ -110,13 +113,15 @@
                     <div class="upload-toolbar">
                         <button type="button"
                                 class="btn btn-secondary"
+                                th:disabled="${!hasAccess}"
                                 th:onclick="document.getElementById('evidenceFiles').click()">
                             Lägg till filer
                         </button>
 
                         <button type="button"
                                 class="btn btn-secondary"
-                                onclick="document.getElementById('evidenceImages').click()">
+                                th:disabled="${!hasAccess}"
+                                th:onclick="document.getElementById('evidenceImages').click()">
                             Lägg till bilder
                         </button>
                     </div>
@@ -147,6 +152,7 @@
                     <div class="field-grid two-columns">
                         <div class="form-field">
                             <label>Vittne</label>
+                            <div th:if="${canAdd}">
                             <ul>
                                 <li>
                                     <span>Ulla-britt</span>
@@ -161,15 +167,31 @@
                                     <span>Lars-göran</span>
                                 </li>
                             </ul>
+                            </div>
+                            <div th:if="${!canAdd}">
+                                <ul>
+                                    <li>
+                                        <span>**********</span>
+                                    </li>
+                                </ul>
+                            </div>
                         </div>
-
                         <div class="form-field">
                             <label>Offer</label>
+                            <div th:if="${canAdd}">
                             <ul>
                                 <li>
                                     <span>Tre små grisar</span>
                                 </li>
                             </ul>
+                            </div>
+                            <div th:if="${!canAdd}">
+                                <ul>
+                                    <li>
+                                        <span>**********</span>
+                                    </li>
+                                </ul>
+                            </div>
                         </div>
                     </div>
                 </section>
@@ -184,7 +206,12 @@
 
                     <div class="form-field">
                         <label>Område</label>
+                        <div th:if="${canAdd}">
                         <span>Majorna</span>
+                        </div>
+                        <div th:if="${!canAdd}">
+                            <spa>**********</spa>
+                        </div>
                     </div>
                 </section>
             </div>

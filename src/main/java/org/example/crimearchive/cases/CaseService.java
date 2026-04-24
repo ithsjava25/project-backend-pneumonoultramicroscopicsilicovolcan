@@ -1,10 +1,13 @@
 package org.example.crimearchive.cases;
 
 import org.example.crimearchive.exceptions.NotFoundException;
+import org.example.crimearchive.permissions.NullAuthzDeniedHandler;
 import org.example.crimearchive.polis.Account;
 import org.example.crimearchive.polis.UserRepository;
 import org.example.crimearchive.reports.Report;
 import org.example.crimearchive.reports.ReportRepository;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authorization.method.HandleAuthorizationDenied;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -54,6 +57,8 @@ public class CaseService {
         return casesRepository.findAll();
     }
 
+    @PreAuthorize("@caseSecurity.canAccessCase(#casenumber, principal)")
+    @HandleAuthorizationDenied(handlerClass = NullAuthzDeniedHandler.class)
     public List<Account> getAllPoliceForCase(String casenumber) {
         return casesRepository.findFirstByCaseNumber(casenumber)
                 .orElseThrow(() -> new NotFoundException("Case not found: " + casenumber))
@@ -78,6 +83,8 @@ public class CaseService {
                 .getReports();
     }
 
+    @PreAuthorize("@caseSecurity.canAccessCase(#caseNumber, principal)")
+    @HandleAuthorizationDenied(handlerClass = NullAuthzDeniedHandler.class)
     @Transactional(readOnly = true)
     public Set<Report> getReportSet(String caseNumber) {
         Long id = caseIdFromCaseNumber(caseNumber);

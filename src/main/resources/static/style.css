@@ -484,3 +484,23 @@ textarea {
 .btn-secondary:hover {
     background: #ffffff;
 }
+
+/* Gör sektionen blekare och hindrar klick */
+.locked {
+    opacity: 0.6;
+    filter: grayscale(50%);
+    cursor: not-allowed;
+}
+
+/* Hindrar att man hovrar eller klickar på saker inuti */
+.locked * {
+    pointer-events: none;
+}
+
+/* Stylar specifikt inaktiverade knappar om din CSS-ramverk inte gör det */
+button:disabled {
+    background-color: #ccc !important;
+    border-color: #bbb !important;
+    color: #666 !important;
+    cursor: not-allowed;
+}
