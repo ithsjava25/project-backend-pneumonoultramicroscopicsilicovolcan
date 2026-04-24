@@ -6,7 +6,9 @@ import org.example.crimearchive.dto.CreateReport;
 import org.example.crimearchive.polis.Account;
 import org.example.crimearchive.reports.Report;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -18,6 +20,10 @@ public class Cases extends Auditable {
     @Column(unique = true, nullable = false)
     private String caseNumber;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private CaseStatus status = CaseStatus.OPEN;
+
     @ManyToMany
     @JoinTable(
             name = "account_cases",
@@ -28,6 +34,14 @@ public class Cases extends Auditable {
 
     @OneToMany(mappedBy = "caseEntity")
     private Set<Report> reports = new HashSet<>();
+
+    @OneToMany(mappedBy = "caseEntity", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("createdAt ASC")
+    private List<CaseEvent> events = new ArrayList<>();
+
+    @OneToMany(mappedBy = "caseEntity", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("createdAt ASC")
+    private List<CaseComment> comments = new ArrayList<>();
 
 
     public Cases() {
@@ -85,5 +99,21 @@ public class Cases extends Auditable {
 
     public void setReports(Set<Report> reports) {
         this.reports = reports;
+    }
+
+    public CaseStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(CaseStatus status) {
+        this.status = status;
+    }
+
+    public List<CaseEvent> getEvents() {
+        return events;
+    }
+
+    public List<CaseComment> getComments() {
+        return comments;
     }
 }

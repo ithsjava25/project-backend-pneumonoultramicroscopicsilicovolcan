@@ -6,6 +6,7 @@ import org.example.crimearchive.dto.Polis.DTOUpdatePolis;
 import org.example.crimearchive.exceptions.PasswordValidationException;
 import org.example.crimearchive.polis.Account;
 import org.example.crimearchive.polis.UserService;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -34,6 +35,7 @@ public class AccountsController {
     }
 
     @GetMapping("/accounts/detail")
+    @PreAuthorize("#userId != authentication.principal.id")
     public String accountDetails(@RequestParam Long userId,
                                  @AuthenticationPrincipal Account user,
                                  Model model) {
@@ -46,7 +48,7 @@ public class AccountsController {
     }
 
     @PostMapping("/accounts/detail")
-    public String updateAccountsDetails(@ModelAttribute("updateAccount") DTOUpdatePolis updateAccount,
+    public String updateAccountsDetails(@ModelAttribute("updateAccount") @Valid DTOUpdatePolis updateAccount,
                                         BindingResult bindingResult,
                                         @AuthenticationPrincipal Account user,
                                         Model model) {
@@ -60,6 +62,9 @@ public class AccountsController {
             userService.updateAccount(updateAccount);
         } catch (IllegalArgumentException e) {
             bindingResult.rejectValue("roles", "error.updateAccount", e.getMessage());
+            return "updateaccountpage";
+        }catch (PasswordValidationException e){
+            bindingResult.rejectValue("password", "error.updateAccount", e.getMessage());
             return "updateaccountpage";
         }
         return "redirect:/accounts";

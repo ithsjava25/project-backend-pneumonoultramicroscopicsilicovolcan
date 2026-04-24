@@ -4,6 +4,7 @@ import org.example.crimearchive.dto.CreateReport;
 import org.example.crimearchive.dto.ReportResponse;
 import org.example.crimearchive.KNumberService;
 import org.example.crimearchive.cases.Cases;
+import org.example.crimearchive.cases.CaseLifecycleService;
 import org.example.crimearchive.cases.CasesRepository;
 import org.example.crimearchive.mapper.Mapper;
 import org.example.crimearchive.polis.Account;
@@ -21,22 +22,27 @@ public class ReportService {
     private final ReportRepository reportRepository;
     private final KNumberService knumberService;
     private final CasesRepository casesRepository;
+    private final CaseLifecycleService lifecycleService;
 
-    public ReportService(ReportRepository reportRepository, KNumberService knumberService, CasesRepository casesRepository) {
+    public ReportService(ReportRepository reportRepository, KNumberService knumberService,
+                         CasesRepository casesRepository, CaseLifecycleService lifecycleService) {
         this.reportRepository = reportRepository;
         this.knumberService = knumberService;
         this.casesRepository = casesRepository;
+        this.lifecycleService = lifecycleService;
     }
 
     @Transactional
     public String saveReport(CreateReport report, Account currentUser) {
         Cases cases;
+        String performedBy = currentUser != null ? currentUser.getUsername() : "system";
 
         if (report.caseNumber() == null || report.caseNumber().isBlank()) {
             String newCaseNumber = knumberService.getKNumber();
             cases = new Cases(newCaseNumber);
             if (currentUser != null) cases.getAccounts().add(currentUser);
             casesRepository.save(cases);
+            lifecycleService.initCase(cases, performedBy);
         } else {
             String sanitized = caseNumberSanitation(report.caseNumber());
             cases = casesRepository.findFirstByCaseNumber(sanitized)

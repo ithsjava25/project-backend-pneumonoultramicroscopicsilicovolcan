@@ -3,7 +3,7 @@ package org.example.crimearchive.service;
 import org.example.crimearchive.dto.CreateReport;
 import org.example.crimearchive.dto.ReportResponse;
 import org.example.crimearchive.KNumberService;
-import org.example.crimearchive.cases.CaseService;
+import org.example.crimearchive.cases.CaseLifecycleService;
 import org.example.crimearchive.cases.Cases;
 import org.example.crimearchive.cases.CasesRepository;
 import org.example.crimearchive.reports.Report;
@@ -23,6 +23,7 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -34,9 +35,9 @@ class ReportServiceTest {
     private KNumberService kNumberService;
     @Mock
     private CasesRepository casesRepository;
+    @Mock
+    private CaseLifecycleService lifecycleService;
 
-    @InjectMocks
-    private CaseService caseService;
     @InjectMocks
     private ReportService reportService;
 
@@ -50,25 +51,27 @@ class ReportServiceTest {
         assertEquals("K-2026-000001", caseNumber);
         verify(casesRepository, times(1)).save(any(Cases.class));
         verify(reportRepository, times(1)).save(any(Report.class));
+        verify(lifecycleService).initCase(any(Cases.class), eq("system"));
     }
 
     @Test
     void saveReport_existingCaseNumber_usesExistingCase() {
         Cases existingCase = new Cases("K-2026-000001");
         CreateReport request = new CreateReport("Murder", "Johan", "K-2026-000001");
-        when(caseService.getCaseFromCaseNumber("K-2026-000001")).thenReturn(Optional.of(existingCase));
+        when(casesRepository.findFirstByCaseNumber("K-2026-000001")).thenReturn(Optional.of(existingCase));
 
         String caseNumber = reportService.saveReport(request, null);
 
         assertEquals("K-2026-000001", caseNumber);
         verify(casesRepository, never()).save(any());
         verify(reportRepository, times(1)).save(any(Report.class));
+        verify(lifecycleService, never()).initCase(any(), any());
     }
 
     @Test
     void saveReport_caseNotFound_throws404() {
         CreateReport request = new CreateReport("Murder", "Johan", "K-2026-999999");
-        when(caseService.getCaseFromCaseNumber("K-2026-999999")).thenReturn(Optional.empty());
+        when(casesRepository.findFirstByCaseNumber("K-2026-999999")).thenReturn(Optional.empty());
 
         ResponseStatusException ex = assertThrows(
                 ResponseStatusException.class,
