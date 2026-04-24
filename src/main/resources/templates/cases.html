@@ -50,12 +50,14 @@
             <thead>
             <tr>
                 <th>K-Nummer</th>
+                <th>Status</th>
                 <th>Antal utredare</th>
             </tr>
             </thead>
             <tbody>
             <tr th:each="case : ${allcases}">
                 <td th:text="${case.getCaseNumber()}"></td>
+                <td th:text="${case.getStatus()}"></td>
                 <td th:text="${case.getAccounts().size()}"></td>
                 <td>
                     <form method="post" th:action="@{/cases/add}" style="display: flex">

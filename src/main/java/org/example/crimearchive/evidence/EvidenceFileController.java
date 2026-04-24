@@ -1,11 +1,13 @@
 package org.example.crimearchive.evidence;
 
 import org.example.crimearchive.polis.Account;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.util.List;
 import java.util.UUID;
 
@@ -41,14 +43,16 @@ public class EvidenceFileController {
     }
 
     @GetMapping("/{id}/pdf")
-    public ResponseEntity<byte[]> downloadPdf(@PathVariable UUID id,
-                                              @AuthenticationPrincipal Account currentUser) {
-        return evidenceFileService.downloadPdf(id, currentUser);
+    public ResponseEntity<Void> downloadPdf(@PathVariable UUID id,
+                                            @AuthenticationPrincipal Account currentUser) {
+        String url = evidenceFileService.signedPdfUrl(id, currentUser);
+        return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(url)).build();
     }
 
     @GetMapping("/{id}/file")
-    public ResponseEntity<byte[]> downloadFile(@PathVariable UUID id,
-                                               @AuthenticationPrincipal Account currentUser) {
-        return evidenceFileService.downloadFile(id, currentUser);
+    public ResponseEntity<Void> downloadFile(@PathVariable UUID id,
+                                             @AuthenticationPrincipal Account currentUser) {
+        String url = evidenceFileService.signedFileUrl(id, currentUser);
+        return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(url)).build();
     }
 }
