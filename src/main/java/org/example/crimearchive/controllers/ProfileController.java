@@ -69,7 +69,7 @@ public class ProfileController {
                                Model model, @RequestParam String casenumber) {
         prepareModel(model, user);
         boolean isHandler = user.getAuthorities().stream()
-                .anyMatch(ga -> ga.getAuthority().equals("ROLE_HANDLER") || ga.getAuthority().equals("ROLE_ADMIN"));
+                .anyMatch(ga -> ga.getAuthority().equals("ROLE_HANDLER"));
         model.addAttribute("isHandler", isHandler);
         model.addAttribute("assignedPolice", caseService.getAllPoliceForCase(casenumber));
         model.addAttribute("rawcasenumber", casenumber);
