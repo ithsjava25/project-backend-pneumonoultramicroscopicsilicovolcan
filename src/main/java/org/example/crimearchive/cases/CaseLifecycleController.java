@@ -47,6 +47,9 @@ public class CaseLifecycleController {
         if (content == null || content.isBlank()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Kommentar får inte vara tom");
         }
+        if (content.length() > 2000) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Kommentar får inte överstiga 2000 tecken");
+        }
         CaseComment comment = lifecycleService.addComment(caseNumber, content, user.getUsername());
         return ResponseEntity.status(HttpStatus.CREATED).body(CaseCommentResponse.from(comment));
     }

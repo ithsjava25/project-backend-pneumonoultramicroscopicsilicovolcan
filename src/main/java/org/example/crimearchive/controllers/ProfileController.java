@@ -96,6 +96,9 @@ public class ProfileController {
                              @RequestParam String content,
                              @AuthenticationPrincipal Account user) {
         if (content != null && !content.isBlank()) {
+            if (content.length() > 2000) {
+                return "redirect:/caseoverview?casenumber=" + URLEncoder.encode(casenumber, StandardCharsets.UTF_8) + "&commentError=1";
+            }
             lifecycleService.addComment(casenumber, content, user.getUsername());
         }
         return "redirect:/caseoverview?casenumber=" + URLEncoder.encode(casenumber, StandardCharsets.UTF_8);

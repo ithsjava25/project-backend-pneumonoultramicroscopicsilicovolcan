@@ -56,7 +56,10 @@ public class CaseLifecycleService {
 
     @Transactional
     public CaseComment addComment(String caseNumber, String content, String author) {
-        if (content != null && content.length() > 2000) {
+        if (content == null || content.isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Kommentar får inte vara tom");
+        }
+        if (content.length() > 2000) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Kommentar får inte överstiga 2000 tecken");
         }
         Cases cases = findCase(caseNumber);
