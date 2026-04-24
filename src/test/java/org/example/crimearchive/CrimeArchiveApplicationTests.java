@@ -8,7 +8,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 class CrimeArchiveApplicationTests {
 
     @Test
-    @Disabled("Aktiveras när integrationstester är uppsatta")
     void contextLoads() {
     }
 }

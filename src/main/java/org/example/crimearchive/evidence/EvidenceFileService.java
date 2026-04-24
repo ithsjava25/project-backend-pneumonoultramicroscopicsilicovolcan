@@ -4,28 +4,27 @@ import com.itextpdf.text.Document;
 import com.itextpdf.text.Image;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.pdf.PdfWriter;
+import org.example.crimearchive.cases.CaseLifecycleService;
+import org.example.crimearchive.cases.CasesRepository;
 import org.example.crimearchive.permissions.PermissionService;
 import org.example.crimearchive.polis.Account;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
-import software.amazon.awssdk.core.ResponseBytes;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
-import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.services.s3.presigner.S3Presigner;
+import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -35,17 +34,26 @@ public class EvidenceFileService {
 
     private final EvidenceFileRepository evidenceFileRepository;
     private final S3Client s3Client;
+    private final S3Presigner s3Presigner;
     private final PermissionService permissionService;
+    private final CaseLifecycleService lifecycleService;
+    private final CasesRepository casesRepository;
 
     @Value("${minio.bucket}")
     private String bucket;
 
     public EvidenceFileService(EvidenceFileRepository evidenceFileRepository,
                                S3Client s3Client,
-                               PermissionService permissionService) {
+                               S3Presigner s3Presigner,
+                               PermissionService permissionService,
+                               CaseLifecycleService lifecycleService,
+                               CasesRepository casesRepository) {
         this.evidenceFileRepository = evidenceFileRepository;
         this.s3Client = s3Client;
+        this.s3Presigner = s3Presigner;
         this.permissionService = permissionService;
+        this.lifecycleService = lifecycleService;
+        this.casesRepository = casesRepository;
     }
 
     public void upload(String caseNumber, String reportName, String reportEvent,
@@ -111,6 +119,11 @@ public class EvidenceFileService {
             evidenceFile.setContentType(file != null ? file.getContentType() : null);
             evidenceFileRepository.save(evidenceFile);
 
+            casesRepository.findFirstByCaseNumber(caseNumber).ifPresent(cases ->
+                    lifecycleService.onDocumentUploaded(cases,
+                            file != null ? file.getOriginalFilename() : "okänd fil",
+                            uploadedBy));
+
         } catch (Exception e) {
             deleteIfExists(s3KeyPdf);
             deleteIfExists(s3KeyFile);
@@ -118,56 +131,32 @@ public class EvidenceFileService {
         }
     }
 
-    public ResponseEntity<byte[]> downloadPdf(UUID id, Account currentUser) {
+    public String signedPdfUrl(UUID id, Account currentUser) {
         EvidenceFile evidence = evidenceFileRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Bevisfil hittades inte: " + id));
-
         requireCaseAccess(evidence.getCaseNumber(), currentUser);
-
-        ResponseBytes<GetObjectResponse> objectBytes = s3Client.getObjectAsBytes(
-                GetObjectRequest.builder()
-                        .bucket(bucket)
-                        .key(evidence.getS3KeyPdf())
-                        .build()
-        );
-
-        return ResponseEntity.ok()
-                .contentType(MediaType.APPLICATION_PDF)
-                .header("Content-Disposition", "attachment; filename=rapport.pdf")
-                .body(objectBytes.asByteArray());
+        return presign(evidence.getS3KeyPdf());
     }
 
-    public ResponseEntity<byte[]> downloadFile(UUID id, Account currentUser) {
+    public String signedFileUrl(UUID id, Account currentUser) {
         EvidenceFile evidence = evidenceFileRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Bevisfil hittades inte: " + id));
-
         requireCaseAccess(evidence.getCaseNumber(), currentUser);
-
         if (evidence.getS3KeyFile() == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Ingen bifogad fil finns för denna post");
         }
+        return presign(evidence.getS3KeyFile());
+    }
 
-        ResponseBytes<GetObjectResponse> objectBytes = s3Client.getObjectAsBytes(
-                GetObjectRequest.builder()
+    private String presign(String s3Key) {
+        GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
+                .signatureDuration(Duration.ofMinutes(10))
+                .getObjectRequest(GetObjectRequest.builder()
                         .bucket(bucket)
-                        .key(evidence.getS3KeyFile())
-                        .build()
-        );
-
-        String contentDisposition = ContentDisposition.attachment()
-                .filename(evidence.getOriginalFilename() != null ? evidence.getOriginalFilename() : "fil",
-                        StandardCharsets.UTF_8)
-                .build()
-                .toString();
-
-        MediaType mediaType = evidence.getContentType() != null
-                ? MediaType.parseMediaType(evidence.getContentType())
-                : MediaType.APPLICATION_OCTET_STREAM;
-
-        return ResponseEntity.ok()
-                .contentType(mediaType)
-                .header("Content-Disposition", contentDisposition)
-                .body(objectBytes.asByteArray());
+                        .key(s3Key)
+                        .build())
+                .build();
+        return s3Presigner.presignGetObject(presignRequest).url().toString();
     }
 
     public List<EvidenceFile> getByCaseNumber(String caseNumber) {
