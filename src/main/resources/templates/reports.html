@@ -27,22 +27,55 @@
         </div>
 
         <div class="topbar-user">
-            <span class="user-chip">demouser · Polis</span>
+            <div th:if="${accountoverview}">
+                <form th:action="@{/accounts}" method="get">
+                    <button class="user-chip" type="submit" style="cursor: pointer">
+                        Konto översikt
+                    </button>
+                </form>
+            </div>
+
+            <div th:if="${assigncasebutton}">
+                <form th:action="@{/cases}" method="get">
+                    <button class="user-chip" type="submit" style="cursor: pointer">
+                        Tilldelning
+                    </button>
+                </form>
+            </div>
+
+            <span class="user-chip"
+                  th:text="${currentUser.getFullName()}"
+                  th:onclick="location.href='/profile'"
+                  style="cursor: pointer">
+    </span>
+
+            <form th:action="@{/logout}" method="post">
+                <input type="hidden"
+                       th:name="${_csrf.parameterName}"
+                       th:value="${_csrf.token}"/>
+                <button type="submit" class="user-chip" style="cursor: pointer">
+                    Logga ut
+                </button>
+            </form>
         </div>
     </header>
 
     <div class="meta-strip">
-        <span>Inloggad som: <strong>demouser</strong></span>
-        <span>Roll: <strong>Polis</strong></span>
-        <span>Avdelning: <strong>Centrum</strong></span>
+    <span>Inloggad som:
+        <strong th:text="${currentUser.getUsername()}">demouser</strong>
+    </span>
+
+        <span>Roll:
+        <strong th:text="${currentUser.getProfession()}">Polis</strong>
+    </span>
+
+        <span>Avdelning:
+        <strong th:text="${currentUser.getDepartment()}">Centrum</strong>
+    </span>
+
         <span>Aktiv databas: <strong>TESTMILJÖ</strong></span>
         <span>Senast uppdaterad: <strong>2026-03-14 10:03</strong></span>
 
-        <button type="button"
-                class="btn btn-secondary meta-strip-button"
-                onclick="location.href='/'">
-            Tillbaka till startsidan
-        </button>
     </div>
 
     <main class="page-wrap">
@@ -52,6 +85,10 @@
               th:object="${newReport}"
               method="post"
               enctype="multipart/form-data">
+
+            <input type="hidden"
+                   th:name="${_csrf.parameterName}"
+                   th:value="${_csrf.token}"/>
 
             <input id="files" name="files" type="file" multiple hidden>
             <input id="images" name="images" type="file" accept="image/*" multiple hidden>
@@ -126,7 +163,7 @@
                             <div class="form-field">
                                 <label for="witness">Vittne</label>
                                 <input id="witness"
-                                       name="witness"
+                                       th:field="*{witness}"
                                        type="text"
                                        placeholder="Ange namn på vittne">
                             </div>
@@ -134,7 +171,7 @@
                             <div class="form-field">
                                 <label for="victim">Offer</label>
                                 <input id="victim"
-                                       name="victim"
+                                       th:field="*{victim}"
                                        type="text"
                                        placeholder="Ange namn på offer">
                             </div>
@@ -150,7 +187,6 @@
                         </div>
 
                         <div class="form-field">
-                            <label for="crimeScene">Brottsplats</label>
                             <input id="crimeScene"
                                    th:field="*{event}"
                                    type="text"
