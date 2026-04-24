@@ -2,6 +2,7 @@ package org.example.crimearchive.audit;
 
 
 import jakarta.persistence.*;
+import org.hibernate.envers.Audited;
 import org.springframework.data.annotation.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -9,6 +10,7 @@ import java.time.LocalDateTime;
 
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
+@Audited
 public abstract class Auditable {
 
     @CreatedBy

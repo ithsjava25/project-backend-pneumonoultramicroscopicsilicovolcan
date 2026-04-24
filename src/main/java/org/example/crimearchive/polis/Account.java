@@ -1,6 +1,7 @@
 package org.example.crimearchive.polis;
 
 import jakarta.persistence.*;
+import org.example.crimearchive.audit.Auditable;
 import org.example.crimearchive.cases.Cases;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -12,7 +13,7 @@ import java.util.List;
 import java.util.Set;
 
 @Entity
-public class Account implements UserDetails {
+public class Account extends Auditable implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

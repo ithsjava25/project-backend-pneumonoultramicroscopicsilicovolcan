@@ -1,4 +1,6 @@
 package org.example.crimearchive.Entity.försvare;
 
-public class Advocat {
+import org.example.crimearchive.audit.Auditable;
+
+public class Advocat extends Auditable {
 }
