@@ -46,15 +46,21 @@ public class HomeController {
     }
 
     @GetMapping("/reports")
-    public String privatePage(@AuthenticationPrincipal Account user, Model model) {
+    public String privatePage(@AuthenticationPrincipal Account currentUser, Model model) {
 
-        CreateReport report = new CreateReport(
-                "",
-                "",
-                ""
-        );
+        CreateReport report = new CreateReport("", "", "", "", "");
 
         model.addAttribute("newReport", report);
+        model.addAttribute("currentUser", currentUser);
+        model.addAttribute("reports", reportService.getAllReports());
+
+        model.addAttribute("assigncasebutton",
+                currentUser.getAuthorities().stream()
+                        .anyMatch(a -> a.getAuthority().equals("ROLE_HANDLER")));
+
+        model.addAttribute("accountoverview",
+                currentUser.getAuthorities().stream()
+                        .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN")));
 
         return "reports";
     }
@@ -62,6 +68,7 @@ public class HomeController {
     @GetMapping("/userpage")
     public String userPage(@AuthenticationPrincipal Account user, Model model) {
         model.addAttribute("reportAmount", reportService.getAmount());
+        model.addAttribute("reports", reportService.getAllReports());
         return "userpage";
     }
 
@@ -73,17 +80,27 @@ public class HomeController {
             @RequestParam(required = false) java.util.List<MultipartFile> images,
             @AuthenticationPrincipal Account currentUser) {
 
+        log.info("saveReport() anropad");
+
         if (bindingResult.hasErrors()) {
             log.info("Binding Error: {}", bindingResult.getAllErrors().getLast());
             return "reports";
         }
 
         try {
-            String caseNumber = reportService.saveReport(newReport, currentUser);
+            log.info("Sparar rapport för user: {}", currentUser != null ? currentUser.getUsername() : "NULL");
 
+            String caseNumber = reportService.saveReport(newReport, currentUser);
+            log.info("Rapport sparad med caseNumber: {}", caseNumber);
+
+            // 🔹 Filer
             if (files != null) {
                 for (MultipartFile f : files) {
+                    log.info("Fil mottagen: {}", f.getOriginalFilename());
+
                     if (!f.isEmpty()) {
+                        log.info("Laddar upp fil: {}", f.getOriginalFilename());
+
                         evidenceFileService.upload(
                                 caseNumber,
                                 newReport.name(),
@@ -91,13 +108,22 @@ public class HomeController {
                                 f,
                                 currentUser.getUsername()
                         );
+                    } else {
+                        log.warn("Fil var tom: {}", f.getOriginalFilename());
                     }
                 }
+            } else {
+                log.info("Inga filer skickades");
             }
 
+            // 🔹 Bilder
             if (images != null) {
                 for (MultipartFile img : images) {
+                    log.info("Bild mottagen: {}", img.getOriginalFilename());
+
                     if (!img.isEmpty()) {
+                        log.info("Laddar upp bild: {}", img.getOriginalFilename());
+
                         evidenceFileService.upload(
                                 caseNumber,
                                 newReport.name(),
@@ -105,8 +131,12 @@ public class HomeController {
                                 img,
                                 currentUser.getUsername()
                         );
+                    } else {
+                        log.warn("Bild var tom: {}", img.getOriginalFilename());
                     }
                 }
+            } else {
+                log.info("Inga bilder skickades");
             }
 
         } catch (Exception e) {
@@ -114,7 +144,8 @@ public class HomeController {
             return "reports";
         }
 
-        return "redirect:/userpage";
+        log.info("Redirect till /reports");
+        return "redirect:/reports";
     }
 
     @GetMapping("/403")
