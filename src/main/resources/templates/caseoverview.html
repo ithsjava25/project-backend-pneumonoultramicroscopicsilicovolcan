@@ -72,12 +72,18 @@
                             <span th:text="${caseStatus}">Status</span>
                         </div>
 
-                        <div class="form-field">
+                        <div class="form-field" th:if="${caseResult.isLeft()}">
                             <label for="policeOfficer">Polis</label>
                             <ul id="policeOfficer">
-                                <li th:each="cop : ${assignedPolice}" th:text="${cop.getFullName()}">
+                                <li th:each="cop : ${caseResult.left().assignedPolice()}" th:text="${cop.getFullName()}">
                                     Lista av tilldelade poliser till ärendet
                                 </li>
+                            </ul>
+                        </div>
+                        <div class="form-field" th:if="${caseResult.isRight()}">
+                            <label for="policeOfficerRedact">Polis</label>
+                            <ul id="policeOfficerRedact">
+                                <span th:text="${caseResult.right().assignedPolice()}"></span>
                             </ul>
                         </div>
                     </div>
@@ -107,7 +113,7 @@
                         </div>
                     </div>
 
-                    <div class="upload-toolbar">
+                    <div class="upload-toolbar" th:if="${caseResult.isLeft()}">
                         <button type="button"
                                 class="btn btn-secondary"
                                 th:onclick="document.getElementById('evidenceFiles').click()">
@@ -120,8 +126,9 @@
                             Lägg till bilder
                         </button>
                     </div>
+                    <div th:if="${caseResult.isLeft()}">
                     <table>
-                        <th:block th:each="report : ${reportList}">
+                        <th:block th:each="report : ${caseResult.left().reportList()}">
                             <tr>
                                 <th class="file-name" th:text="${report.getEvent()}"></th>
                             </tr>
@@ -132,6 +139,7 @@
                             </tr>
                         </th:block>
                     </table>
+                    </div>
                 </section>
             </div>
 
@@ -147,6 +155,7 @@
                     <div class="field-grid two-columns">
                         <div class="form-field">
                             <label>Vittne</label>
+                            <div th:if="${caseResult.isLeft()}">
                             <ul>
                                 <li>
                                     <span>Ulla-britt</span>
@@ -161,15 +170,24 @@
                                     <span>Lars-göran</span>
                                 </li>
                             </ul>
+                            </div>
+                            <div th:if="${caseResult.isRight()}">
+                                <span>Censurerat</span>
+                            </div>
                         </div>
 
                         <div class="form-field">
                             <label>Offer</label>
+                            <div th:if="${caseResult.isLeft()}">
                             <ul>
                                 <li>
                                     <span>Tre små grisar</span>
                                 </li>
                             </ul>
+                            </div>
+                            <div th:if="${caseResult.isRight()}">
+                                <span>Censurerat</span>
+                            </div>
                         </div>
                     </div>
                 </section>
@@ -182,9 +200,13 @@
                         </div>
                     </div>
 
-                    <div class="form-field">
+                    <div class="form-field" th:if="${caseResult.isLeft()}">
                         <label>Område</label>
                         <span>Majorna</span>
+                    </div>
+                    <div class="form-field" th:if="${caseResult.isRight()}">
+                        <label>Område</label>
+                        <span>Censurerat</span>
                     </div>
                 </section>
             </div>

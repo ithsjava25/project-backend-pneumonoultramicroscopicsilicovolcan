@@ -1,8 +1,10 @@
 package org.example.crimearchive.polis;
 
+import org.aspectj.weaver.ast.Not;
 import org.example.crimearchive.DTO.Polis.DTOCreatePolis;
 import org.example.crimearchive.DTO.Polis.DTOUpdatePolis;
 import org.example.crimearchive.DTO.Polis.DTOUpdateProfile;
+import org.example.crimearchive.exceptions.NotFoundException;
 import org.example.crimearchive.exceptions.PasswordValidationException;
 import org.example.crimearchive.mapper.Mapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -49,7 +51,7 @@ public class UserService {
     @Transactional
     public void updateAccount(DTOUpdatePolis updatedAcc) {
         Long accId = updatedAcc.id();
-        Account dbAccount = userRepository.findById(accId).orElseThrow(() -> new RuntimeException("Inget konto funnet"));
+        Account dbAccount = userRepository.findById(accId).orElseThrow(() -> new NotFoundException("Inget konto funnet"));
 
         dbAccount.setFullName(updatedAcc.fullName());
         dbAccount.setUsername(updatedAcc.username());
@@ -63,6 +65,14 @@ public class UserService {
         }
     }
 
+    public Account getUserByUsernameIfExists(String username){
+        if(userRepository.existsByUsername(username)){
+            return userRepository.findUserByUsername(username);
+        }else {
+            throw new NotFoundException("Användarnamnet hittades inte");
+        }
+    }
+
     public DTOUpdateProfile prefillProfileFields(Account user){
         return new DTOUpdateProfile(user.getFullName(), "", user.getId());
     }
@@ -70,7 +80,7 @@ public class UserService {
     @Transactional
     public void updateProfile(DTOUpdateProfile profileUpdate){
         Account updateProfile = userRepository.findById(profileUpdate.id())
-                .orElseThrow(() -> new RuntimeException("Kontot hittades inte"));
+                .orElseThrow(() -> new NotFoundException("Kontot hittades inte"));
         updateProfile.setFullName(profileUpdate.fullname());
         if(profileUpdate.password() != null && !profileUpdate.password().isBlank()){
             if(profileUpdate.password().length() <= MINIMUM_PASSWORD_LENGTH) throw new PasswordValidationException("Lösenordet måste vara längre än 5");
