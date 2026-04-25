@@ -23,10 +23,8 @@ public record CreateReport(
     public CreateReport(String event, String name) {
         this(event, name, "", "", "");
     }
+
     public CreateReport(String event, String name, String caseNumber) {
         this(event, name, caseNumber, "", "");
-    }
-    public CreateReport(String event, String name, String witness, String victim) {
-        this(event, name, "", witness, victim);
     }
 }
