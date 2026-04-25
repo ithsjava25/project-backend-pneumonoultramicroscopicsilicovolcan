@@ -4,13 +4,15 @@ import jakarta.validation.constraints.NotBlank;
 import org.example.crimearchive.validations.ValidCasenumber;
 
 public record CreateReport(
-        @NotBlank(message = "Måste ha en anledning till anmälan")
+        @NotBlank(message = "Brottsplats måste anges")
         String event,
-        @NotBlank(message = "Måste ha ett namn på anmälaren")
+        @NotBlank(message = "Polis måste anges")
         String name,
         @ValidCasenumber
         String caseNumber,
+        @NotBlank(message = "Vittne måste anges")
         String witness,
+        @NotBlank(message = "Offer måste anges")
         String victim
 ) {
 
@@ -20,5 +22,8 @@ public record CreateReport(
 
     public CreateReport(String event, String name) {
         this(event, name, "", "", "");
+    }
+    public CreateReport(String event, String name, String witness, String victim) {
+        this(event, name, "", witness, victim);
     }
 }
