@@ -264,6 +264,8 @@
             const removeBtn = document.createElement("button");
             removeBtn.textContent = "❌";
             removeBtn.style.marginLeft = "10px";
+            removeBtn.type = "button";
+            removeBtn.setAttribute("aria-label", `Ta bort ${file.name}`);
 
             removeBtn.onclick = () => {
                 if (type === "file") {
