@@ -51,14 +51,18 @@
             <tr>
                 <th>K-Nummer</th>
                 <th>Status</th>
-                <th>Antal utredare</th>
+                <th>Utredare</th>
             </tr>
             </thead>
             <tbody>
             <tr th:each="case : ${allcases}">
                 <td th:text="${case.getCaseNumber()}"></td>
                 <td th:text="${case.getStatus()}"></td>
-                <td th:text="${case.getAccounts().size()}"></td>
+                <td>
+                    <ul th:each="police : ${case.getAccounts()}">
+                        <li th:text="${police.getFullName()}"></li>
+                    </ul>
+                </td>
                 <td>
                     <form method="post" th:action="@{/cases/add}" style="display: flex">
                         <input type="hidden" name="case_number" th:value="${case.getCaseNumber()}">
