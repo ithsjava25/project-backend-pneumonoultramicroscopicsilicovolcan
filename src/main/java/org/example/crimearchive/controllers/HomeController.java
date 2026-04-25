@@ -8,8 +8,6 @@ import org.example.crimearchive.cases.CasesRepository;
 import org.example.crimearchive.evidence.EvidenceFileService;
 import org.example.crimearchive.polis.Account;
 import org.example.crimearchive.reports.ReportService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -23,7 +21,6 @@ import org.springframework.web.multipart.MultipartFile;
 @Controller
 public class HomeController {
 
-    Logger log = LoggerFactory.getLogger(HomeController.class);
     private final ReportService reportService;
     private final EvidenceFileService evidenceFileService;
     private final CaseService caseService;
@@ -80,27 +77,18 @@ public class HomeController {
             @RequestParam(required = false) java.util.List<MultipartFile> images,
             @AuthenticationPrincipal Account currentUser) {
 
-        log.info("saveReport() anropad");
-
         if (bindingResult.hasErrors()) {
-            log.info("Binding Error: {}", bindingResult.getAllErrors().getLast());
             return "reports";
         }
 
         try {
-            log.info("Sparar rapport för user: {}", currentUser != null ? currentUser.getUsername() : "NULL");
 
             String caseNumber = reportService.saveReport(newReport, currentUser);
-            log.info("Rapport sparad med caseNumber: {}", caseNumber);
 
-            // 🔹 Filer
             if (files != null) {
                 for (MultipartFile f : files) {
-                    log.info("Fil mottagen: {}", f.getOriginalFilename());
 
                     if (!f.isEmpty()) {
-                        log.info("Laddar upp fil: {}", f.getOriginalFilename());
-
                         evidenceFileService.upload(
                                 caseNumber,
                                 newReport.name(),
@@ -108,22 +96,14 @@ public class HomeController {
                                 f,
                                 currentUser.getUsername()
                         );
-                    } else {
-                        log.warn("Fil var tom: {}", f.getOriginalFilename());
                     }
                 }
-            } else {
-                log.info("Inga filer skickades");
             }
 
-            // 🔹 Bilder
             if (images != null) {
                 for (MultipartFile img : images) {
-                    log.info("Bild mottagen: {}", img.getOriginalFilename());
 
                     if (!img.isEmpty()) {
-                        log.info("Laddar upp bild: {}", img.getOriginalFilename());
-
                         evidenceFileService.upload(
                                 caseNumber,
                                 newReport.name(),
@@ -131,20 +111,14 @@ public class HomeController {
                                 img,
                                 currentUser.getUsername()
                         );
-                    } else {
-                        log.warn("Bild var tom: {}", img.getOriginalFilename());
                     }
                 }
-            } else {
-                log.info("Inga bilder skickades");
             }
 
         } catch (Exception e) {
-            log.error("Fel vid sparande av rapport", e);
             return "reports";
         }
 
-        log.info("Redirect till /reports");
         return "redirect:/reports";
     }
 
