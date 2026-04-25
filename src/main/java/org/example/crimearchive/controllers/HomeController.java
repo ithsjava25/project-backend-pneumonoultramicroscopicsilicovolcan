@@ -2,7 +2,6 @@ package org.example.crimearchive.controllers;
 
 import jakarta.validation.Valid;
 import org.example.crimearchive.DTO.CreateReport;
-import org.example.crimearchive.KNumberService;
 import org.example.crimearchive.cases.CaseService;
 import org.example.crimearchive.cases.CasesRepository;
 import org.example.crimearchive.evidence.EvidenceFileService;
@@ -17,6 +16,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
+import java.util.List;
 
 @Controller
 public class HomeController {
@@ -25,16 +25,13 @@ public class HomeController {
     private final EvidenceFileService evidenceFileService;
     private final CaseService caseService;
     private final CasesRepository casesRepository;
-    private final KNumberService kNumberService;
 
     public HomeController(ReportService reportService, EvidenceFileService evidenceFileService,
-                          CaseService caseService, CasesRepository casesRepository,
-                          KNumberService kNumberService) {
+                          CaseService caseService, CasesRepository casesRepository) {
         this.reportService = reportService;
         this.evidenceFileService = evidenceFileService;
         this.caseService = caseService;
         this.casesRepository = casesRepository;
-        this.kNumberService = kNumberService;
     }
 
     @GetMapping("/")
@@ -73,21 +70,21 @@ public class HomeController {
     public String saveReport(
             @ModelAttribute("newReport") @Valid CreateReport newReport,
             BindingResult bindingResult,
-            @RequestParam(required = false) java.util.List<MultipartFile> files,
-            @RequestParam(required = false) java.util.List<MultipartFile> images,
-            @AuthenticationPrincipal Account currentUser) {
+            @RequestParam(required = false) List<MultipartFile> files,
+            @RequestParam(required = false) List<MultipartFile> images,
+            @AuthenticationPrincipal Account currentUser,
+            Model model) {
 
         if (bindingResult.hasErrors()) {
+            populateReportsModel(model, currentUser);
             return "reports";
         }
 
         try {
-
             String caseNumber = reportService.saveReport(newReport, currentUser);
 
             if (files != null) {
                 for (MultipartFile f : files) {
-
                     if (!f.isEmpty()) {
                         evidenceFileService.upload(
                                 caseNumber,
@@ -116,6 +113,8 @@ public class HomeController {
             }
 
         } catch (Exception e) {
+            populateReportsModel(model, currentUser);
+            model.addAttribute("errorMessage", "Något gick fel vid sparande");
             return "reports";
         }
 
@@ -128,5 +127,18 @@ public class HomeController {
         model.addAttribute("title", "Åtkomst nekad");
         model.addAttribute("message", "Du saknar rättigheter för att visa denna sida.");
         return "error/error";
+    }
+
+    private void populateReportsModel(Model model, Account currentUser) {
+        model.addAttribute("currentUser", currentUser);
+        model.addAttribute("reports", reportService.getAllReports());
+
+        model.addAttribute("assigncasebutton",
+                currentUser.getAuthorities().stream()
+                        .anyMatch(a -> a.getAuthority().equals("ROLE_HANDLER")));
+
+        model.addAttribute("accountoverview",
+                currentUser.getAuthorities().stream()
+                        .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN")));
     }
 }
