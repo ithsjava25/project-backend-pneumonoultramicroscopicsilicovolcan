@@ -93,7 +93,7 @@
                     <th>Antal uppdateringar</th>
                     </thead>
                     <tbody>
-                    <tr th:if="${searchCases.isEmpty()}">
+                    <tr th:if="${searchCases == null || searchCases.isEmpty()}">
                         <td colspan="3">Inga fall tillgängliga</td>
                     </tr>
                     <tr th:each="cases : ${searchCases}">
