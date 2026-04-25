@@ -103,6 +103,13 @@
 
                         <div class="field-grid">
                             <div class="form-field">
+                                <label for="caseNumber">K-nummer</label>
+                                <input id="caseNumber"
+                                       type="text"
+                                       value="Genereras automatiskt"
+                                       readonly>
+                            </div>
+                            <div class="form-field">
                                 <label for="policeOfficer">Polis</label>
                                 <input id="policeOfficer"
                                        th:field="*{name}"
@@ -194,6 +201,7 @@
                         </div>
 
                         <div class="form-field">
+                            <label for="crimeScene">Brottsplats</label>
                             <input id="crimeScene"
                                    th:field="*{event}"
                                    type="text"
