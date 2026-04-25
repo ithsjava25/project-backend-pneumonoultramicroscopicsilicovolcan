@@ -74,14 +74,14 @@
 
                         <div class="form-field">
                             <label for="policeOfficer">Polis</label>
-                            <div th:if="${canAdd}">
+                            <div th:if="${canAdd || isHandler}">
                             <ul id="policeOfficer">
                                 <li th:each="cop : ${assignedPolice}" th:text="${cop.getFullName()}">
                                     Lista av tilldelade poliser till ärendet
                                 </li>
                             </ul>
                             </div>
-                            <span th:if="${!canAdd}">***********</span>
+                            <span th:if="${!canAdd && !isHandler}">***********</span>
                         </div>
                     </div>
 

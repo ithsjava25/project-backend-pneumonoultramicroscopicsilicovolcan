@@ -57,7 +57,7 @@ public class CaseService {
         return casesRepository.findAll();
     }
 
-    @PreAuthorize("@caseSecurity.canAccessCase(#casenumber, principal)")
+    @PreAuthorize("@caseSecurity.canAccessCaseAsHandler(#casenumber, principal)")
     @HandleAuthorizationDenied(handlerClass = NullAuthzDeniedHandler.class)
     public List<Account> getAllPoliceForCase(String casenumber) {
         return casesRepository.findFirstByCaseNumber(casenumber)

@@ -106,8 +106,6 @@ public class ProfileController {
 
     private void prepareModel(Model model, Account user) {
         List<Cases> caseList = caseService.getAuthzCases(user.getId());
-        model.addAttribute("assigncasebutton", user.getAuthorities().stream()
-                .anyMatch(ga -> ga.getAuthority().equals("ROLE_HANDLER")));
         model.addAttribute("accountoverview", user.getAuthorities().stream()
                 .anyMatch(ga -> ga.getAuthority().equals("ROLE_ADMIN")));
         model.addAttribute("cases", caseService.getReportsWithCaseNumber(caseList));

@@ -18,4 +18,10 @@ public class PermissionService {
         if (currentUser.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))) return true;
         return caseService.accountIdConnectedWithCaseId(caseNumber, currentUser.getId());
     }
+
+    public boolean canAccessCaseAsHandler(String caseNumber, Account currentUser) {
+        if (caseNumber == null || currentUser == null) return false;
+        if (currentUser.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_HANDLER"))) return true;
+        return caseService.accountIdConnectedWithCaseId(caseNumber, currentUser.getId());
+    }
 }
