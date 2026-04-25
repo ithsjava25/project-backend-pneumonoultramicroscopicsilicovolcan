@@ -58,7 +58,9 @@
     <div class="report-grid">
     <div class="report-column">
         <div class="card">
-            <h3>Tilldelade fall</h3>
+            <div class="card-header">
+                <span class="card-kicker">Tilldelade fall</span>
+            </div>
             <table>
                 <thead>
                 <th><span>K-Nummber</span></th>
@@ -102,6 +104,41 @@
             </div>
         </div>
     </div>
+    </div>
+    <div class="report-grid">
+        <div class="report-column">
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-kicker">Öppna fall</span>
+                </div>
+                <table>
+                    <thead>
+                    <th>K-nummner</th>
+                    <th>Status</th>
+                    <th>Antal uppdateringar</th>
+                    </thead>
+                    <tbody>
+                    <tr th:if="${searchCases.isEmpty()}">
+                        <td colspan="3">Inga fall tillgängliga</td>
+                    </tr>
+                    <tr th:each="cases : ${searchCases}">
+                        <td>
+                            <span th:text="${cases.getCaseNumber()}"></span>
+                        </td>
+                        <td>
+                            <span th:text="${cases.getStatus()}"></span>
+                        </td>
+                        <td>
+                            <span th:text="${cases.getEvents().size()}"></span>
+                        </td>
+                        <td>
+                            <a th:href="@{/caseoverview(casenumber=${cases.getCaseNumber()})}">Översikt</a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 </div>
 </body>

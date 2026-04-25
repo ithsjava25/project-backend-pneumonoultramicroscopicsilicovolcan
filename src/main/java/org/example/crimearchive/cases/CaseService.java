@@ -103,7 +103,6 @@ public class CaseService {
         return casesRepository.findAllByAccountsEmpty();
     }
 
-
     public Long caseIdFromCaseNumber(String casenumber) {
         return casesRepository.findFirstByCaseNumber(casenumber)
                 .orElseThrow(() -> new NotFoundException("Case not found: " + casenumber))
@@ -118,9 +117,7 @@ public class CaseService {
         return casesRepository.existsByCaseNumberAndAccounts_Id(caseNumber, accountId);
     }
 
-//
-//    public List<Report> hasPermission(Long accountId){
-//    List<String> permittedCaseNumbers = permissionRepository.findAllPermittedReports(accountId);
-//    return simpleRepository.findAllByCaseNumberIn(permittedCaseNumbers);
-//    }
+    public List<Cases> getOpenCases(CaseStatus excludeStatus) {
+        return casesRepository.findAllByStatusNot(excludeStatus);
+    }
 }

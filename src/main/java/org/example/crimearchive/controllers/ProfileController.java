@@ -44,6 +44,7 @@ public class ProfileController {
     public String profilePage(@AuthenticationPrincipal Account user, Model model) {
         prepareModel(model, user);
         model.addAttribute("updateProfile", userService.prefillProfileFields(user));
+        model.addAttribute("searchCases", caseService.getOpenCases(CaseStatus.CLOSED));
         return "profile";
     }
 
