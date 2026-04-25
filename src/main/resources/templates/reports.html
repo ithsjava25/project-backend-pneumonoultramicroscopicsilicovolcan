@@ -30,7 +30,7 @@
             <div th:if="${accountoverview}">
                 <form th:action="@{/accounts}" method="get">
                     <button class="user-chip" type="submit" style="cursor: pointer">
-                        Konto översikt
+                        Kontoöversikt
                     </button>
                 </form>
             </div>
@@ -44,7 +44,7 @@
             </div>
 
             <span class="user-chip"
-                  th:text="${currentUser.getFullName()}"
+                  th:text="${currentUser?.fullName}"
                   th:onclick="location.href='/profile'"
                   style="cursor: pointer">
     </span>
@@ -62,19 +62,16 @@
 
     <div class="meta-strip">
     <span>Inloggad som:
-        <strong th:text="${currentUser.getUsername()}">demouser</strong>
+        <strong th:text="${currentUser?.username}">demouser</strong>
     </span>
 
         <span>Roll:
-        <strong th:text="${currentUser.getProfession()}">Polis</strong>
+        <strong th:text="${currentUser?.profession}">Polis</strong>
     </span>
 
         <span>Avdelning:
-        <strong th:text="${currentUser.getDepartment()}">Centrum</strong>
+        <strong th:text="${currentUser?.department}">Centrum</strong>
     </span>
-
-        <span>Aktiv databas: <strong>TESTMILJÖ</strong></span>
-        <span>Senast uppdaterad: <strong>2026-03-14 10:03</strong></span>
 
     </div>
 
@@ -106,19 +103,17 @@
 
                         <div class="field-grid">
                             <div class="form-field">
-                                <label for="caseNumber">K-nummer</label>
-                                <input id="caseNumber"
-                                       value="Genereras automatiskt"
-                                       type="text"
-                                       readonly>
-                            </div>
-
-                            <div class="form-field">
                                 <label for="policeOfficer">Polis</label>
                                 <input id="policeOfficer"
                                        th:field="*{name}"
                                        type="text"
-                                       placeholder="Ange polis">
+                                       placeholder="Ange polis"
+                                       th:classappend="${#fields.hasErrors('name')} ? 'input-error'">
+
+                                <div th:if="${#fields.hasErrors('name')}"
+                                     th:errors="*{name}"
+                                     class="error-text">
+                                </div>
                             </div>
                         </div>
                     </section>
@@ -165,7 +160,13 @@
                                 <input id="witness"
                                        th:field="*{witness}"
                                        type="text"
-                                       placeholder="Ange namn på vittne">
+                                       placeholder="Ange namn på vittne"
+                                       th:classappend="${#fields.hasErrors('witness')} ? 'input-error'">
+
+                                <div th:if="${#fields.hasErrors('witness')}"
+                                     th:errors="*{witness}"
+                                     class="error-text">
+                                </div>
                             </div>
 
                             <div class="form-field">
@@ -173,7 +174,13 @@
                                 <input id="victim"
                                        th:field="*{victim}"
                                        type="text"
-                                       placeholder="Ange namn på offer">
+                                       placeholder="Ange namn på offer"
+                                       th:classappend="${#fields.hasErrors('victim')} ? 'input-error'">
+
+                                <div th:if="${#fields.hasErrors('victim')}"
+                                     th:errors="*{victim}"
+                                     class="error-text">
+                                </div>
                             </div>
                         </div>
                     </section>
@@ -190,7 +197,13 @@
                             <input id="crimeScene"
                                    th:field="*{event}"
                                    type="text"
-                                   placeholder="Ange brottsplats">
+                                   placeholder="Ange brottsplats"
+                                   th:classappend="${#fields.hasErrors('event')} ? 'input-error'">
+
+                            <div th:if="${#fields.hasErrors('event')}"
+                                 th:errors="*{event}"
+                                 class="error-text">
+                            </div>
                         </div>
                     </section>
                     <div class="form-actions">
@@ -205,6 +218,103 @@
     </main>
 
 </div>
+
+<script>
+    const fileInput = document.getElementById("files");
+    const imageInput = document.getElementById("images");
+    const evidenceList = document.getElementById("evidenceList");
+
+    let selectedFiles = [];
+    let selectedImages = [];
+
+    function updateInput(input, filesArray) {
+        const dt = new DataTransfer();
+        filesArray.forEach(file => dt.items.add(file));
+        input.files = dt.files;
+    }
+
+    function isDuplicate(file, list) {
+        return list.some(f => f.name === file.name && f.size === file.size);
+    }
+
+    function renderList(label, filesArray, type) {
+        const section = document.createElement("div");
+        section.classList.add("evidence-section");
+
+        const title = document.createElement("strong");
+        title.textContent = label;
+        section.appendChild(title);
+
+        const list = document.createElement("ul");
+
+        filesArray.forEach((file, index) => {
+            const li = document.createElement("li");
+
+            const text = document.createElement("span");
+            text.textContent = file.name;
+
+            const removeBtn = document.createElement("button");
+            removeBtn.textContent = "❌";
+            removeBtn.style.marginLeft = "10px";
+
+            removeBtn.onclick = () => {
+                if (type === "file") {
+                    selectedFiles.splice(index, 1);
+                    updateInput(fileInput, selectedFiles);
+                } else {
+                    selectedImages.splice(index, 1);
+                    updateInput(imageInput, selectedImages);
+                }
+                renderAll();
+            };
+
+            li.appendChild(text);
+            li.appendChild(removeBtn);
+            list.appendChild(li);
+        });
+
+        section.appendChild(list);
+        return section;
+    }
+
+    function renderAll() {
+        evidenceList.innerHTML = "";
+
+        if (selectedFiles.length > 0) {
+            evidenceList.appendChild(renderList("Filer:", selectedFiles, "file"));
+        }
+
+        if (selectedImages.length > 0) {
+            evidenceList.appendChild(renderList("Bilder:", selectedImages, "image"));
+        }
+    }
+
+    fileInput.addEventListener("change", () => {
+        const newFiles = Array.from(fileInput.files);
+
+        newFiles.forEach(file => {
+            if (!isDuplicate(file, selectedFiles)) {
+                selectedFiles.push(file);
+            }
+        });
+
+        updateInput(fileInput, selectedFiles);
+        renderAll();
+    });
+
+    imageInput.addEventListener("change", () => {
+        const newImages = Array.from(imageInput.files);
+
+        newImages.forEach(file => {
+            if (!isDuplicate(file, selectedImages)) {
+                selectedImages.push(file);
+            }
+        });
+
+        updateInput(imageInput, selectedImages);
+        renderAll();
+    });
+</script>
 
 </body>
 </html>
