@@ -1,7 +1,7 @@
 package org.example.crimearchive.controllers;
 
-import org.example.crimearchive.DTO.Polis.DTOCreatePolis;
-import org.example.crimearchive.DTO.Polis.DTOUpdatePolis;
+import org.example.crimearchive.dto.Polis.DTOCreatePolis;
+import org.example.crimearchive.dto.Polis.DTOUpdatePolis;
 import org.example.crimearchive.polis.Account;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.test.context.support.WithUserDetails;

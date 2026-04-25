@@ -1,6 +1,6 @@
 package org.example.crimearchive.controllers;
 
-import org.example.crimearchive.DTO.Polis.DTOUpdateProfile;
+import org.example.crimearchive.dto.Polis.DTOUpdateProfile;
 import org.example.crimearchive.cases.Cases;
 import org.example.crimearchive.polis.Account;
 import org.junit.jupiter.api.Test;
