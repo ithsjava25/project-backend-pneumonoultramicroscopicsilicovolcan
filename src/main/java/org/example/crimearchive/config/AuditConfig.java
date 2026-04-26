@@ -14,8 +14,8 @@ import java.util.Optional;
 public class AuditConfig {
 
     @Bean
-    public AuditorAware<String> auditorProvider(){
-        return() -> {
+    public AuditorAware<String> auditorProvider() {
+        return () -> {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             if (authentication == null || !authentication.isAuthenticated()) {
                 return Optional.of("SYSTEM");
@@ -24,3 +24,4 @@ public class AuditConfig {
         };
     }
 }
+

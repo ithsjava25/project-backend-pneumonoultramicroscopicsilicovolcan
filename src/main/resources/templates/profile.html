@@ -47,8 +47,7 @@
         <span>Inloggad som: <strong th:text="${currentUser.getUsername()}"></strong></span>
         <span>Roll: <strong th:text="${currentUser.getProfession()}"></strong></span>
         <span>Avdelning: <strong th:text="${currentUser.getDepartment()}"></strong></span>
-        <span>Aktiv databas: <strong
-                th:text="${currentUser.getAuthorities().contains('ROLE_HANDLER')}">TESTMILJÖ</strong></span>
+        <span>Aktiv databas: <strong>TESTMILJÖ</strong></span>
         <span>Senast uppdaterad: <strong>2026-03-14 10:03</strong></span>
 
         <button th:onclick="location.href='/reports'" class="btn btn-primary meta-strip-button">

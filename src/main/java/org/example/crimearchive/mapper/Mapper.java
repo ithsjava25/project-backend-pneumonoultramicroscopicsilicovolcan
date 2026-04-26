@@ -1,8 +1,8 @@
 package org.example.crimearchive.mapper;
 
 import org.example.crimearchive.dto.CreateReport;
-import org.example.crimearchive.dto.Polis.DTOCreatePolis;
-import org.example.crimearchive.dto.Polis.DTOUpdatePolis;
+import org.example.crimearchive.dto.police.DTOCreatePolis;
+import org.example.crimearchive.dto.police.DTOUpdatePolis;
 import org.example.crimearchive.polis.Account;
 import org.example.crimearchive.reports.Report;
 import org.springframework.security.core.GrantedAuthority;

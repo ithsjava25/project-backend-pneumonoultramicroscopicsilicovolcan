@@ -110,15 +110,17 @@
                     <div class="upload-toolbar">
                         <button type="button"
                                 class="btn btn-secondary"
-                                th:onclick="document.getElementById('evidenceFiles').click()">
+                                onclick="document.getElementById('evidenceFiles').click()">
                             Lägg till filer
                         </button>
+                        <input type="file" id="evidenceFiles" style="display: none;">
 
                         <button type="button"
                                 class="btn btn-secondary"
                                 onclick="document.getElementById('evidenceImages').click()">
                             Lägg till bilder
                         </button>
+                        <input type="file" id="evidenceImages" style="display: none;">
                     </div>
                     <table>
                         <th:block th:each="report : ${reportList}">
