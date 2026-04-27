@@ -1,6 +1,7 @@
 package org.example.crimearchive.evidence;
 
 import jakarta.persistence.*;
+import org.example.crimearchive.audit.Auditable;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -16,7 +17,7 @@ import java.util.UUID;
                 @Index(name = "idx_evidence_file_group_id_version", columnList = "group_id, version")
         }
 )
-public class EvidenceFile {
+public class EvidenceFile extends Auditable {
 
     @Id
     @Column(nullable = false, updatable = false)

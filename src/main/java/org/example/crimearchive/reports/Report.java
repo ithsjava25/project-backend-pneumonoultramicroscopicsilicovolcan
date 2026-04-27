@@ -4,13 +4,14 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import org.example.crimearchive.audit.Auditable;
 import org.example.crimearchive.cases.Cases;
 
 import java.util.Objects;
 import java.util.UUID;
 
 @Entity
-public class Report {
+public class Report extends Auditable{
 
     @Id
     private UUID uuid;

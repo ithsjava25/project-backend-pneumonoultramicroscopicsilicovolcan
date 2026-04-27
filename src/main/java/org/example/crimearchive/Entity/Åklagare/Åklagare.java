@@ -2,10 +2,11 @@ package org.example.crimearchive.Entity.Åklagare;
 
 
 import jakarta.persistence.*;
+import org.example.crimearchive.audit.Auditable;
 
 @Entity
 @Table(name = "Åklagare")
-public class Åklagare {
+public class Åklagare extends Auditable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

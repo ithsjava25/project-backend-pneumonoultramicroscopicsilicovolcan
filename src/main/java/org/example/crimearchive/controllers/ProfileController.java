@@ -1,7 +1,7 @@
 package org.example.crimearchive.controllers;
 
 import jakarta.validation.Valid;
-import org.example.crimearchive.DTO.Polis.DTOUpdateProfile;
+import org.example.crimearchive.dto.police.DTOUpdateProfile;
 import org.example.crimearchive.cases.CaseLifecycleService;
 import org.example.crimearchive.cases.CaseService;
 import org.example.crimearchive.cases.CaseStatus;
