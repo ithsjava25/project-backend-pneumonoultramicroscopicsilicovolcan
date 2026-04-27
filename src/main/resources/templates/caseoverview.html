@@ -142,10 +142,10 @@
                             </div>
                             <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
                                 <a th:href="@{/evidence/{id}/pdf(id=${ef.id})}"
-                                   class="btn btn-secondary btn-sm" target="_blank">PDF</a>
+                                   class="btn btn-secondary btn-sm" target="_blank" rel="noopener noreferrer">PDF</a>
                                 <a th:if="${ef.s3KeyFile != null}"
                                    th:href="@{/evidence/{id}/file(id=${ef.id})}"
-                                   class="btn btn-secondary btn-sm" target="_blank">Fil</a>
+                                   class="btn btn-secondary btn-sm" target="_blank" rel="noopener noreferrer">Fil</a>
 
                                 <form method="post" th:action="@{/caseoverview/replace}"
                                       enctype="multipart/form-data" style="display:inline">
@@ -295,23 +295,35 @@
     </main>
 </div>
 <script>
-    function trackFiles(input, label) {
+    function renderPending() {
         var pending = document.getElementById('pendingFiles');
         var btn = document.getElementById('uploadSubmit');
-        Array.from(input.files).forEach(function(f) {
-            var row = document.createElement('div');
-            row.className = 'evidence-row';
-            row.innerHTML =
-                '<div class="file-meta">' +
-                '<span class="file-name">' + f.name + '</span>' +
-                '<span class="file-type">' + label + ' · ' + (f.size / 1024).toFixed(1) + ' KB</span>' +
-                '</div>';
-            pending.appendChild(row);
+        pending.innerHTML = '';
+        [
+            { input: document.getElementById('evidenceFiles'), label: 'Fil' },
+            { input: document.getElementById('evidenceImages'), label: 'Bild' }
+        ].forEach(function(entry) {
+            Array.from(entry.input.files).forEach(function(f) {
+                var row = document.createElement('div');
+                row.className = 'evidence-row';
+                var meta = document.createElement('div');
+                meta.className = 'file-meta';
+                var name = document.createElement('span');
+                name.className = 'file-name';
+                name.textContent = f.name;
+                var type = document.createElement('span');
+                type.className = 'file-type';
+                type.textContent = entry.label + ' · ' + (f.size / 1024).toFixed(1) + ' KB';
+                meta.appendChild(name);
+                meta.appendChild(type);
+                row.appendChild(meta);
+                pending.appendChild(row);
+            });
         });
-        if (pending.children.length > 0) btn.style.display = '';
+        btn.style.display = pending.children.length > 0 ? '' : 'none';
     }
-    document.getElementById('evidenceFiles').addEventListener('change', function() { trackFiles(this, 'Fil'); });
-    document.getElementById('evidenceImages').addEventListener('change', function() { trackFiles(this, 'Bild'); });
+    document.getElementById('evidenceFiles').addEventListener('change', renderPending);
+    document.getElementById('evidenceImages').addEventListener('change', renderPending);
 </script>
 </body>
 </html>

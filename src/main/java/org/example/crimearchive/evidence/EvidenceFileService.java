@@ -72,10 +72,15 @@ public class EvidenceFileService {
             UUID resolvedGroupId = groupId;
 
             if (resolvedGroupId != null) {
-                int latest = evidenceFileRepository.findTopByGroupIdOrderByVersionDesc(resolvedGroupId)
-                        .map(EvidenceFile::getVersion)
-                        .orElse(0);
-                nextVersion = latest + 1;
+                EvidenceFile latestInGroup = evidenceFileRepository.findTopByGroupIdOrderByVersionDesc(resolvedGroupId)
+                        .orElse(null);
+                if (latestInGroup != null) {
+                    if (!latestInGroup.getCaseNumber().equals(caseNumber)) {
+                        throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                                "groupId tillhör inte ärendet: " + caseNumber);
+                    }
+                    nextVersion = latestInGroup.getVersion() + 1;
+                }
             } else {
                 resolvedGroupId = UUID.randomUUID();
             }
@@ -181,8 +186,8 @@ public class EvidenceFileService {
         if (files.isEmpty()) return;
         requireCaseAccess(files.get(0).getCaseNumber(), currentUser);
         for (EvidenceFile file : files) {
-            deleteIfExists(file.getS3KeyPdf());
-            deleteIfExists(file.getS3KeyFile());
+            deleteS3Object(file.getS3KeyPdf());
+            deleteS3Object(file.getS3KeyFile());
         }
         evidenceFileRepository.deleteAll(files);
     }
@@ -224,10 +229,15 @@ public class EvidenceFileService {
         return pdfStream.toByteArray();
     }
 
+    private void deleteS3Object(String key) {
+        if (key == null) return;
+        s3Client.deleteObject(DeleteObjectRequest.builder().bucket(bucket).key(key).build());
+    }
+
     private void deleteIfExists(String key) {
         if (key == null) return;
         try {
-            s3Client.deleteObject(DeleteObjectRequest.builder().bucket(bucket).key(key).build());
+            deleteS3Object(key);
         } catch (Exception ignored) {
         }
     }
