@@ -268,7 +268,7 @@
                             <h2>Händelselogg</h2>
                         </div>
                     </div>
-                    <table th:if="${!#lists.isEmpty(events)}">
+                    <table>
                         <thead>
                             <tr>
                                 <th>Tid</th>
@@ -284,7 +284,7 @@
                             </tr>
                         </tbody>
                     </table>
-                    <p th:if="${#lists.isEmpty(events)}">Inga händelser registrerade.</p>
+                    <p th:if="${#lists.isEmpty(events)}" id="empty-msg">Inga händelser registrerade.</p>
                 </section>
             </div>
 
@@ -321,65 +321,84 @@
         </div>
     </main>
 </div>
-<script>
-      function renderPending() {                                                                                                                                                                                                                                                                 
-          var pending = document.getElementById('pendingFiles');
+<script>                                                                                                                                                                                                                                                                                       
+      function renderPending() {                            
+          var pending = document.getElementById('pendingFiles');                                                                                                                                                                                                                                 
           var btn = document.getElementById('uploadSubmit');
-          pending.innerHTML = '';
-          [
+          pending.innerHTML = '';                                                                                                                                                                                                                                                                
+          [                                                 
               { input: document.getElementById('evidenceFiles'), label: 'Fil' },
               { input: document.getElementById('evidenceImages'), label: 'Bild' }                                                                                                                                                                                                                
           ].forEach(function(entry) {
               Array.from(entry.input.files).forEach(function(f) {                                                                                                                                                                                                                                
-                  var row = document.createElement('div');                                                                                                                                                                                                                                       
+                  var row = document.createElement('div');  
                   row.className = 'evidence-row';
                   var meta = document.createElement('div');                                                                                                                                                                                                                                      
                   meta.className = 'file-meta';
-                  var name = document.createElement('span');
-                  name.className = 'file-name';
-                  name.textContent = f.name;                                                                                                                                                                                                                                                     
-                  var type = document.createElement('span');
-                  type.className = 'file-type';                                                                                                                                                                                                                                                  
-                  type.textContent = entry.label + ' · ' + (f.size / 1024).toFixed(1) + ' KB';
-                  meta.appendChild(name);                                                                                                                                                                                                                                                        
-                  meta.appendChild(type);
-                  row.appendChild(meta);                                                                                                                                                                                                                                                         
-                  pending.appendChild(row);
-              });
+                  var name = document.createElement('span');                                                                                                                                                                                                                                     
+                  name.className = 'file-name';             
+                  name.textContent = f.name;
+                  var type = document.createElement('span');                                                                                                                                                                                                                                     
+                  type.className = 'file-type';
+                  type.textContent = entry.label + ' · ' + (f.size / 1024).toFixed(1) + ' KB';                                                                                                                                                                                                   
+                  meta.appendChild(name);                   
+                  meta.appendChild(type);                                                                                                                                                                                                                                                        
+                  row.appendChild(meta);
+                  pending.appendChild(row);                                                                                                                                                                                                                                                      
+              });                                           
           });
           btn.style.display = pending.children.length > 0 ? '' : 'none';
-      }                                                                                                                                                                                                                                                                                          
+      }
       document.getElementById('evidenceFiles').addEventListener('change', renderPending);
       document.getElementById('evidenceImages').addEventListener('change', renderPending);                                                                                                                                                                                                       
-                  
+   
+      const caseNumber = /*[[${rawcasenumber}]]*/ '';                                                                                                                                                                                                                                            
+      const tbody = document.querySelector('#event-table-body');
+                                                                                                                                                                                                                                                                                                 
+      const es = new EventSource('/api/cases/' + caseNumber + '/events/stream');                                                                                                                                                                                                                 
+      es.addEventListener('case-event', function(e) {
+          const event = JSON.parse(e.data);                                                                                                                                                                                                                                                      
+          const tr = document.createElement('tr');          
+          tr.style.animation = 'highlight 2s ease-out';
+          const time = new Date(event.createdAt).toLocaleString('sv-SE', {                                                                                                                                                                                                                       
+              year: 'numeric', month: '2-digit', day: '2-digit',
+              hour: '2-digit', minute: '2-digit'                                                                                                                                                                                                                                                 
+          });                                                                                                                                                                                                                                                                                    
+          tr.innerHTML =
+              '<td>' + time + '</td>' +                                                                                                                                                                                                                                                          
+              '<td>' + event.description + '</td>' +        
+              '<td>' + event.performedBy + '</td>';
+          tbody.appendChild(tr);
+          tr.scrollIntoView({ behavior: 'smooth', block: 'nearest' });                                                                                                                                                                                                                           
+      });
+      es.onerror = function() { es.close(); };                                                                                                                                                                                                                                                   
+                                                            
       document.addEventListener('DOMContentLoaded', function() {                                                                                                                                                                                                                                 
           const casenumberInput = document.querySelector('input[name="casenumber"]');
           if (!casenumberInput) return;                                                                                                                                                                                                                                                          
+          const updateUrl = window.location.pathname + "?casenumber=" + casenumberInput.value;
                                                                                                                                                                                                                                                                                                  
-          const casenumber = casenumberInput.value;
-          const updateUrl = window.location.pathname + "?casenumber=" + casenumber;                                                                                                                                                                                                              
-                  
-          function updateDataSectors() {
-              if (document.activeElement.id === 'commentContent') return;
-              fetch(updateUrl)                                                                                                                                                                                                                                                                   
+          function updateComments() {
+              if (document.activeElement.id === 'commentContent') return;                                                                                                                                                                                                                        
+              fetch(updateUrl)                              
                   .then(response => response.text())
-                  .then(html => {                                                                                                                                                                                                                                                                
-                      const parser = new DOMParser();
+                  .then(html => {
+                      const parser = new DOMParser();                                                                                                                                                                                                                                            
                       const doc = parser.parseFromString(html, 'text/html');
-                                                                                                                                                                                                                                                                                                 
-                      const newEvents = doc.querySelector('#event-table-body');
-                      const currentEvents = document.querySelector('#event-table-body');                                                                                                                                                                                                         
-                      if (newEvents && currentEvents) currentEvents.innerHTML = newEvents.innerHTML;
-                                                                                                                                                                                                                                                                                                 
-                      const newComments = doc.querySelector('#comments-container');
-                      const currentComments = document.querySelector('#comments-container');                                                                                                                                                                                                     
-                      if (newComments && currentComments) currentComments.innerHTML = newComments.innerHTML;
-                  })                                                                                                                                                                                                                                                                             
-                  .catch(err => console.error("Kunde inte uppdatera loggar:", err));
-          }                                                                                                                                                                                                                                                                                      
-                  
-          setInterval(updateDataSectors, 15000);
+                      const newComments = doc.querySelector('#comments-container');                                                                                                                                                                                                              
+                      const currentComments = document.querySelector('#comments-container');
+                      if (newComments && currentComments) currentComments.innerHTML = newComments.innerHTML;                                                                                                                                                                                     
+                  })
+                  .catch(err => console.error("Kunde inte uppdatera kommentarer:", err));                                                                                                                                                                                                        
+          }                                                 
+          setInterval(updateComments, 15000);                                                                                                                                                                                                                                                    
       });
-  </script>
+  </script>                                                                                                                                                                                                                                                                                      
+  <style>                                                   
+      @keyframes highlight {
+          from { background-color: #fffbcc; }
+          to   { background-color: transparent; }
+      }                                                                                                                                                                                                                                                                                          
+  </style>
 </body>
 </html>

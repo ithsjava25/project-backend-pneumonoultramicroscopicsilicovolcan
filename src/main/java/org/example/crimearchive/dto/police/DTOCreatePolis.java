@@ -1,10 +1,10 @@
-package org.example.crimearchive.DTO.Polis;
+package org.example.crimearchive.dto.police;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
-public record DTOUpdatePolis(
-        Long id,
+
+public record DTOCreatePolis(
         @NotBlank(message = "Namn får inte vara tomt")
         String fullName,
         @NotBlank(message = "Yrke får inte vara tomt")
@@ -14,6 +14,11 @@ public record DTOUpdatePolis(
         @NotBlank(message = "Användarnamn får inte vara tomt")
         String username,
         String password,
+        //Fixa en validering hit istället för att ha det i service
+        @NotBlank(message = "Behörighet får inte vara tomt")
         String roles
 ) {
+        public DTOCreatePolis() {
+                this(null, null, null, null, null, null);
+        }
 }

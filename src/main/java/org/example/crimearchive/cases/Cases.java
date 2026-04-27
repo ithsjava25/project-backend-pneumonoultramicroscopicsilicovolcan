@@ -1,7 +1,8 @@
 package org.example.crimearchive.cases;
 
 import jakarta.persistence.*;
-import org.example.crimearchive.DTO.CreateReport;
+import org.example.crimearchive.audit.Auditable;
+import org.example.crimearchive.dto.CreateReport;
 import org.example.crimearchive.polis.Account;
 import org.example.crimearchive.reports.Report;
 
@@ -12,7 +13,7 @@ import java.util.Set;
 import java.util.UUID;
 
 @Entity
-public class Cases {
+public class Cases extends Auditable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long Id;

@@ -1,8 +1,8 @@
 package org.example.crimearchive.controllers;
 
 import jakarta.validation.Valid;
-import org.example.crimearchive.DTO.Polis.DTOCreatePolis;
-import org.example.crimearchive.DTO.Polis.DTOUpdatePolis;
+import org.example.crimearchive.dto.police.DTOCreatePolis;
+import org.example.crimearchive.dto.police.DTOUpdatePolis;
 import org.example.crimearchive.exceptions.PasswordValidationException;
 import org.example.crimearchive.polis.Account;
 import org.example.crimearchive.polis.UserService;

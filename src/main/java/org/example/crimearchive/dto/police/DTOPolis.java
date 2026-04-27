@@ -1,4 +1,4 @@
-package org.example.crimearchive.DTO.Polis;
+package org.example.crimearchive.dto.police;
 
 public record DTOPolis(
         long id,
