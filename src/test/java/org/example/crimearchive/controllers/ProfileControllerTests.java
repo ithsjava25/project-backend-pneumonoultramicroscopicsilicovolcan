@@ -86,13 +86,14 @@ public class ProfileControllerTests extends IntegrationBaseTest{
     }
 
     @Test
-    void userWithoutCaseAccessCannotViewCaseoverview() throws Exception{
+    void userWithoutCaseAccessCanViewCaseoverviewButRedacted() throws Exception {
         Account caseAccess = createAndSaveTestUser("user","user");
         Cases testCase = createCaseAndSave();
 
         mockMvc.perform(get("/caseoverview")
                 .with(user(caseAccess))
                 .param("casenumber", testCase.getCaseNumber()))
-                .andExpect(status().isForbidden());
+                .andExpect(status().isOk())
+                .andExpect(model().attribute("canAdd", false));
     }
 }

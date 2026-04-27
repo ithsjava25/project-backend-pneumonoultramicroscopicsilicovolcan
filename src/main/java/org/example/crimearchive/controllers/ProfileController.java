@@ -8,6 +8,7 @@ import org.example.crimearchive.cases.CaseStatus;
 import org.example.crimearchive.cases.Cases;
 import org.example.crimearchive.evidence.EvidenceFileService;
 import org.example.crimearchive.exceptions.PasswordValidationException;
+import org.example.crimearchive.permissions.PermissionService;
 import org.example.crimearchive.polis.Account;
 import org.example.crimearchive.polis.UserService;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -33,21 +34,26 @@ public class ProfileController {
     private final CaseService caseService;
     private final UserService userService;
     private final CaseLifecycleService lifecycleService;
-    private final EvidenceFileService evidenceFileService;
-
-    public ProfileController(CaseService caseService, UserService userService,
-                             CaseLifecycleService lifecycleService, EvidenceFileService evidenceFileService) {
-        this.caseService = caseService;
-        this.userService = userService;
-        this.lifecycleService = lifecycleService;
-        this.evidenceFileService = evidenceFileService;
-    }
+ private final EvidenceFileService evidenceFileService;                                                                                                                                                                                                                                     
+      private final PermissionService permissionService;                                                                                                                                                                                                                                         
+                                                                                                                                                                                                                                                                                                 
+      public ProfileController(CaseService caseService, UserService userService,                                                                                                                                                                                                                 
+                               CaseLifecycleService lifecycleService,
+                               EvidenceFileService evidenceFileService,
+                               PermissionService permissionService) {                                                                                                                                                                                                                            
+          this.caseService = caseService;
+          this.userService = userService;                                                                                                                                                                                                                                                        
+          this.lifecycleService = lifecycleService;
+          this.evidenceFileService = evidenceFileService;
+          this.permissionService = permissionService;                                                                                                                                                                                                                                            
+      }
 
 
     @GetMapping("/profile")
     public String profilePage(@AuthenticationPrincipal Account user, Model model) {
         prepareModel(model, user);
         model.addAttribute("updateProfile", userService.prefillProfileFields(user));
+        model.addAttribute("searchCases", caseService.getOpenCases(CaseStatus.CLOSED));
         return "profile";
     }
 
@@ -71,13 +77,10 @@ public class ProfileController {
     }
 
     @GetMapping("/caseoverview")
-    @PreAuthorize("@caseSecurity.canAccessCase(#casenumber, principal)")
     public String caseoverview(@AuthenticationPrincipal Account user,
                                Model model, @RequestParam String casenumber) {
         prepareModel(model, user);
-        boolean isHandler = user.getAuthorities().stream()
-                .anyMatch(ga -> ga.getAuthority().equals("ROLE_HANDLER"));
-        model.addAttribute("isHandler", isHandler);
+        model.addAttribute("canAdd", permissionService.canAccessCase(casenumber, user));
         model.addAttribute("assignedPolice", caseService.getAllPoliceForCase(casenumber));
         model.addAttribute("rawcasenumber", casenumber);
         model.addAttribute("reportList", caseService.getReportSet(casenumber));
@@ -99,7 +102,6 @@ public class ProfileController {
     }
 
     @PostMapping("/caseoverview/comment")
-    @PreAuthorize("@caseSecurity.canAccessCase(#casenumber, principal)")
     public String addComment(@RequestParam String casenumber,
                              @RequestParam String content,
                              @AuthenticationPrincipal Account user) {
@@ -168,12 +170,12 @@ public class ProfileController {
 
     private void prepareModel(Model model, Account user) {
         List<Cases> caseList = caseService.getAuthzCases(user.getId());
-        model.addAttribute("assigncasebutton", user.getAuthorities().stream()
-                .anyMatch(ga -> ga.getAuthority().equals("ROLE_HANDLER")));
         model.addAttribute("accountoverview", user.getAuthorities().stream()
                 .anyMatch(ga -> ga.getAuthority().equals("ROLE_ADMIN")));
         model.addAttribute("cases", caseService.getReportsWithCaseNumber(caseList));
         model.addAttribute("currentUser", user);
         model.addAttribute("user", user);
+        model.addAttribute("isHandler", user.getAuthorities().stream()
+                .anyMatch(ga -> ga.getAuthority().equals("ROLE_HANDLER")));
     }
 }
