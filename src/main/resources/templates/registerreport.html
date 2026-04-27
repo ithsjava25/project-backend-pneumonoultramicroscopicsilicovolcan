@@ -75,38 +75,78 @@
     </main>
 </div>
 <script>
+    var pendingList = [];
+
+    function syncInputs() {
+        var filesInput = document.getElementById('evidenceFiles');
+        var imagesInput = document.getElementById('evidenceImages');
+        var dt;
+
+        dt = new DataTransfer();
+        pendingList.filter(p => p.kind === 'Fil').forEach(p => dt.items.add(p.file));
+        filesInput.files = dt.files;
+
+        dt = new DataTransfer();
+        pendingList.filter(p => p.kind === 'Bild').forEach(p => dt.items.add(p.file));
+        imagesInput.files = dt.files;
+    }
+
     function renderPending() {
         var pending = document.getElementById('pendingFiles');
         pending.innerHTML = '';
-        [
-            { input: document.getElementById('evidenceFiles'), label: 'Fil' },
-            { input: document.getElementById('evidenceImages'), label: 'Bild' }
-        ].forEach(function(entry) {
-            Array.from(entry.input.files).forEach(function(f) {
-                var row = document.createElement('div');
-                row.className = 'evidence-row';
-                var meta = document.createElement('div');
-                meta.className = 'file-meta';
-                var name = document.createElement('span');
-                name.className = 'file-name';
-                name.textContent = f.name;
-                var type = document.createElement('span');
-                type.className = 'file-type';
-                type.textContent = entry.label + ' · ' + (f.size / 1024).toFixed(1) + ' KB';
-                meta.appendChild(name);
-                meta.appendChild(type);
-                row.appendChild(meta);
-                pending.appendChild(row);
+        pendingList.forEach(function(entry, idx) {
+            var row = document.createElement('div');
+            row.className = 'evidence-row';
+
+            var meta = document.createElement('div');
+            meta.className = 'file-meta';
+            var name = document.createElement('span');
+            name.className = 'file-name';
+            name.textContent = entry.file.name;
+            var type = document.createElement('span');
+            type.className = 'file-type';
+            type.textContent = entry.kind + ' · ' + (entry.file.size / 1024).toFixed(1) + ' KB';
+            meta.appendChild(name);
+            meta.appendChild(type);
+
+            var actions = document.createElement('div');
+            actions.style.cssText = 'display:flex;gap:6px;align-items:center';
+            var del = document.createElement('button');
+            del.type = 'button';
+            del.className = 'btn btn-danger btn-sm';
+            del.textContent = 'Ta bort';
+            del.addEventListener('click', function() {
+                pendingList.splice(idx, 1);
+                syncInputs();
+                renderPending();
             });
+            actions.appendChild(del);
+
+            row.appendChild(meta);
+            row.appendChild(actions);
+            pending.appendChild(row);
         });
     }
 
-    function clearPending() {
-        document.getElementById('pendingFiles').innerHTML = '';
+    function addFiles(kind, files) {
+        Array.from(files).forEach(function(f) {
+            pendingList.push({ kind: kind, file: f });
+        });
+        renderPending();
     }
 
-    document.getElementById('evidenceFiles').addEventListener('change', renderPending);
-    document.getElementById('evidenceImages').addEventListener('change', renderPending);
+    function clearPending() {
+        pendingList = [];
+        syncInputs();
+        renderPending();
+    }
+
+    document.getElementById('evidenceFiles').addEventListener('change', function() {
+        addFiles('Fil', this.files);
+    });
+    document.getElementById('evidenceImages').addEventListener('change', function() {
+        addFiles('Bild', this.files);
+    });
 </script>
 </body>
 </html>
