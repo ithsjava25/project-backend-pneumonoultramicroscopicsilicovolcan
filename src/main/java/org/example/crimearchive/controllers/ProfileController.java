@@ -6,6 +6,7 @@ import org.example.crimearchive.cases.CaseLifecycleService;
 import org.example.crimearchive.cases.CaseService;
 import org.example.crimearchive.cases.CaseStatus;
 import org.example.crimearchive.cases.Cases;
+import org.example.crimearchive.evidence.EvidenceFileService;
 import org.example.crimearchive.exceptions.PasswordValidationException;
 import org.example.crimearchive.permissions.PermissionService;
 import org.example.crimearchive.polis.Account;
@@ -19,7 +20,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.util.UUID;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -30,14 +34,19 @@ public class ProfileController {
     private final CaseService caseService;
     private final UserService userService;
     private final CaseLifecycleService lifecycleService;
-    private final PermissionService permissionService;
-
-    public ProfileController(CaseService caseService, UserService userService, CaseLifecycleService lifecycleService, PermissionService permissionService) {
-        this.caseService = caseService;
-        this.userService = userService;
-        this.lifecycleService = lifecycleService;
-        this.permissionService = permissionService;
-    }
+ private final EvidenceFileService evidenceFileService;                                                                                                                                                                                                                                     
+      private final PermissionService permissionService;                                                                                                                                                                                                                                         
+                                                                                                                                                                                                                                                                                                 
+      public ProfileController(CaseService caseService, UserService userService,                                                                                                                                                                                                                 
+                               CaseLifecycleService lifecycleService,
+                               EvidenceFileService evidenceFileService,
+                               PermissionService permissionService) {                                                                                                                                                                                                                            
+          this.caseService = caseService;
+          this.userService = userService;                                                                                                                                                                                                                                                        
+          this.lifecycleService = lifecycleService;
+          this.evidenceFileService = evidenceFileService;
+          this.permissionService = permissionService;                                                                                                                                                                                                                                            
+      }
 
 
     @GetMapping("/profile")
@@ -79,6 +88,7 @@ public class ProfileController {
         model.addAttribute("allStatuses", CaseStatus.values());
         model.addAttribute("events", lifecycleService.getEvents(casenumber));
         model.addAttribute("comments", lifecycleService.getComments(casenumber));
+        model.addAttribute("evidenceFiles", evidenceFileService.getLatestVersionsByCaseNumber(casenumber));
         return "caseoverview";
     }
 
@@ -101,6 +111,60 @@ public class ProfileController {
             }
             lifecycleService.addComment(casenumber, content, user.getUsername());
         }
+        return "redirect:/caseoverview?casenumber=" + URLEncoder.encode(casenumber, StandardCharsets.UTF_8);
+    }
+
+    @PostMapping("/caseoverview/upload")
+    @PreAuthorize("@caseSecurity.canAccessCase(#casenumber, principal)")
+    public String uploadEvidence(@RequestParam String casenumber,
+                                 @RequestParam(required = false) List<MultipartFile> files,
+                                 @RequestParam(required = false) List<MultipartFile> images,
+                                 @AuthenticationPrincipal Account user) {
+        String redirect = "redirect:/caseoverview?casenumber=" + URLEncoder.encode(casenumber, StandardCharsets.UTF_8);
+        try {
+            if (files != null) {
+                for (MultipartFile file : files) {
+                    if (!file.isEmpty()) {
+                        evidenceFileService.upload(casenumber, casenumber, "Uppladdad från ärendeöversikt", file, user.getUsername());
+                    }
+                }
+            }
+            if (images != null) {
+                for (MultipartFile image : images) {
+                    if (!image.isEmpty()) {
+                        evidenceFileService.upload(casenumber, casenumber, "Uppladdad från ärendeöversikt", image, user.getUsername());
+                    }
+                }
+            }
+        } catch (IOException e) {
+            return redirect + "&uploadError=1";
+        }
+        return redirect;
+    }
+
+    @PostMapping("/caseoverview/replace")
+    @PreAuthorize("@caseSecurity.canAccessCase(#casenumber, principal)")
+    public String replaceEvidence(@RequestParam String casenumber,
+                                  @RequestParam UUID groupId,
+                                  @RequestParam MultipartFile file,
+                                  @AuthenticationPrincipal Account user) {
+        String redirect = "redirect:/caseoverview?casenumber=" + URLEncoder.encode(casenumber, StandardCharsets.UTF_8);
+        try {
+            if (!file.isEmpty()) {
+                evidenceFileService.upload(casenumber, casenumber, "Ersatt från ärendeöversikt", file, user.getUsername(), groupId);
+            }
+        } catch (IOException e) {
+            return redirect + "&uploadError=1";
+        }
+        return redirect;
+    }
+
+    @PostMapping("/caseoverview/delete")
+    @PreAuthorize("@caseSecurity.canAccessCase(#casenumber, principal)")
+    public String deleteEvidence(@RequestParam String casenumber,
+                                 @RequestParam UUID groupId,
+                                 @AuthenticationPrincipal Account user) {
+        evidenceFileService.deleteGroup(groupId, user);
         return "redirect:/caseoverview?casenumber=" + URLEncoder.encode(casenumber, StandardCharsets.UTF_8);
     }
 

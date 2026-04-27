@@ -12,7 +12,7 @@ public record EvidenceFileResponse(
         String uploadedBy,
         LocalDateTime uploadedAt
 ) {
-    static EvidenceFileResponse from(EvidenceFile e) {
+    public static EvidenceFileResponse from(EvidenceFile e) {
         return new EvidenceFileResponse(
                 e.getId(), e.getGroupId(), e.getVersion(), e.getCaseNumber(),
                 e.getOriginalFilename(), e.getUploadedBy(), e.getUploadedAt()

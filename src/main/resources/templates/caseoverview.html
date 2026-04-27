@@ -112,33 +112,71 @@
                         </div>
                     </div>
 
-                    <div class="upload-toolbar">
-                        <button type="button"
-                                class="btn btn-secondary"
-                                th:disabled="${!hasAccess}"
-                                th:onclick="document.getElementById('evidenceFiles').click()">
-                            Lägg till filer
-                        </button>
-
-                        <button type="button"
-                                class="btn btn-secondary"
-                                th:disabled="${!hasAccess}"
-                                th:onclick="document.getElementById('evidenceImages').click()">
-                            Lägg till bilder
-                        </button>
-                    </div>
-                    <table>
-                        <th:block th:each="report : ${reportList}">
-                            <tr>
-                                <th class="file-name" th:text="${report.getEvent()}"></th>
-                            </tr>
-                            <tr class="table description">
-                                <td>
-                                    <span class="file-type">Beskrivning i text, eller om det är en pdf/bild -&gt; länk</span>
-                                </td>
-                            </tr>
-                        </th:block>
-                    </table>
+ <form method="post" th:action="@{/caseoverview/upload}" enctype="multipart/form-data">                                                                                                                                                                                     
+                          <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                          <input type="hidden" name="casenumber" th:value="${rawcasenumber}">                                                                                                                                                                                                    
+                          <input type="file" id="evidenceFiles" name="files" multiple hidden>
+                          <input type="file" id="evidenceImages" name="images" accept="image/*" multiple hidden>                                                                                                                                                                                 
+                  
+                          <div class="upload-toolbar">                                                                                                                                                                                                                                           
+                              <button type="button" class="btn btn-secondary"
+                                      onclick="document.getElementById('evidenceFiles').click()">                                                                                                                                                                                                
+                                  Lägg till filer
+                              </button>                                                                                                                                                                                                                                                          
+                              <button type="button" class="btn btn-secondary"
+                                      onclick="document.getElementById('evidenceImages').click()">                                                                                                                                                                                               
+                                  Lägg till bilder
+                              </button>                                                                                                                                                                                                                                                          
+                              <button type="submit" id="uploadSubmit" class="btn btn-primary" style="display:none">
+                                  Ladda upp                                                                                                                                                                                                                                                      
+                              </button>
+                          </div>                                                                                                                                                                                                                                                                 
+                  
+                          <div id="pendingFiles" class="evidence-list"></div>                                                                                                                                                                                                                    
+                      </form>
+                                                                                                                                                                                                                                                                                                 
+                      <div class="evidence-list" th:if="${not #lists.isEmpty(evidenceFiles)}" style="margin-top: 8px;">                                                                                                                                                                          
+                          <div th:each="ef : ${evidenceFiles}" class="evidence-row">
+                              <div class="file-meta">                                                                                                                                                                                                                                            
+                                  <span class="file-name"
+                                        th:text="${ef.originalFilename != null ? ef.originalFilename : 'Okänd fil'}">                                                                                                                                                                            
+                                  </span>                                                                                                                                                                                                                                                        
+                                  <span class="file-type"
+                                        th:text="|Uppladdad av ${ef.uploadedBy} · ${#temporals.format(ef.uploadedAt, 'yyyy-MM-dd HH:mm')}|">                                                                                                                                                     
+                                  </span>                                                                                                                                                                                                                                                        
+                              </div>
+                              <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">                                                                                                                                                                                               
+                                  <a th:href="@{/evidence/{id}/pdf(id=${ef.id})}"                                                                                                                                                                                                                
+                                     class="btn btn-secondary btn-sm" target="_blank" rel="noopener noreferrer">PDF</a>                                                                                                                                                                          
+                                  <a th:if="${ef.s3KeyFile != null}"                                                                                                                                                                                                                             
+                                     th:href="@{/evidence/{id}/file(id=${ef.id})}"                                                                                                                                                                                                               
+                                     class="btn btn-secondary btn-sm" target="_blank" rel="noopener noreferrer">Fil</a>                                                                                                                                                                          
+                                                                                                                                                                                                                                                                                                 
+                                  <form method="post" th:action="@{/caseoverview/replace}"                                                                                                                                                                                                       
+                                        enctype="multipart/form-data" style="display:inline">
+                                      <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>                                                                                                                                                                          
+                                      <input type="hidden" name="casenumber" th:value="${rawcasenumber}">
+                                      <input type="hidden" name="groupId" th:value="${ef.groupId}">                                                                                                                                                                                              
+                                      <input type="file" name="file" th:id="'replace_' + ${ef.groupId}" hidden
+                                             onchange="this.form.submit()">                                                                                                                                                                                                                      
+                                      <label th:for="'replace_' + ${ef.groupId}"
+                                             class="btn btn-secondary btn-sm" style="cursor:pointer;margin:0">Ersätt</label>                                                                                                                                                                     
+                                  </form>
+                                                                                                                                                                                                                                                                                                 
+                                  <form method="post" th:action="@{/caseoverview/delete}" style="display:inline">
+                                      <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>                                                                                                                                                                          
+                                      <input type="hidden" name="casenumber" th:value="${rawcasenumber}">                                                                                                                                                                                        
+                                      <input type="hidden" name="groupId" th:value="${ef.groupId}">
+                                      <button type="submit" class="btn btn-danger btn-sm"                                                                                                                                                                                                        
+                                              onclick="return confirm('Ta bort filen permanent?')">Ta bort</button>                                                                                                                                                                              
+                                  </form>
+                              </div>                                                                                                                                                                                                                                                             
+                          </div>
+                      </div>
+                    <p th:if="${#lists.isEmpty(evidenceFiles)}"
+                       style="color: var(--muted); font-size: 0.95rem; margin-top: 8px;">
+                        Inga filer uppladdade ännu.
+                    </p>
                 </section>
             </div>
 
@@ -283,46 +321,65 @@
         </div>
     </main>
 </div>
-<script th:inline="javascript">
-    document.addEventListener('DOMContentLoaded', function() {
-        // Hämta casenumber från det dolda fältet i ditt formulär
-        const casenumberInput = document.querySelector('input[name="casenumber"]');
-
-        if (!casenumberInput) {
-            console.warn("Kunde inte hitta casenumber för auto-uppdatering.");
-            return;
-        }
-
-        const casenumber = casenumberInput.value;
-        const updateUrl = window.location.pathname + "?casenumber=" + casenumber;
-
-        function updateDataSectors() {
-            if (document.activeElement.id === 'commentContent') return;
-
-            fetch(updateUrl)
-                .then(response => response.text())
-                .then(html => {
-                    const parser = new DOMParser();
-                    const doc = parser.parseFromString(html, 'text/html');
-
-                    const newEvents = doc.querySelector('#event-table-body');
-                    const currentEvents = document.querySelector('#event-table-body');
-                    if (newEvents && currentEvents) {
-                        currentEvents.innerHTML = newEvents.innerHTML;
-                    }
-
-                    const newComments = doc.querySelector('#comments-container');
-                    const currentComments = document.querySelector('#comments-container');
-                    if (newComments && currentComments) {
-                        currentComments.innerHTML = newComments.innerHTML;
-                    }
-
-                })
-                .catch(err => console.error("Kunde inte uppdatera loggar:", err));
-        }
-
-        setInterval(updateDataSectors, 15000);
-    });
-</script>
+<script>
+      function renderPending() {                                                                                                                                                                                                                                                                 
+          var pending = document.getElementById('pendingFiles');
+          var btn = document.getElementById('uploadSubmit');
+          pending.innerHTML = '';
+          [
+              { input: document.getElementById('evidenceFiles'), label: 'Fil' },
+              { input: document.getElementById('evidenceImages'), label: 'Bild' }                                                                                                                                                                                                                
+          ].forEach(function(entry) {
+              Array.from(entry.input.files).forEach(function(f) {                                                                                                                                                                                                                                
+                  var row = document.createElement('div');                                                                                                                                                                                                                                       
+                  row.className = 'evidence-row';
+                  var meta = document.createElement('div');                                                                                                                                                                                                                                      
+                  meta.className = 'file-meta';
+                  var name = document.createElement('span');
+                  name.className = 'file-name';
+                  name.textContent = f.name;                                                                                                                                                                                                                                                     
+                  var type = document.createElement('span');
+                  type.className = 'file-type';                                                                                                                                                                                                                                                  
+                  type.textContent = entry.label + ' · ' + (f.size / 1024).toFixed(1) + ' KB';
+                  meta.appendChild(name);                                                                                                                                                                                                                                                        
+                  meta.appendChild(type);
+                  row.appendChild(meta);                                                                                                                                                                                                                                                         
+                  pending.appendChild(row);
+              });
+          });
+          btn.style.display = pending.children.length > 0 ? '' : 'none';
+      }                                                                                                                                                                                                                                                                                          
+      document.getElementById('evidenceFiles').addEventListener('change', renderPending);
+      document.getElementById('evidenceImages').addEventListener('change', renderPending);                                                                                                                                                                                                       
+                  
+      document.addEventListener('DOMContentLoaded', function() {                                                                                                                                                                                                                                 
+          const casenumberInput = document.querySelector('input[name="casenumber"]');
+          if (!casenumberInput) return;                                                                                                                                                                                                                                                          
+                                                                                                                                                                                                                                                                                                 
+          const casenumber = casenumberInput.value;
+          const updateUrl = window.location.pathname + "?casenumber=" + casenumber;                                                                                                                                                                                                              
+                  
+          function updateDataSectors() {
+              if (document.activeElement.id === 'commentContent') return;
+              fetch(updateUrl)                                                                                                                                                                                                                                                                   
+                  .then(response => response.text())
+                  .then(html => {                                                                                                                                                                                                                                                                
+                      const parser = new DOMParser();
+                      const doc = parser.parseFromString(html, 'text/html');
+                                                                                                                                                                                                                                                                                                 
+                      const newEvents = doc.querySelector('#event-table-body');
+                      const currentEvents = document.querySelector('#event-table-body');                                                                                                                                                                                                         
+                      if (newEvents && currentEvents) currentEvents.innerHTML = newEvents.innerHTML;
+                                                                                                                                                                                                                                                                                                 
+                      const newComments = doc.querySelector('#comments-container');
+                      const currentComments = document.querySelector('#comments-container');                                                                                                                                                                                                     
+                      if (newComments && currentComments) currentComments.innerHTML = newComments.innerHTML;
+                  })                                                                                                                                                                                                                                                                             
+                  .catch(err => console.error("Kunde inte uppdatera loggar:", err));
+          }                                                                                                                                                                                                                                                                                      
+                  
+          setInterval(updateDataSectors, 15000);
+      });
+  </script>
 </body>
 </html>
