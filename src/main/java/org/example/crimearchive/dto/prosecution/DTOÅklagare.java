@@ -1,4 +1,4 @@
-package org.example.crimearchive.dto.Åklagare;
+package org.example.crimearchive.dto.prosecution;
 
 public record DTOÅklagare(
         long id,
