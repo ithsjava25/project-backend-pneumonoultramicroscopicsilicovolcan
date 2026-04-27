@@ -2,29 +2,111 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Registrera ärende</title>
+    <link rel="stylesheet" th:href="@{/style.css}">
 </head>
 <body>
-<h1>Här kan bara användare med rollen Admin lägga till raporter</h1>
-<form th:action="@{/reports/add}" th:object="${newReport}" method="post" enctype="multipart/form-data">
-    <label for="reason">Brottstyp</label>
-    <input id="reason" th:field="*{event}">
-    <span th:if="${#fields.hasErrors('event')}" th:errors="*{event}"></span><br/>
+<div class="durtre-shell">
+    <main class="page-wrap">
+        <div class="report-grid">
+            <div class="report-column">
+                <section class="card">
+                    <div class="card-header">
+                        <div>
+                            <span class="card-kicker">Nytt ärende</span>
+                            <h2>Registrera rapport</h2>
+                        </div>
+                    </div>
 
-    <label for="name">Namn</label>
-    <input id="name" th:field="*{name}">
-    <span th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></span><br/>
+                    <form th:action="@{/reports/add}" th:object="${newReport}" method="post" enctype="multipart/form-data">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
 
-    <label for="case">K-Nummer</label>
-    <input id="case" th:field="*{caseNumber}">
-    <span th:if="${#fields.hasErrors('caseNumber')}" th:errors="*{caseNumber}"></span><br/>
+                        <div class="field-grid">
+                            <div class="form-field">
+                                <label for="reason">Brottstyp</label>
+                                <input id="reason" th:field="*{event}">
+                                <span th:if="${#fields.hasErrors('event')}" th:errors="*{event}" style="color:red;font-size:0.85rem;"></span>
+                            </div>
 
-    <label for="file">Bifoga fil</label>
-    <input id="file" type="file" name="file"><br/>
+                            <div class="form-field">
+                                <label for="name">Namn</label>
+                                <input id="name" th:field="*{name}">
+                                <span th:if="${#fields.hasErrors('name')}" th:errors="*{name}" style="color:red;font-size:0.85rem;"></span>
+                            </div>
 
-    <button type="submit">Spara</button>
-    <button type="reset">Avbryt</button>
-</form>
-<a href="/userpage">Gå till använar sida</a>
+                            <div class="form-field">
+                                <label for="case">K-Nummer</label>
+                                <input id="case" th:field="*{caseNumber}">
+                                <span th:if="${#fields.hasErrors('caseNumber')}" th:errors="*{caseNumber}" style="color:red;font-size:0.85rem;"></span>
+                            </div>
+                        </div>
+
+                        <div class="card-header" style="margin-top: 20px;">
+                            <div>
+                                <span class="card-kicker">Material</span>
+                                <h2>Bifoga bevis</h2>
+                            </div>
+                        </div>
+
+                        <input type="file" id="evidenceFiles" name="files" multiple hidden>
+                        <input type="file" id="evidenceImages" name="images" accept="image/*" multiple hidden>
+
+                        <div class="upload-toolbar">
+                            <button type="button" class="btn btn-secondary"
+                                    onclick="document.getElementById('evidenceFiles').click()">
+                                Lägg till filer
+                            </button>
+                            <button type="button" class="btn btn-secondary"
+                                    onclick="document.getElementById('evidenceImages').click()">
+                                Lägg till bilder
+                            </button>
+                        </div>
+
+                        <div id="pendingFiles" class="evidence-list"></div>
+
+                        <div style="margin-top: 16px; display: flex; gap: 8px;">
+                            <button type="submit" class="btn btn-primary">Spara</button>
+                            <button type="reset" class="btn btn-secondary" onclick="clearPending()">Avbryt</button>
+                        </div>
+                    </form>
+                </section>
+            </div>
+        </div>
+    </main>
+</div>
+<script>
+    function renderPending() {
+        var pending = document.getElementById('pendingFiles');
+        pending.innerHTML = '';
+        [
+            { input: document.getElementById('evidenceFiles'), label: 'Fil' },
+            { input: document.getElementById('evidenceImages'), label: 'Bild' }
+        ].forEach(function(entry) {
+            Array.from(entry.input.files).forEach(function(f) {
+                var row = document.createElement('div');
+                row.className = 'evidence-row';
+                var meta = document.createElement('div');
+                meta.className = 'file-meta';
+                var name = document.createElement('span');
+                name.className = 'file-name';
+                name.textContent = f.name;
+                var type = document.createElement('span');
+                type.className = 'file-type';
+                type.textContent = entry.label + ' · ' + (f.size / 1024).toFixed(1) + ' KB';
+                meta.appendChild(name);
+                meta.appendChild(type);
+                row.appendChild(meta);
+                pending.appendChild(row);
+            });
+        });
+    }
+
+    function clearPending() {
+        document.getElementById('pendingFiles').innerHTML = '';
+    }
+
+    document.getElementById('evidenceFiles').addEventListener('change', renderPending);
+    document.getElementById('evidenceImages').addEventListener('change', renderPending);
+</script>
 </body>
 </html>
