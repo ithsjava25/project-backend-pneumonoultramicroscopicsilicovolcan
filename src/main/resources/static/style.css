@@ -320,6 +320,10 @@ textarea {
     gap: 8px;
 }
 
+.form-field.compact {
+    margin-bottom: 1.25rem;
+}
+
 .form-field label {
     font-size: 0.98rem;
     font-weight: 700;
