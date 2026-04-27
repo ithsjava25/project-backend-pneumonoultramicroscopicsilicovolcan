@@ -16,6 +16,8 @@ public class Report {
     private UUID uuid;
     private String name;
     private String event;
+    private String witness;
+    private String victim;
     @ManyToOne
     @JoinColumn(name = "case_id")
     private Cases caseEntity;
@@ -31,18 +33,18 @@ public class Report {
     public Report() {
     }
 
-    public Report(UUID id, String name, String event, Cases caseEntity) {
+    public Report(UUID id, String name, String event, String witness, String victim, Cases caseEntity) {
         this.uuid = id;
         this.name = name;
         this.event = event;
+        this.witness = witness;
+        this.victim = victim;
         this.caseEntity = caseEntity;
     }
 
     public Report(UUID id, String name, String event) {
-        this(id, name, event, (Cases) null);
+        this(id, name, event, null, null, null);
     }
-
-
 
     public UUID getUuid() {
         return uuid;
@@ -60,9 +62,15 @@ public class Report {
         this.name = name;
     }
 
-    public String getEvent() {
-        return event;
-    }
+    public String getEvent() { return event; }
+
+    public String getWitness() { return witness; }
+
+    public void setWitness(String witness) { this.witness = witness; }
+
+    public String getVictim() { return victim; }
+
+    public void setVictim(String victim) { this.victim = victim; }
 
     public void setEvent(String event) {
         this.event = event;

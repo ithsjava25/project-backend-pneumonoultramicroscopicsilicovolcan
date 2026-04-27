@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="sv" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DurTre - Skapa nytt ärende</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body class="durtre-body">
+
+<div class="durtre-shell">
+
+    <header class="topbar">
+        <div class="brand">
+            <img th:src="@{/images/police-logo-color.png}"
+                 src="/images/police-logo-color.png"
+                 alt="Polislogga"
+                 class="brand-logo">
+
+            <div class="brand-text">
+                <div class="brand-title-row">
+                    <span class="brand-title">DurTre</span>
+                    <span class="brand-subtitle">Polismyndigheten</span>
+                </div>
+                <span class="brand-tagline">Skapa och registrera ärenden</span>
+            </div>
+        </div>
+
+        <div class="topbar-user">
+            <div th:if="${accountoverview}">
+                <form th:action="@{/accounts}" method="get">
+                    <button class="user-chip" type="submit" style="cursor: pointer">
+                        Kontoöversikt
+                    </button>
+                </form>
+            </div>
+
+            <div th:if="${assigncasebutton}">
+                <form th:action="@{/cases}" method="get">
+                    <button class="user-chip" type="submit" style="cursor: pointer">
+                        Tilldelning
+                    </button>
+                </form>
+            </div>
+
+            <span class="user-chip"
+                  th:text="${currentUser?.fullName}"
+                  th:onclick="location.href='/profile'"
+                  style="cursor: pointer">
+    </span>
+
+            <form th:action="@{/logout}" method="post">
+                <input type="hidden"
+                       th:name="${_csrf.parameterName}"
+                       th:value="${_csrf.token}"/>
+                <button type="submit" class="user-chip" style="cursor: pointer">
+                    Logga ut
+                </button>
+            </form>
+        </div>
+    </header>
+
+    <div class="meta-strip">
+    <span>Inloggad som:
+        <strong th:text="${currentUser?.username}">demouser</strong>
+    </span>
+
+        <span>Roll:
+        <strong th:text="${currentUser?.profession}">Polis</strong>
+    </span>
+
+        <span>Avdelning:
+        <strong th:text="${currentUser?.department}">Centrum</strong>
+    </span>
+
+    </div>
+
+    <main class="page-wrap">
+        <form id="caseForm"
+              class="report-form"
+              th:action="@{/reports}"
+              th:object="${newReport}"
+              method="post"
+              enctype="multipart/form-data">
+
+            <input type="hidden"
+                   th:name="${_csrf.parameterName}"
+                   th:value="${_csrf.token}"/>
+
+            <input id="files" name="files" type="file" multiple hidden>
+            <input id="images" name="images" type="file" accept="image/*" multiple hidden>
+
+            <div class="report-grid">
+
+                <div class="report-column">
+                    <section class="card">
+                        <div class="card-header">
+                            <div>
+                                <span class="card-kicker">Ärende</span>
+                                <h2>K-nummer & Polis</h2>
+                            </div>
+                        </div>
+
+                        <div class="field-grid">
+                            <div class="form-field">
+                                <label for="caseNumber">K-nummer</label>
+                                <input id="caseNumber"
+                                       type="text"
+                                       value="Genereras automatiskt"
+                                       readonly>
+                            </div>
+                            <div class="form-field">
+                                <label for="policeOfficer">Polis</label>
+                                <input id="policeOfficer"
+                                       th:field="*{name}"
+                                       type="text"
+                                       placeholder="Ange polis"
+                                       th:classappend="${#fields.hasErrors('name')} ? 'input-error'">
+
+                                <div th:if="${#fields.hasErrors('name')}"
+                                     th:errors="*{name}"
+                                     class="error-text">
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="card">
+                        <div class="card-header">
+                            <div>
+                                <span class="card-kicker">Material</span>
+                                <h2>Bevis</h2>
+                            </div>
+                        </div>
+
+                        <div class="upload-toolbar">
+                            <button type="button"
+                                    class="btn btn-secondary"
+                                    onclick="document.getElementById('files').click()">
+                                Lägg till filer
+                            </button>
+
+                            <button type="button"
+                                    class="btn btn-secondary"
+                                    onclick="document.getElementById('images').click()">
+                                Lägg till bilder
+                            </button>
+                        </div>
+
+                        <div class="evidence-list" id="evidenceList"></div>
+
+                    </section>
+                </div>
+
+                <div class="report-column">
+                    <section class="card">
+                        <div class="card-header">
+                            <div>
+                                <span class="card-kicker">Personer</span>
+                                <h2>Vittne & Offer</h2>
+                            </div>
+                        </div>
+
+                        <div class="field-grid two-columns">
+                            <div class="form-field">
+                                <label for="witness">Vittne</label>
+                                <input id="witness"
+                                       th:field="*{witness}"
+                                       type="text"
+                                       placeholder="Ange namn på vittne"
+                                       th:classappend="${#fields.hasErrors('witness')} ? 'input-error'">
+
+                                <div th:if="${#fields.hasErrors('witness')}"
+                                     th:errors="*{witness}"
+                                     class="error-text">
+                                </div>
+                            </div>
+
+                            <div class="form-field">
+                                <label for="victim">Offer</label>
+                                <input id="victim"
+                                       th:field="*{victim}"
+                                       type="text"
+                                       placeholder="Ange namn på offer"
+                                       th:classappend="${#fields.hasErrors('victim')} ? 'input-error'">
+
+                                <div th:if="${#fields.hasErrors('victim')}"
+                                     th:errors="*{victim}"
+                                     class="error-text">
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="card">
+                        <div class="card-header">
+                            <div>
+                                <span class="card-kicker">Plats</span>
+                                <h2>Brottsplats</h2>
+                            </div>
+                        </div>
+
+                        <div class="form-field">
+                            <label for="crimeScene">Brottsplats</label>
+                            <input id="crimeScene"
+                                   th:field="*{event}"
+                                   type="text"
+                                   placeholder="Ange brottsplats"
+                                   th:classappend="${#fields.hasErrors('event')} ? 'input-error'">
+
+                            <div th:if="${#fields.hasErrors('event')}"
+                                 th:errors="*{event}"
+                                 class="error-text">
+                            </div>
+                        </div>
+                    </section>
+                    <div class="form-actions">
+                        <button type="submit" form="caseForm" class="btn btn-primary">
+                            Registrera ärende
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </form>
+    </main>
+
+</div>
+
+<script>
+    const fileInput = document.getElementById("files");
+    const imageInput = document.getElementById("images");
+    const evidenceList = document.getElementById("evidenceList");
+
+    let selectedFiles = [];
+    let selectedImages = [];
+
+    function updateInput(input, filesArray) {
+        const dt = new DataTransfer();
+        filesArray.forEach(file => dt.items.add(file));
+        input.files = dt.files;
+    }
+
+    function isDuplicate(file, list) {
+        return list.some(f => f.name === file.name && f.size === file.size);
+    }
+
+    function renderList(label, filesArray, type) {
+        const section = document.createElement("div");
+        section.classList.add("evidence-section");
+
+        const title = document.createElement("strong");
+        title.textContent = label;
+        section.appendChild(title);
+
+        const list = document.createElement("ul");
+
+        filesArray.forEach((file, index) => {
+            const li = document.createElement("li");
+
+            const text = document.createElement("span");
+            text.textContent = file.name;
+
+            const removeBtn = document.createElement("button");
+            removeBtn.textContent = "❌";
+            removeBtn.style.marginLeft = "10px";
+            removeBtn.type = "button";
+            removeBtn.setAttribute("aria-label", `Ta bort ${file.name}`);
+
+            removeBtn.onclick = () => {
+                if (type === "file") {
+                    selectedFiles.splice(index, 1);
+                    updateInput(fileInput, selectedFiles);
+                } else {
+                    selectedImages.splice(index, 1);
+                    updateInput(imageInput, selectedImages);
+                }
+                renderAll();
+            };
+
+            li.appendChild(text);
+            li.appendChild(removeBtn);
+            list.appendChild(li);
+        });
+
+        section.appendChild(list);
+        return section;
+    }
+
+    function renderAll() {
+        evidenceList.innerHTML = "";
+
+        if (selectedFiles.length > 0) {
+            evidenceList.appendChild(renderList("Filer:", selectedFiles, "file"));
+        }
+
+        if (selectedImages.length > 0) {
+            evidenceList.appendChild(renderList("Bilder:", selectedImages, "image"));
+        }
+    }
+
+    fileInput.addEventListener("change", () => {
+        const newFiles = Array.from(fileInput.files);
+
+        newFiles.forEach(file => {
+            if (!isDuplicate(file, selectedFiles)) {
+                selectedFiles.push(file);
+            }
+        });
+
+        updateInput(fileInput, selectedFiles);
+        renderAll();
+    });
+
+    imageInput.addEventListener("change", () => {
+        const newImages = Array.from(imageInput.files);
+
+        newImages.forEach(file => {
+            if (!isDuplicate(file, selectedImages)) {
+                selectedImages.push(file);
+            }
+        });
+
+        updateInput(imageInput, selectedImages);
+        renderAll();
+    });
+</script>
+
+</body>
+</html>
