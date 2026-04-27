@@ -38,7 +38,7 @@ public class HomeController {
 
     @GetMapping("/")
     public String indexPage(Model model) {
-        return "index";
+        return "redirect:/profile";
     }
 
     @GetMapping("/reports")
