@@ -36,9 +36,6 @@
         <span>Inloggad som: <strong th:text="${currentUser.getUsername()}"></strong></span>
         <span>Roll: <strong th:text="${currentUser.getProfession()}"></strong></span>
         <span>Avdelning: <strong th:text="${currentUser.getDepartment()}"></strong></span>
-        <span>Aktiv databas: <strong>TESTMILJÖ</strong></span>
-        <span>Senast uppdaterad: <strong>2026-03-14 10:03</strong></span>
-
     </div>
 
     <div>
@@ -51,14 +48,20 @@
             <tr>
                 <th>K-Nummer</th>
                 <th>Status</th>
-                <th>Antal utredare</th>
+                <th>Utredare</th>
             </tr>
             </thead>
             <tbody>
             <tr th:each="case : ${allcases}">
                 <td th:text="${case.getCaseNumber()}"></td>
                 <td th:text="${case.getStatus()}"></td>
-                <td th:text="${case.getAccounts().size()}"></td>
+                <td>
+                    <ul>
+                        <li th:each="police : ${case.getAccounts()}">
+                            <span th:text="${police.getFullName()}"> </span>
+                        </li>
+                    </ul>
+                </td>
                 <td>
                     <form method="post" th:action="@{/cases/add}" style="display: flex">
                         <input type="hidden" name="case_number" th:value="${case.getCaseNumber()}">

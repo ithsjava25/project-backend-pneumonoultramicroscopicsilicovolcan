@@ -50,6 +50,9 @@ public class S3Config {
                         AwsBasicCredentials.create(accessKey, secretKey)
                 ))
                 .region(Region.US_EAST_1)
+                .serviceConfiguration(software.amazon.awssdk.services.s3.S3Configuration.builder()
+                        .pathStyleAccessEnabled(true)
+                        .build())
                 .build();
     }
 

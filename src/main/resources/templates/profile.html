@@ -30,7 +30,7 @@
                     <button class="user-chip" type="submit" style="cursor: pointer">Konto översikt</button>
                 </form>
             </div>
-            <div th:if="${assigncasebutton}">
+            <div th:if="${isHandler}">
                 <form th:action="@{/cases}" method="get">
                     <button class="user-chip" type="submit" style="cursor: pointer">Tilldelning</button>
                 </form>
@@ -47,60 +47,90 @@
         <span>Inloggad som: <strong th:text="${currentUser.getUsername()}"></strong></span>
         <span>Roll: <strong th:text="${currentUser.getProfession()}"></strong></span>
         <span>Avdelning: <strong th:text="${currentUser.getDepartment()}"></strong></span>
-        <span>Aktiv databas: <strong>TESTMILJÖ</strong></span>
-        <span>Senast uppdaterad: <strong>2026-03-14 10:03</strong></span>
-
         <button th:onclick="location.href='/reports'" class="btn btn-primary meta-strip-button">
             Registrera ärende
         </button>
     </div>
     <div class="report-grid">
-    <div class="report-column">
-        <div class="card">
-            <h3>Tilldelade fall</h3>
-            <table>
-                <thead>
-                <th><span>K-Nummber</span></th>
-                <th><span>Antal kopplade rapporter</span></th>
-                </thead>
-                <tbody>
-                <tr th:if="${cases.isEmpty()}">
-                    <td colspan="2">Inga befogade fall</td>
-                </tr>
-                <tr th:each="entry : ${cases}">
-                    <td><span th:text="${entry.key}"></span></td>
-                    <td>
-                        <span th:text="${entry.value.size()}"></span>
-                    </td>
-                    <td>
-                        <a th:href="@{/caseoverview(casenumber=${entry.key})}">Översikt</a>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-    <div class="report-column">
-        <div class="card">
-            <div class="card-header">
-                <span class="card-kicker">Konto uppgifter</span>
-                <label for="enableEdit" class="card-kicker">
-                    <input type="checkbox" id="enableEdit" autocomplete="off"> Redigera profil
-                </label>
+        <div class="report-column">
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-kicker">Tilldelade fall</span>
+                </div>
+                <table>
+                    <thead>
+                    <th><span>K-Nummber</span></th>
+                    <th><span>Antal kopplade rapporter</span></th>
+                    </thead>
+                    <tbody>
+                    <tr th:if="${cases.isEmpty()}">
+                        <td colspan="3">Inga befogade fall</td>
+                    </tr>
+                    <tr th:each="entry : ${cases}">
+                        <td><span th:text="${entry.key}"></span></td>
+                        <td>
+                            <span th:text="${entry.value.size()}"></span>
+                        </td>
+                        <td>
+                            <a th:href="@{/caseoverview(casenumber=${entry.key})}">Översikt</a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
             </div>
-            <div class="field-grid">
-                <form id="profileForm" th:object="${updateProfile}" th:action="@{/profile/update}" method="post">
-                    <input th:field="*{fullname}" type="text" disabled>
-                    <input th:field="*{password}" type="password" placeholder="Ange nytt lösenord" disabled>
-                    <button class="btn-primary" type="submit" id="submitBtn" disabled>Spara uppdatering</button>
-                    <div>
-                        <span th:if="${#fields.hasErrors('fullname')}" th:errors="*{fullname}"></span>
-                        <span th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></span>
-                    </div>
-                </form>
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-kicker">Öppna fall</span>
+                </div>
+                <table>
+                    <thead>
+                    <th>K-nummner</th>
+                    <th>Status</th>
+                    <th>Antal uppdateringar</th>
+                    </thead>
+                    <tbody>
+                    <tr th:if="${searchCases == null || searchCases.isEmpty()}">
+                        <td colspan="4">Inga fall tillgängliga</td>
+                    </tr>
+                    <tr th:each="cases : ${searchCases}">
+                        <td>
+                            <span th:text="${cases.getCaseNumber()}"></span>
+                        </td>
+                        <td>
+                            <span th:text="${cases.getStatus()}"></span>
+                        </td>
+                        <td>
+                            <span th:text="${cases.getEvents().size()}"></span>
+                        </td>
+                        <td>
+                            <a th:href="@{/caseoverview(casenumber=${cases.getCaseNumber()})}">Översikt</a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
-    </div>
+        <div class="report-column">
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-kicker">Konto uppgifter</span>
+                    <label for="enableEdit" class="card-kicker">
+                        <input type="checkbox" id="enableEdit" autocomplete="off"> Redigera profil
+                    </label>
+                </div>
+                <div class="field-grid">
+                    <form id="profileForm" th:object="${updateProfile}" th:action="@{/profile/update}" method="post">
+                        <input th:field="*{fullname}" type="text" disabled>
+                        <input th:field="*{password}" type="password" placeholder="Ange nytt lösenord" disabled>
+                        <button class="btn-primary" type="submit" id="submitBtn" disabled>Spara uppdatering</button>
+                        <div>
+                            <span th:if="${#fields.hasErrors('fullname')}" th:errors="*{fullname}"></span>
+                            <span th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></span>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 </body>

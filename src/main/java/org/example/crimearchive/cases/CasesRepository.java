@@ -27,4 +27,6 @@ public interface CasesRepository extends ListCrudRepository<Cases, Long> {
 
 
     List<Cases> findByAccountsId(Long accountId);
+
+    List<Cases> findAllByStatusNot(CaseStatus status);
 }
