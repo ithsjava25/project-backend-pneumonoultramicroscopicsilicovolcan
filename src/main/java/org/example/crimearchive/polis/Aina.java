@@ -1,6 +1,7 @@
 package org.example.crimearchive.polis;
 
 import jakarta.persistence.*;
+import org.example.crimearchive.audit.Auditable;
 import org.example.crimearchive.contactInformation.Clearance;
 import org.example.crimearchive.contactInformation.Email;
 import org.springframework.security.core.GrantedAuthority;
@@ -10,7 +11,7 @@ import java.util.Collection;
 import java.util.List;
 
 @Entity
-public class Aina {
+public class Aina extends Auditable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

@@ -1,6 +1,6 @@
 package org.example.crimearchive.controllers;
 
-import org.example.crimearchive.DTO.Polis.DTOUpdateProfile;
+import org.example.crimearchive.dto.police.DTOUpdateProfile;
 import org.example.crimearchive.cases.Cases;
 import org.example.crimearchive.polis.Account;
 import org.junit.jupiter.api.Test;
@@ -86,13 +86,14 @@ public class ProfileControllerTests extends IntegrationBaseTest{
     }
 
     @Test
-    void userWithoutCaseAccessCannotViewCaseoverview() throws Exception{
+    void userWithoutCaseAccessCanViewCaseoverviewButRedacted() throws Exception {
         Account caseAccess = createAndSaveTestUser("user","user");
         Cases testCase = createCaseAndSave();
 
         mockMvc.perform(get("/caseoverview")
                 .with(user(caseAccess))
                 .param("casenumber", testCase.getCaseNumber()))
-                .andExpect(status().isForbidden());
+                .andExpect(status().isOk())
+                .andExpect(model().attribute("canAdd", false));
     }
 }

@@ -1,4 +1,4 @@
-package org.example.crimearchive.DTO;
+package org.example.crimearchive.dto;
 
 import java.util.UUID;
 

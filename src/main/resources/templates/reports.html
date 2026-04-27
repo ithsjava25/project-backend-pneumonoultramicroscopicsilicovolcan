@@ -245,58 +245,52 @@
         return list.some(f => f.name === file.name && f.size === file.size);
     }
 
-    function renderList(label, filesArray, type) {
-        const section = document.createElement("div");
-        section.classList.add("evidence-section");
-
-        const title = document.createElement("strong");
-        title.textContent = label;
-        section.appendChild(title);
-
-        const list = document.createElement("ul");
-
-        filesArray.forEach((file, index) => {
-            const li = document.createElement("li");
-
-            const text = document.createElement("span");
-            text.textContent = file.name;
-
-            const removeBtn = document.createElement("button");
-            removeBtn.textContent = "❌";
-            removeBtn.style.marginLeft = "10px";
-            removeBtn.type = "button";
-            removeBtn.setAttribute("aria-label", `Ta bort ${file.name}`);
-
-            removeBtn.onclick = () => {
-                if (type === "file") {
-                    selectedFiles.splice(index, 1);
-                    updateInput(fileInput, selectedFiles);
-                } else {
-                    selectedImages.splice(index, 1);
-                    updateInput(imageInput, selectedImages);
-                }
-                renderAll();
-            };
-
-            li.appendChild(text);
-            li.appendChild(removeBtn);
-            list.appendChild(li);
-        });
-
-        section.appendChild(list);
-        return section;
-    }
-
     function renderAll() {
         evidenceList.innerHTML = "";
 
-        if (selectedFiles.length > 0) {
-            evidenceList.appendChild(renderList("Filer:", selectedFiles, "file"));
-        }
+        [
+            { filesArray: selectedFiles, label: "Fil", type: "file" },
+            { filesArray: selectedImages, label: "Bild", type: "image" }
+        ].forEach(({ filesArray, label, type }) => {
+            filesArray.forEach((file, index) => {
+                const row = document.createElement("div");
+                row.className = "evidence-row";
 
-        if (selectedImages.length > 0) {
-            evidenceList.appendChild(renderList("Bilder:", selectedImages, "image"));
-        }
+                const meta = document.createElement("div");
+                meta.className = "file-meta";
+
+                const name = document.createElement("span");
+                name.className = "file-name";
+                name.textContent = file.name;
+
+                const info = document.createElement("span");
+                info.className = "file-type";
+                info.textContent = label + " · " + (file.size / 1024).toFixed(1) + " KB";
+
+                meta.appendChild(name);
+                meta.appendChild(info);
+                row.appendChild(meta);
+
+                const removeBtn = document.createElement("button");
+                removeBtn.textContent = "Ta bort";
+                removeBtn.type = "button";
+                removeBtn.className = "btn btn-danger btn-sm";
+                removeBtn.setAttribute("aria-label", `Ta bort ${file.name}`);
+                removeBtn.onclick = () => {
+                    if (type === "file") {
+                        selectedFiles.splice(index, 1);
+                        updateInput(fileInput, selectedFiles);
+                    } else {
+                        selectedImages.splice(index, 1);
+                        updateInput(imageInput, selectedImages);
+                    }
+                    renderAll();
+                };
+
+                row.appendChild(removeBtn);
+                evidenceList.appendChild(row);
+            });
+        });
     }
 
     fileInput.addEventListener("change", () => {

@@ -1,4 +1,4 @@
-package org.example.crimearchive.DTO.Golare;
+package org.example.crimearchive.dto.informant;
 
 import jakarta.validation.constraints.NotBlank;
 

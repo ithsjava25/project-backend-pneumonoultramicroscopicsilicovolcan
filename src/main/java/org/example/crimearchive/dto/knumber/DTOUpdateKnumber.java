@@ -1,4 +1,4 @@
-package org.example.crimearchive.DTO.Knumber;
+package org.example.crimearchive.dto.knumber;
 
 public record DTOUpdateKnumber(
         String description

@@ -1,4 +1,4 @@
-package org.example.crimearchive.DTO.Åklagare;
+package org.example.crimearchive.dto.prosecution;
 
 import jakarta.validation.constraints.NotBlank;
 

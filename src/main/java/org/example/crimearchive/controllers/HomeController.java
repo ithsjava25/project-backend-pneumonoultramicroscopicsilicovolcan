@@ -1,7 +1,7 @@
 package org.example.crimearchive.controllers;
 
 import jakarta.validation.Valid;
-import org.example.crimearchive.DTO.CreateReport;
+import org.example.crimearchive.dto.CreateReport;
 import org.example.crimearchive.cases.CaseService;
 import org.example.crimearchive.cases.CasesRepository;
 import org.example.crimearchive.evidence.EvidenceFileService;
@@ -36,7 +36,7 @@ public class HomeController {
 
     @GetMapping("/")
     public String indexPage(Model model) {
-        return "index";
+        return "redirect:/profile";
     }
 
     @GetMapping("/reports")
@@ -91,7 +91,9 @@ public class HomeController {
                                 newReport.name(),
                                 newReport.event(),
                                 f,
-                                currentUser.getUsername()
+                                currentUser.getUsername(),
+                                newReport.witness(),
+                                newReport.victim()
                         );
                     }
                 }
@@ -106,7 +108,9 @@ public class HomeController {
                                 newReport.name(),
                                 newReport.event(),
                                 img,
-                                currentUser.getUsername()
+                                currentUser.getUsername(),
+                                newReport.witness(),
+                                newReport.victim()
                         );
                     }
                 }

@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
-public class EvidenceFileService {
+public class  EvidenceFileService {
 
     private final EvidenceFileRepository evidenceFileRepository;
     private final S3Client s3Client;
@@ -58,12 +58,24 @@ public class EvidenceFileService {
 
     public void upload(String caseNumber, String reportName, String reportEvent,
                        MultipartFile file, String uploadedBy) throws IOException {
-        upload(caseNumber, reportName, reportEvent, file, uploadedBy, null);
+        upload(caseNumber, reportName, reportEvent, file, uploadedBy, null, "", "");
+    }
+
+    public void upload(String caseNumber, String reportName, String reportEvent,
+                       MultipartFile file, String uploadedBy,
+                       String witness, String victim) throws IOException {
+        upload(caseNumber, reportName, reportEvent, file, uploadedBy, null, witness, victim);
+    }
+
+    public void upload(String caseNumber, String reportName, String reportEvent,
+                       MultipartFile file, String uploadedBy, UUID groupId) throws IOException {
+        upload(caseNumber, reportName, reportEvent, file, uploadedBy, groupId, "", "");
     }
 
     @Transactional
     public void upload(String caseNumber, String reportName, String reportEvent,
-                       MultipartFile file, String uploadedBy, UUID groupId) throws IOException {
+                       MultipartFile file, String uploadedBy, UUID groupId,
+                       String witness, String victim) throws IOException {
         String s3KeyPdf = null;
         String s3KeyFile = null;
 
@@ -72,15 +84,20 @@ public class EvidenceFileService {
             UUID resolvedGroupId = groupId;
 
             if (resolvedGroupId != null) {
-                int latest = evidenceFileRepository.findTopByGroupIdOrderByVersionDesc(resolvedGroupId)
-                        .map(EvidenceFile::getVersion)
-                        .orElse(0);
-                nextVersion = latest + 1;
+                EvidenceFile latestInGroup = evidenceFileRepository.findTopByGroupIdOrderByVersionDesc(resolvedGroupId)
+                        .orElse(null);
+                if (latestInGroup != null) {
+                    if (!latestInGroup.getCaseNumber().equals(caseNumber)) {
+                        throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                                "groupId tillhör inte ärendet: " + caseNumber);
+                    }
+                    nextVersion = latestInGroup.getVersion() + 1;
+                }
             } else {
                 resolvedGroupId = UUID.randomUUID();
             }
 
-            byte[] pdfBytes = generatePdf(reportName, reportEvent, file);
+            byte[] pdfBytes = generatePdf(caseNumber, reportName, reportEvent, witness, victim, file);
             s3KeyPdf = "cases/" + caseNumber + "/pdf/" + UUID.randomUUID() + ".pdf";
 
             s3Client.putObject(
@@ -175,21 +192,37 @@ public class EvidenceFileService {
         return history;
     }
 
+    @Transactional
+    public void deleteGroup(UUID groupId, Account currentUser) {
+        List<EvidenceFile> files = evidenceFileRepository.findByGroupIdOrderByVersionAsc(groupId);
+        if (files.isEmpty()) return;
+        requireCaseAccess(files.get(0).getCaseNumber(), currentUser);
+        for (EvidenceFile file : files) {
+            deleteS3Object(file.getS3KeyPdf());
+            deleteS3Object(file.getS3KeyFile());
+        }
+        evidenceFileRepository.deleteAll(files);
+    }
+
     private void requireCaseAccess(String caseNumber, Account currentUser) {
         if (!permissionService.canAccessCase(caseNumber, currentUser)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Åtkomst nekad till ärende: " + caseNumber);
         }
     }
 
-    private byte[] generatePdf(String reportName, String reportEvent, MultipartFile file) throws Exception {
+    private byte[] generatePdf(String caseNumber, String reportName, String reportEvent,
+                               String witness, String victim, MultipartFile file) throws Exception {
         ByteArrayOutputStream pdfStream = new ByteArrayOutputStream();
         Document document = new Document();
         PdfWriter.getInstance(document, pdfStream);
         document.open();
 
         document.add(new Paragraph("Brottsanmälan"));
-        document.add(new Paragraph("Namn: " + reportName));
-        document.add(new Paragraph("Brottstyp: " + reportEvent));
+        document.add(new Paragraph("K-nummer: " + caseNumber));
+        document.add(new Paragraph("Ansvarig polis: " + reportName));
+        document.add(new Paragraph("Brottsplats: " + reportEvent));
+        document.add(new Paragraph("Vittne: " + (witness != null && !witness.isBlank() ? witness : "-")));
+        document.add(new Paragraph("Offer: " + (victim != null && !victim.isBlank() ? victim : "-")));
         document.add(new Paragraph("Datum: " + LocalDateTime.now()));
 
         if (file != null && !file.isEmpty()) {
@@ -212,10 +245,15 @@ public class EvidenceFileService {
         return pdfStream.toByteArray();
     }
 
+    private void deleteS3Object(String key) {
+        if (key == null) return;
+        s3Client.deleteObject(DeleteObjectRequest.builder().bucket(bucket).key(key).build());
+    }
+
     private void deleteIfExists(String key) {
         if (key == null) return;
         try {
-            s3Client.deleteObject(DeleteObjectRequest.builder().bucket(bucket).key(key).build());
+            deleteS3Object(key);
         } catch (Exception ignored) {
         }
     }
