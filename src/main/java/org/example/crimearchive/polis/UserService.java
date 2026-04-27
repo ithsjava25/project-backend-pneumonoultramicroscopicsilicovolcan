@@ -1,15 +1,18 @@
 package org.example.crimearchive.polis;
 
+import org.example.crimearchive.cases.CaseLifecycleService;
 import org.example.crimearchive.dto.police.DTOCreatePolis;
 import org.example.crimearchive.dto.police.DTOUpdatePolis;
 import org.example.crimearchive.dto.police.DTOUpdateProfile;
 import org.example.crimearchive.exceptions.PasswordValidationException;
 import org.example.crimearchive.mapper.Mapper;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -17,12 +20,14 @@ import java.util.Set;
 public class UserService {
     private final UserRepository userRepository;
     private PasswordEncoder encoder;
+    private final CaseLifecycleService caseLifecycleService;
     private final Set<String> VALID_ROLES = Set.of("USER", "HANDLER", "ADMIN");
     private final int MINIMUM_PASSWORD_LENGTH = 5;
 
-    public UserService(UserRepository userRepository, PasswordEncoder encoder) {
+    public UserService(UserRepository userRepository, PasswordEncoder encoder, CaseLifecycleService caseLifecycleService) {
         this.userRepository = userRepository;
         this.encoder = encoder;
+        this.caseLifecycleService = caseLifecycleService;
     }
 
     public List<Account> getAllAccounts() {
@@ -51,11 +56,19 @@ public class UserService {
         Long accId = updatedAcc.id();
         Account dbAccount = userRepository.findById(accId).orElseThrow(() -> new RuntimeException("Inget konto funnet"));
 
+        List<String> oldRoles = dbAccount.getAuthoritesAsStringList();
+        List<String> newRoles = convertStringToListString(updatedAcc.roles());
+
         dbAccount.setFullName(updatedAcc.fullName());
         dbAccount.setUsername(updatedAcc.username());
         dbAccount.setDepartment(updatedAcc.department());
         dbAccount.setProfession(updatedAcc.profession());
-        dbAccount.setAuthorities(convertStringToListString(updatedAcc.roles()));
+        dbAccount.setAuthorities(newRoles);
+
+        if (!new HashSet<>(oldRoles).equals(new HashSet<>(newRoles))) {
+            String performedBy = SecurityContextHolder.getContext().getAuthentication().getName();
+            caseLifecycleService.onRoleChanged(accId, dbAccount.getUsername(), oldRoles, newRoles, performedBy);
+        }
 
         if (updatedAcc.password() != null && !updatedAcc.password().isBlank()) {
             if(updatedAcc.password().length() <= MINIMUM_PASSWORD_LENGTH) throw new PasswordValidationException("Lösenordet måste vara längre än 5");

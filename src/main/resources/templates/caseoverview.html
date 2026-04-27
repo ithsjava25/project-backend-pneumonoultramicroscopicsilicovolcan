@@ -203,7 +203,7 @@
                             <h2>Händelselogg</h2>
                         </div>
                     </div>
-                    <table th:if="${!#lists.isEmpty(events)}">
+                    <table>
                         <thead>
                             <tr>
                                 <th>Tid</th>
@@ -211,7 +211,7 @@
                                 <th>Utförd av</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody id="event-tbody">
                             <tr th:each="event : ${events}">
                                 <td th:text="${#temporals.format(event.createdAt, 'yyyy-MM-dd HH:mm')}"></td>
                                 <td th:text="${event.description}"></td>
@@ -219,7 +219,7 @@
                             </tr>
                         </tbody>
                     </table>
-                    <p th:if="${#lists.isEmpty(events)}">Inga händelser registrerade.</p>
+                    <p th:if="${#lists.isEmpty(events)}" id="empty-msg">Inga händelser registrerade.</p>
                 </section>
             </div>
 
@@ -256,5 +256,35 @@
         </div>
     </main>
 </div>
+<script th:inline="javascript">
+    const caseNumber = [[${rawcasenumber}]];
+    const tbody = document.querySelector('#event-tbody');
+
+    const es = new EventSource('/api/cases/' + caseNumber + '/events/stream');
+
+    es.addEventListener('case-event', function(e) {
+        const event = JSON.parse(e.data);
+        const tr = document.createElement('tr');
+        tr.style.animation = 'highlight 2s ease-out';
+        const time = new Date(event.createdAt).toLocaleString('sv-SE', {
+            year: 'numeric', month: '2-digit', day: '2-digit',
+            hour: '2-digit', minute: '2-digit'
+        });
+        tr.innerHTML =
+            '<td>' + time + '</td>' +
+            '<td>' + event.description + '</td>' +
+            '<td>' + event.performedBy + '</td>';
+        tbody.appendChild(tr);
+        tr.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    });
+
+    es.onerror = function() { es.close(); };
+</script>
+<style>
+    @keyframes highlight {
+        from { background-color: #fffbcc; }
+        to   { background-color: transparent; }
+    }
+</style>
 </body>
 </html>

@@ -3,10 +3,12 @@ package org.example.crimearchive.cases;
 import org.example.crimearchive.permissions.PermissionService;
 import org.example.crimearchive.polis.Account;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.util.List;
 
@@ -70,6 +72,13 @@ public class CaseLifecycleController {
         List<CaseEventResponse> events = lifecycleService.getEvents(caseNumber)
                 .stream().map(CaseEventResponse::from).toList();
         return ResponseEntity.ok(events);
+    }
+
+    @GetMapping(value = "/{caseNumber}/events/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public SseEmitter streamEvents(@PathVariable String caseNumber,
+                                   @AuthenticationPrincipal Account user) {
+        requireAccess(caseNumber, user);
+        return lifecycleService.subscribe(caseNumber);
     }
 
     private void requireAccess(String caseNumber, Account user) {
