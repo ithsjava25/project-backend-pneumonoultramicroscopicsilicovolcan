@@ -9,7 +9,7 @@
 <table>
     <tbody>
     <tr th:each="report : ${reports}">
-        <td><span th:text="${report.getEvent()()}"></span></td>
+        <td><span th:text="${report.event}"></span></td>
     </tr>
     </tbody>
 </table>

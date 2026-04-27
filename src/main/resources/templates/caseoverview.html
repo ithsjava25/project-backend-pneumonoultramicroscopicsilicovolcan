@@ -107,31 +107,71 @@
                         </div>
                     </div>
 
-                    <div class="upload-toolbar">
-                        <button type="button"
-                                class="btn btn-secondary"
-                                th:onclick="document.getElementById('evidenceFiles').click()">
-                            Lägg till filer
-                        </button>
+                    <form method="post" th:action="@{/caseoverview/upload}" enctype="multipart/form-data">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                        <input type="hidden" name="casenumber" th:value="${rawcasenumber}">
+                        <input type="file" id="evidenceFiles" name="files" multiple hidden>
+                        <input type="file" id="evidenceImages" name="images" accept="image/*" multiple hidden>
 
-                        <button type="button"
-                                class="btn btn-secondary"
-                                onclick="document.getElementById('evidenceImages').click()">
-                            Lägg till bilder
-                        </button>
+                        <div class="upload-toolbar">
+                            <button type="button" class="btn btn-secondary"
+                                    onclick="document.getElementById('evidenceFiles').click()">
+                                Lägg till filer
+                            </button>
+                            <button type="button" class="btn btn-secondary"
+                                    onclick="document.getElementById('evidenceImages').click()">
+                                Lägg till bilder
+                            </button>
+                            <button type="submit" id="uploadSubmit" class="btn btn-primary" style="display:none">
+                                Ladda upp
+                            </button>
+                        </div>
+
+                        <div id="pendingFiles" class="evidence-list"></div>
+                    </form>
+
+                    <div class="evidence-list" th:if="${not #lists.isEmpty(evidenceFiles)}" style="margin-top: 8px;">
+                        <div th:each="ef : ${evidenceFiles}" class="evidence-row">
+                            <div class="file-meta">
+                                <span class="file-name"
+                                      th:text="${ef.originalFilename != null ? ef.originalFilename : 'Okänd fil'}">
+                                </span>
+                                <span class="file-type"
+                                      th:text="|Uppladdad av ${ef.uploadedBy} · ${#temporals.format(ef.uploadedAt, 'yyyy-MM-dd HH:mm')}|">
+                                </span>
+                            </div>
+                            <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+                                <a th:href="@{/evidence/{id}/pdf(id=${ef.id})}"
+                                   class="btn btn-secondary btn-sm" target="_blank">PDF</a>
+                                <a th:if="${ef.s3KeyFile != null}"
+                                   th:href="@{/evidence/{id}/file(id=${ef.id})}"
+                                   class="btn btn-secondary btn-sm" target="_blank">Fil</a>
+
+                                <form method="post" th:action="@{/caseoverview/replace}"
+                                      enctype="multipart/form-data" style="display:inline">
+                                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                                    <input type="hidden" name="casenumber" th:value="${rawcasenumber}">
+                                    <input type="hidden" name="groupId" th:value="${ef.groupId}">
+                                    <input type="file" name="file" th:id="'replace_' + ${ef.groupId}" hidden
+                                           onchange="this.form.submit()">
+                                    <label th:for="'replace_' + ${ef.groupId}"
+                                           class="btn btn-secondary btn-sm" style="cursor:pointer;margin:0">Ersätt</label>
+                                </form>
+
+                                <form method="post" th:action="@{/caseoverview/delete}" style="display:inline">
+                                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                                    <input type="hidden" name="casenumber" th:value="${rawcasenumber}">
+                                    <input type="hidden" name="groupId" th:value="${ef.groupId}">
+                                    <button type="submit" class="btn btn-danger btn-sm"
+                                            onclick="return confirm('Ta bort filen permanent?')">Ta bort</button>
+                                </form>
+                            </div>
+                        </div>
                     </div>
-                    <table>
-                        <th:block th:each="report : ${reportList}">
-                            <tr>
-                                <th class="file-name" th:text="${report.getEvent()}"></th>
-                            </tr>
-                            <tr class="table description">
-                                <td>
-                                    <span class="file-type">Beskrivning i text, eller om det är en pdf/bild -&gt; länk</span>
-                                </td>
-                            </tr>
-                        </th:block>
-                    </table>
+                    <p th:if="${#lists.isEmpty(evidenceFiles)}"
+                       style="color: var(--muted); font-size: 0.95rem; margin-top: 8px;">
+                        Inga filer uppladdade ännu.
+                    </p>
                 </section>
             </div>
 
@@ -254,5 +294,24 @@
         </div>
     </main>
 </div>
+<script>
+    function trackFiles(input, label) {
+        var pending = document.getElementById('pendingFiles');
+        var btn = document.getElementById('uploadSubmit');
+        Array.from(input.files).forEach(function(f) {
+            var row = document.createElement('div');
+            row.className = 'evidence-row';
+            row.innerHTML =
+                '<div class="file-meta">' +
+                '<span class="file-name">' + f.name + '</span>' +
+                '<span class="file-type">' + label + ' · ' + (f.size / 1024).toFixed(1) + ' KB</span>' +
+                '</div>';
+            pending.appendChild(row);
+        });
+        if (pending.children.length > 0) btn.style.display = '';
+    }
+    document.getElementById('evidenceFiles').addEventListener('change', function() { trackFiles(this, 'Fil'); });
+    document.getElementById('evidenceImages').addEventListener('change', function() { trackFiles(this, 'Bild'); });
+</script>
 </body>
 </html>

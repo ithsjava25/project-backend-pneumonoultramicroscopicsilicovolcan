@@ -175,6 +175,18 @@ public class EvidenceFileService {
         return history;
     }
 
+    @Transactional
+    public void deleteGroup(UUID groupId, Account currentUser) {
+        List<EvidenceFile> files = evidenceFileRepository.findByGroupIdOrderByVersionAsc(groupId);
+        if (files.isEmpty()) return;
+        requireCaseAccess(files.get(0).getCaseNumber(), currentUser);
+        for (EvidenceFile file : files) {
+            deleteIfExists(file.getS3KeyPdf());
+            deleteIfExists(file.getS3KeyFile());
+        }
+        evidenceFileRepository.deleteAll(files);
+    }
+
     private void requireCaseAccess(String caseNumber, Account currentUser) {
         if (!permissionService.canAccessCase(caseNumber, currentUser)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Åtkomst nekad till ärende: " + caseNumber);
