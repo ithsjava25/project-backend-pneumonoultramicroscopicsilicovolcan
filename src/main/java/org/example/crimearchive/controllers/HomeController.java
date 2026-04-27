@@ -7,8 +7,6 @@ import org.example.crimearchive.cases.CasesRepository;
 import org.example.crimearchive.evidence.EvidenceFileService;
 import org.example.crimearchive.polis.Account;
 import org.example.crimearchive.reports.ReportService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -18,11 +16,11 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
+import java.util.List;
 
 @Controller
 public class HomeController {
 
-    Logger log = LoggerFactory.getLogger(HomeController.class);
     private final ReportService reportService;
     private final EvidenceFileService evidenceFileService;
     private final CaseService caseService;
@@ -42,39 +40,85 @@ public class HomeController {
     }
 
     @GetMapping("/reports")
-    public String privatePage(@AuthenticationPrincipal Account user, Model model) {
-        model.addAttribute("newReport", new CreateReport());
-        return "registerreport";
+    public String privatePage(@AuthenticationPrincipal Account currentUser, Model model) {
+
+        CreateReport report = new CreateReport("", "", "", "", "");
+
+        model.addAttribute("newReport", report);
+        model.addAttribute("currentUser", currentUser);
+        model.addAttribute("reports", reportService.getAllReports());
+
+        model.addAttribute("assigncasebutton",
+                currentUser.getAuthorities().stream()
+                        .anyMatch(a -> a.getAuthority().equals("ROLE_HANDLER")));
+
+        model.addAttribute("accountoverview",
+                currentUser.getAuthorities().stream()
+                        .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN")));
+
+        return "reports";
     }
 
     @GetMapping("/userpage")
     public String userPage(@AuthenticationPrincipal Account user, Model model) {
         model.addAttribute("reportAmount", reportService.getAmount());
+        model.addAttribute("reports", reportService.getAllReports());
         return "userpage";
     }
 
-    @PostMapping("/reports/add")
+    @PostMapping("/reports")
     public String saveReport(
             @ModelAttribute("newReport") @Valid CreateReport newReport,
             BindingResult bindingResult,
-            @RequestParam(required = false) MultipartFile file,
-            @AuthenticationPrincipal Account currentUser) {
+            @RequestParam(required = false) List<MultipartFile> files,
+            @RequestParam(required = false) List<MultipartFile> images,
+            @AuthenticationPrincipal Account currentUser,
+            Model model) {
 
         if (bindingResult.hasErrors()) {
-            log.info("Binding Error: {}", bindingResult.getAllErrors().getLast());
-            return "registerreport";
+            populateReportsModel(model, currentUser);
+            return "reports";
         }
 
         try {
             String caseNumber = reportService.saveReport(newReport, currentUser);
-            evidenceFileService.upload(caseNumber, newReport.name(), newReport.event(),
-                    file, currentUser.getUsername());
+
+            if (files != null) {
+                for (MultipartFile f : files) {
+                    if (!f.isEmpty()) {
+                        evidenceFileService.upload(
+                                caseNumber,
+                                newReport.name(),
+                                newReport.event(),
+                                f,
+                                currentUser.getUsername()
+                        );
+                    }
+                }
+            }
+
+            if (images != null) {
+                for (MultipartFile img : images) {
+
+                    if (!img.isEmpty()) {
+                        evidenceFileService.upload(
+                                caseNumber,
+                                newReport.name(),
+                                newReport.event(),
+                                img,
+                                currentUser.getUsername()
+                        );
+                    }
+                }
+            }
+
         } catch (Exception e) {
-            log.error("Fel vid sparande av rapport", e);
-            return "registerreport";
+            populateReportsModel(model, currentUser);
+            model.addAttribute("errorMessage", "Något gick fel vid sparande");
+            return "reports";
         }
 
-        return "redirect:/userpage";
+        return "redirect:/reports";
     }
 
     @GetMapping("/403")
@@ -83,5 +127,18 @@ public class HomeController {
         model.addAttribute("title", "Åtkomst nekad");
         model.addAttribute("message", "Du saknar rättigheter för att visa denna sida.");
         return "error/error";
+    }
+
+    private void populateReportsModel(Model model, Account currentUser) {
+        model.addAttribute("currentUser", currentUser);
+        model.addAttribute("reports", reportService.getAllReports());
+
+        model.addAttribute("assigncasebutton",
+                currentUser.getAuthorities().stream()
+                        .anyMatch(a -> a.getAuthority().equals("ROLE_HANDLER")));
+
+        model.addAttribute("accountoverview",
+                currentUser.getAuthorities().stream()
+                        .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN")));
     }
 }

@@ -49,7 +49,14 @@ public class ReportService {
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Case not found: " + sanitized));
         }
 
-        Report newReport = new Report(UUID.randomUUID(), report.name(), report.event(), cases);
+        Report newReport = new Report(
+                UUID.randomUUID(),
+                report.name(),
+                report.event(),
+                report.witness(),
+                report.victim(),
+                cases
+        );
         reportRepository.save(newReport);
         return cases.getCaseNumber();
     }

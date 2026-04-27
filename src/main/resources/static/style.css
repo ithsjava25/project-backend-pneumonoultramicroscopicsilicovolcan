@@ -485,6 +485,12 @@ textarea {
     background: #ffffff;
 }
 
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: -8px;
+}
+
 /* Gör sektionen blekare och hindrar klick */
 .locked {
     opacity: 0.6;
