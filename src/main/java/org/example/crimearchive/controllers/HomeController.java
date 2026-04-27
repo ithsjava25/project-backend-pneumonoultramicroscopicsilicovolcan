@@ -91,7 +91,9 @@ public class HomeController {
                                 newReport.name(),
                                 newReport.event(),
                                 f,
-                                currentUser.getUsername()
+                                currentUser.getUsername(),
+                                newReport.witness(),
+                                newReport.victim()
                         );
                     }
                 }
@@ -106,7 +108,9 @@ public class HomeController {
                                 newReport.name(),
                                 newReport.event(),
                                 img,
-                                currentUser.getUsername()
+                                currentUser.getUsername(),
+                                newReport.witness(),
+                                newReport.victim()
                         );
                     }
                 }
