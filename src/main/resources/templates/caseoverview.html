@@ -24,7 +24,12 @@
         </div>
 
         <div class="topbar-user">
-            <div th:if="${assigncasebutton}">
+            <div th:if="${accountoverview}">
+                <form th:action="@{/accounts}" method="get">
+                    <button class="user-chip" type="submit" style="cursor: pointer">Konto översikt</button>
+                </form>
+            </div>
+            <div th:if="${isHandler}">
                 <form th:action="@{/cases}" method="get">
                     <button class="user-chip" type="submit" style="cursor: pointer">Tilldelning</button>
                 </form>
@@ -210,7 +215,7 @@
                         <span>Majorna</span>
                         </div>
                         <div th:if="${!canAdd}">
-                            <spa>**********</spa>
+                            <span>**********</span>
                         </div>
                     </div>
                 </section>
@@ -236,7 +241,7 @@
                                 <th>Utförd av</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody id="event-table-body">
                             <tr th:each="event : ${events}">
                                 <td th:text="${#temporals.format(event.createdAt, 'yyyy-MM-dd HH:mm')}"></td>
                                 <td th:text="${event.description}"></td>
@@ -256,7 +261,7 @@
                             <h2>Kommentarer</h2>
                         </div>
                     </div>
-                    <div th:if="${!#lists.isEmpty(comments)}">
+                    <div th:if="${!#lists.isEmpty(comments)}" id="comments-container">
                         <div th:each="comment : ${comments}" style="padding: 8px 0; border-bottom: 1px solid #eee;">
                             <div>
                                 <strong th:text="${comment.author}"></strong>
@@ -281,10 +286,47 @@
         </div>
     </main>
 </div>
-<script>
-    setTimeout(function () {
-        location.reload();
-    }, 30000);
+<script th:inline="javascript">
+    document.addEventListener('DOMContentLoaded', function() {
+        // Hämta casenumber från det dolda fältet i ditt formulär
+        const casenumberInput = document.querySelector('input[name="casenumber"]');
+
+        if (!casenumberInput) {
+            console.warn("Kunde inte hitta casenumber för auto-uppdatering.");
+            return;
+        }
+
+        const casenumber = casenumberInput.value;
+        const updateUrl = window.location.pathname + "?casenumber=" + casenumber;
+
+        function updateDataSectors() {
+            if (document.activeElement.id === 'commentContent') return;
+
+            fetch(updateUrl)
+                .then(response => response.text())
+                .then(html => {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+
+                    const newEvents = doc.querySelector('#event-table-body');
+                    const currentEvents = document.querySelector('#event-table-body');
+                    if (newEvents && currentEvents) {
+                        currentEvents.innerHTML = newEvents.innerHTML;
+                    }
+
+                    const newComments = doc.querySelector('#comments-container');
+                    const currentComments = document.querySelector('#comments-container');
+                    if (newComments && currentComments) {
+                        currentComments.innerHTML = newComments.innerHTML;
+                    }
+
+                })
+                .catch(err => console.error("Kunde inte uppdatera loggar:", err));
+        }
+
+        setInterval(updateDataSectors, 15000);
+    });
 </script>
 </body>
 </html>
+

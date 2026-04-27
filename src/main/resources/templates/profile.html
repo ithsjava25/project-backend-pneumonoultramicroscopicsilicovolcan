@@ -68,7 +68,7 @@
                     </thead>
                     <tbody>
                     <tr th:if="${cases.isEmpty()}">
-                        <td colspan="2">Inga befogade fall</td>
+                        <td colspan="3">Inga befogade fall</td>
                     </tr>
                     <tr th:each="entry : ${cases}">
                         <td><span th:text="${entry.key}"></span></td>
@@ -94,7 +94,7 @@
                     </thead>
                     <tbody>
                     <tr th:if="${searchCases == null || searchCases.isEmpty()}">
-                        <td colspan="3">Inga fall tillgängliga</td>
+                        <td colspan="4">Inga fall tillgängliga</td>
                     </tr>
                     <tr th:each="cases : ${searchCases}">
                         <td>
@@ -153,10 +153,5 @@
             });
         });
     });
-</script>
-<script>
-    setTimeout(function () {
-        location.reload();
-    }, 30000);
 </script>
 </html>

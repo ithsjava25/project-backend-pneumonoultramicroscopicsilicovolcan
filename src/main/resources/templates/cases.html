@@ -59,8 +59,10 @@
                 <td th:text="${case.getCaseNumber()}"></td>
                 <td th:text="${case.getStatus()}"></td>
                 <td>
-                    <ul th:each="police : ${case.getAccounts()}">
-                        <li th:text="${police.getFullName()}"></li>
+                    <ul>
+                        <li th:each="police : ${case.getAccounts()}">
+                            <span th:text="${police.getFullName()}"> </span>
+                        </li>
                     </ul>
                 </td>
                 <td>
