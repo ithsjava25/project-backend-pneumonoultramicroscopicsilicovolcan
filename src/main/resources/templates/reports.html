@@ -94,35 +94,38 @@
 
                 <div class="report-column">
                     <section class="card">
+
                         <div class="card-header">
                             <div>
                                 <span class="card-kicker">Ärende</span>
-                                <h2>K-nummer & Polis</h2>
+                                <h2>Rapportera händelse</h2>
                             </div>
                         </div>
 
-                        <div class="field-grid">
-                            <div class="form-field">
-                                <label for="caseNumber">K-nummer</label>
-                                <input id="caseNumber"
-                                       type="text"
-                                       value="Genereras automatiskt"
-                                       readonly>
-                            </div>
-                            <div class="form-field">
-                                <label for="policeOfficer">Polis</label>
-                                <input id="policeOfficer"
-                                       th:field="*{name}"
-                                       type="text"
-                                       placeholder="Ange polis"
-                                       th:classappend="${#fields.hasErrors('name')} ? 'input-error'">
+                        <div class="form-field compact">
+                            <label for="caseNumber" class="subtle-label">K-nummer</label>
+                            <input id="caseNumber"
+                                   type="text"
+                                   value="Genereras automatiskt"
+                                   readonly
+                                   class="input-muted">
+                        </div>
 
-                                <div th:if="${#fields.hasErrors('name')}"
-                                     th:errors="*{name}"
-                                     class="error-text">
-                                </div>
+                        <div class="form-field">
+                            <label for="name">Beskriv ärende</label>
+                            <textarea id="name"
+                                      th:field="*{name}"
+                                      rows="6"
+                                      placeholder="Beskriv ärendet i fritext..."
+                                      th:classappend="${#fields.hasErrors('name')} ? 'input-error'">
+    </textarea>
+
+                            <div th:if="${#fields.hasErrors('name')}"
+                                 th:errors="*{name}"
+                                 class="error-text">
                             </div>
                         </div>
+
                     </section>
 
                     <section class="card">
@@ -201,11 +204,11 @@
                         </div>
 
                         <div class="form-field">
-                            <label for="crimeScene">Brottsplats</label>
+                            <label for="crimeScene">Adress eller plats</label>
                             <input id="crimeScene"
                                    th:field="*{event}"
                                    type="text"
-                                   placeholder="Ange brottsplats"
+                                   placeholder="Ange adress, område eller plats"
                                    th:classappend="${#fields.hasErrors('event')} ? 'input-error'">
 
                             <div th:if="${#fields.hasErrors('event')}"
@@ -249,9 +252,9 @@
         evidenceList.innerHTML = "";
 
         [
-            { filesArray: selectedFiles, label: "Fil", type: "file" },
-            { filesArray: selectedImages, label: "Bild", type: "image" }
-        ].forEach(({ filesArray, label, type }) => {
+            {filesArray: selectedFiles, label: "Fil", type: "file"},
+            {filesArray: selectedImages, label: "Bild", type: "image"}
+        ].forEach(({filesArray, label, type}) => {
             filesArray.forEach((file, index) => {
                 const row = document.createElement("div");
                 row.className = "evidence-row";
